@@ -17,9 +17,11 @@ for f in bin build out; do
 done
 
 lint() {
-    echo "$1"
-    # hlint "$1"
-    hindent --indent-size 4 --sort-imports --line-length 78 "$1"
+    hlint "$1"
+    for f in "$1"/*.hs; do
+        echo "$f"
+        hindent --indent-size 4 --sort-imports --line-length 78 "$f"
+    done
     echo ""
 }
 

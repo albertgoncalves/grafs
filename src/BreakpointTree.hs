@@ -1,7 +1,6 @@
 {-# LANGUAGE Strict #-}
 
 -- https://github.com/SimplyNaOH/voronoi/blob/master/src/BreakpointTree.hs
-
 module BreakpointTree
     ( BTree(..)
     , Breakpoint(..)

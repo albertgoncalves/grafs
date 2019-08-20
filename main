@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -eu
+
+cd "$WD/build"
+for f in src/BreakpointTree.hs src/Fortune.hs src/Main.hs; do
+    cp "$WD/$f" ./
+done
+ghc -Wall BreakpointTree.hs Fortune.hs Main.hs -o "$WD/bin/Main"
+
+"$WD/bin/Main"

@@ -1,29 +1,28 @@
 {-# LANGUAGE StrictData #-}
 
 -- https://github.com/SimplyNaOH/voronoi/blob/master/src/Fortune.hs
-
 module Fortune
     ( voronoi
     , Edge'(..)
+    , Point'(..)
     ) where
 
 import BreakpointTree
 
 -- import Control.Monad (join, liftM)
-
 import Data.List (sortOn)
 import Data.Maybe (catMaybes, maybeToList)
 
 import qualified Data.Vector as V
--- import qualified Data.Vector.Unboxed as VU
 
+-- import qualified Data.Vector.Unboxed as VU
 import qualified Data.Map.Strict as Map
 import Data.Map.Strict (Map)
 
 import qualified Data.HashPSQ as PSQ
 import Data.HashPSQ (HashPSQ)
 
-import Prelude hiding (succ, map)
+import Prelude hiding (map, succ)
 
 type Index = Int
 
