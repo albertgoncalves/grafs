@@ -48,8 +48,9 @@ def relative_neighborhoods(points):
     return edges
 
 
-def plot(edges, filename):
+def plot(points, edges, filename):
     _, ax = subplots(figsize=(8, 8))
+    ax.scatter(*zip(*points))
     for edge in edges:
         a = edge[0]
         b = edge[1]
@@ -63,13 +64,28 @@ def plot(edges, filename):
 
 
 def main():
-    seed(1)
-    radius = 1
-    plot(
-        relative_neighborhoods([point(radius) for _ in range(200)]),
-        "{}/out/main.png".format(environ["WD"]),
-    )
-
+    # seed(1)
+    # radius = 1
+    # plot(
+    #     relative_neighborhoods([point(radius) for _ in range(200)]),
+    #     "{}/out/main.png".format(environ["WD"]),
+    # )
+    points = [
+        (1.0, 0.0),
+        (0.5, 0.25),
+        (0.0, 1.0),
+        (0.75, 0.65),
+        (0.9, 0.45),
+        (0.3, 0.7),
+    ]
+    edges = [
+        ((0.7812, 0.1875), (0.6613, 0.4273)),
+        ((0.6613, 0.4272), (0.5081, 0.5230)),
+        ((0.5081, 0.5230), (-0.7250,-2.5e-2)),
+        ((0.5081, 0.5230), (0.5937, 1.2937)),
+        ((-0.7250, -2.5e-2), (0.5937, 1.2937)),
+    ]
+    plot(points, edges, "{}/out/verify_hs.png".format(environ["WD"]))
 
 if __name__ == "__main__":
     main()
