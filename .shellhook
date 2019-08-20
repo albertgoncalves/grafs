@@ -13,3 +13,5 @@ WD=$(pwd)
 if [ ! -d "$WD/out" ]; then
     mkdir "$WD/out"
 fi
+
+alias flake8="flake8 --ignore=E722"

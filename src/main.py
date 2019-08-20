@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 
-from math import sqrt
+from math import cos, pi, sin, sqrt
 from os import environ
 from random import random, seed
 
 from matplotlib.pyplot import close, savefig, subplots, tight_layout
 
+PI2 = pi * 2
 
-def point():
-    return (random(), random())
+
+def point(radius):
+    a = random() * PI2
+    r = radius * sqrt(random())
+    return (r * cos(a), r * sin(a))
 
 
 def distance(ax, ay, bx, by):
@@ -47,7 +51,11 @@ def relative_neighborhoods(points):
 def plot(edges, filename):
     _, ax = subplots(figsize=(8, 8))
     for edge in edges:
-        ax.plot([edge[0][0], edge[1][0]], [edge[0][1], edge[1][1]], color="k")
+        a = edge[0]
+        b = edge[1]
+        x = (a[0], b[0])
+        y = (a[1], b[1])
+        ax.plot(x, y, lw=0.85)
     ax.set_aspect("equal")
     tight_layout()
     savefig(filename)
@@ -56,8 +64,9 @@ def plot(edges, filename):
 
 def main():
     seed(1)
+    radius = 1
     plot(
-        relative_neighborhoods([point() for _ in range(300)]),
+        relative_neighborhoods([point(radius) for _ in range(200)]),
         "{}/out/main.png".format(environ["WD"]),
     )
 
