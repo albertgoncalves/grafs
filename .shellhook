@@ -10,8 +10,17 @@ fi
 export WD
 WD=$(pwd)
 
-if [ ! -d "$WD/out" ]; then
-    mkdir "$WD/out"
-fi
+for f in bin build out; do
+    if [ ! -d "$WD/$f" ]; then
+        mkdir "$WD/$f"
+    fi
+done
+
+lint() {
+    echo "$1"
+    # hlint "$1"
+    hindent --indent-size 4 --sort-imports --line-length 78 "$1"
+    echo ""
+}
 
 alias flake8="flake8 --ignore=E722"

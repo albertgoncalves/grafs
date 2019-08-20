@@ -4,3 +4,4 @@
 !.shellhook
 !src/
 !*.py
+!*.hs
