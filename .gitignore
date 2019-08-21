@@ -3,6 +3,7 @@
 !shell.nix
 !.shellhook
 !src/
-!*.py
 !*.hs
+!scripts/
+!*.py
 !main
