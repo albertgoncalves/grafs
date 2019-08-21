@@ -38,9 +38,8 @@ data BTree
 nilEnd :: Breakpoint -> BTree
 nilEnd x = Node Nil x Nil
 
-{-  > intersection f1 f2 d
-    Find the intersection between the parabolas with focus /f1/ and /f2/ and
-    directrix /d/.  -}
+{-  Find the intersection between the parabolas with focus `f1` and `f2` and
+    directrix `d`. -}
 intersection :: Point -> Point -> Double -> Double
 intersection (P _ f1x f1y) (P _ f2x f2y) d =
     if abs (f1y - f2y) < 0.0000001

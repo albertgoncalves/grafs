@@ -77,9 +77,9 @@ setVert p EmptyEdge = IEdge p
 setVert p (IEdge p') = Edge p' p
 setVert _ (Edge _ _) = undefined
 
-{-  Returns (Just) the (center, radius) of the circle defined by three given
+{-  Returns `Just (center, radius)` of the circle defined by three given
     points.
-    If the points are colinear or counter clockwise, it returns Nothing. -}
+    If the points are colinear or counter clockwise, it returns `Nothing`. -}
 circleFrom3Points :: Point -> Point -> Point -> Maybe (Point', Double)
 circleFrom3Points (P _ x1 y1) (P _ x2 y2) (P _ x3 y3) =
     if denominator <= 0
@@ -197,8 +197,8 @@ processEvent state
         | (PSQ.null . circleEvents . events) state = False
         | otherwise = nextCircleY <= nextPointY
 
-{-  voronoi takes a Vector of pairs of Double(s) and returns a Vector of
-    Edge(s) representing the corresponding voronoi diagram.  -}
+{-  voronoi takes a `Vector` of pairs of `Double` and returns a `Vector` of
+    `Edge` representing the corresponding voronoi diagram. -}
 voronoi :: [Point'] -> [Edge']
 voronoi = go . mkState
   where
