@@ -55,9 +55,9 @@ nilEnd x = Node Nil x Nil
 
 -- | 'evalParabola focus directrix x' evaluates the parabola defined by the
 -- focus and directrix at x
-evalParabola :: Point -> Double -> Double -> Double
-evalParabola (P _ fx fy) d x =
-    (fx * fx - 2 * fx * x + fy * fy - d * d + x * x) / (2 * fy - 2 * d)
+-- evalParabola :: Point -> Double -> Double -> Double
+-- evalParabola (P _ fx fy) d x =
+--     (fx * fx - 2 * fx * x + fy * fy - d * d + x * x) / (2 * fy - 2 * d)
 
 {- |
     > intersection f1 f2 d
@@ -91,7 +91,7 @@ insertPar p@(P _ x _) d (Node Nil b Nil)
     | x < updated = (Node (Node Nil newl (nilEnd newl')) b Nil, Left b)
     | otherwise = (Node Nil b (Node Nil newr (nilEnd newr')), Right b)
   where
-    Breakpoint pl@(P i _ _) pr@(P j _ _) = b
+    Breakpoint pl@(P _ _ _) pr@(P _ _ _) = b
     updated = intersection pl pr d
     newl = Breakpoint pl p
     newl' = Breakpoint p pl
@@ -109,7 +109,7 @@ insertPar p@(P _ x _) d (Node l b Nil)
     | x < updated = first (flip (flip Node b) Nil) $ insertPar p d l
     | otherwise = (Node l b $ Node Nil newr (nilEnd newr'), Right b)
   where
-    Breakpoint pl pr@(P j _ _) = b
+    Breakpoint pl pr@(P _ _ _) = b
     updated = intersection pl pr d
     newr = Breakpoint pr p
     newr' = Breakpoint p pr
@@ -129,6 +129,7 @@ tail' (Node l b r) = Node (tail' l) b r
 leftistElement :: BTree -> Breakpoint
 leftistElement (Node Nil b _) = b
 leftistElement (Node l _ _) = leftistElement l
+leftistElement Nil = undefined
 
 rightestElement :: BTree -> Breakpoint
 rightestElement (Node _ b Nil) = b

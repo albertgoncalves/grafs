@@ -149,9 +149,9 @@ processCircleEvent state
         newBreak = Breakpoint pi pk
         newBTree = joinPairAt (fst p) bl br d d' bTree
   -- process events
-        prevB@(Breakpoint prev@(P previ _ _) (P prevj _ _)) =
+        Breakpoint prev@(P previ _ _) (P prevj _ _) =
             inOrderPredecessor bl d' bTree
-        nextB@(Breakpoint (P nexti _ _) next@(P nextj _ _)) =
+        Breakpoint (P nexti _ _) next@(P nextj _ _) =
             inOrderSuccessor br d' bTree
         newCEvents'
             | previ == 0 && prevj == 0 = maybeToList $ circleEvent pi pk next
@@ -177,7 +177,7 @@ processCircleEvent state
             foldr (Map.adjust (setVert p)) (edges state) edgesToUpdate
         newEdges =
             Map.insert (sortPair (pindex pi) (pindex pk)) newEdge updatedEdges
-        pretty (a, b, c) = (pindex a, pindex b, pindex c)
+        -- pretty (a, b, c) = (pindex a, pindex b, pindex c)
      in state
             { breaks = newBTree
             , events = newEvents
@@ -272,7 +272,7 @@ voronoi points =
 mkState :: [Point'] -> State
 mkState points =
     let ps = sortOn snd points
-        newPEvents' = V.imap (\i (x, y) -> P i x y) . V.fromList $ ps
+        newPEvents' = V.imap (\i' (x, y) -> P i' x y) . V.fromList $ ps
         newPEvents = V.tail . V.tail $ newPEvents'
         p0@(P i _ _) = (newPEvents' V.! 0)
         p1@(P j _ d) = (newPEvents' V.! 1)
@@ -283,12 +283,14 @@ mkState points =
      in State (Events newPEvents PSQ.empty) firstPair firstEdge d
 
 mapToList :: Map (Index, Index) Edge -> [Edge']
-mapToList map =
-    let list' = Map.toList map
-        predicate (_, e) =
-            case e of
-                Edge _ _ -> True
-                _ -> False
-        list = filter predicate list'
-        edge' ((i, j), Edge l r) = Edge' i j l r
-     in fmap edge' list
+mapToList map = fmap edge' list
+  where
+    list' = Map.toList map
+    predicate (_, e) =
+        case e of
+            Edge _ _ -> True
+            _ -> False
+    list = filter predicate list'
+    edge' ((i, j), Edge l r) = Edge' i j l r
+    edge' ((_, _), EmptyEdge) = undefined
+    edge' ((_, _), IEdge _) = undefined
