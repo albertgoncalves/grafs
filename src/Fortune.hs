@@ -55,10 +55,10 @@ data State =
         }
 
 pindex :: Point -> Index
-pindex (P i _ _) = i
+pindex (Point i _ _) = i
 
 breakNull :: Breakpoint -> Bool
-breakNull (Breakpoint (P i _ _) (P j _ _)) = i == 0 && j == 0
+breakNull (Breakpoint (Point i _ _) (Point j _ _)) = i == 0 && j == 0
 
 pointAtLeftOf :: Breakpoint -> Point
 pointAtLeftOf (Breakpoint l _) = l
@@ -81,7 +81,7 @@ setVert _ (Edge _ _) = undefined
     points.
     If the points are colinear or counter clockwise, it returns `Nothing`. -}
 circleFrom3Points :: Point -> Point -> Point -> Maybe (Point', Double)
-circleFrom3Points (P _ x1 y1) (P _ x2 y2) (P _ x3 y3) =
+circleFrom3Points (Point _ x1 y1) (Point _ x2 y2) (Point _ x3 y3) =
     if denominator <= 0
         then Nothing
         else Just ((x, y), r)
@@ -104,7 +104,7 @@ processCircleEvent :: State -> State
 processCircleEvent state =
     state {breaks = newBTree, events = newEvents, edges = newEdges, prevd = d}
   where
-    Just (_, _, CircleEvent pi@(P i _ _) pj@(P j _ _) pk@(P k _ _) y p, cevents) =
+    Just (_, _, CircleEvent pi@(Point i _ _) pj@(Point j _ _) pk@(Point k _ _) y p, cevents) =
         PSQ.minView . circleEvents . events $ state
     events' = events state
     bTree = breaks state
@@ -113,9 +113,10 @@ processCircleEvent state =
     bl = Breakpoint pi pj
     br = Breakpoint pj pk
     newBTree = joinPairAt (fst p) bl br d d' bTree
-    Breakpoint prev@(P previ _ _) (P prevj _ _) =
+    Breakpoint prev@(Point previ _ _) (Point prevj _ _) =
         inOrderPredecessor bl d' bTree
-    Breakpoint (P nexti _ _) next@(P nextj _ _) = inOrderSuccessor br d' bTree
+    Breakpoint (Point nexti _ _) next@(Point nextj _ _) =
+        inOrderSuccessor br d' bTree
     newCEvents'
         | previ == 0 && prevj == 0 = maybeToList $ circleEvent pi pk next
         | nexti == 0 && nextj == 0 = maybeToList $ circleEvent prev pi pk
@@ -141,7 +142,7 @@ processNewPointEvent :: State -> State
 processNewPointEvent state =
     state {breaks = newBTree, events = newEvents, edges = newEdges, prevd = d}
   where
-    newp@(P idx _ d) = V.head . newPointEvents . events $ state
+    newp@(Point idx _ d) = V.head . newPointEvents . events $ state
     newPEvents = V.tail . newPointEvents . events $ state
     cEvents = circleEvents . events $ state
     events' = events state
@@ -190,7 +191,7 @@ processEvent state
             then processCircleEvent state
             else processNewPointEvent state
   where
-    (P _ _ nextPointY) = V.head . newPointEvents . events $ state
+    (Point _ _ nextPointY) = V.head . newPointEvents . events $ state
     (Just (_, nextCircleY, _)) = PSQ.findMin . circleEvents . events $ state
     nextIsCircle
         | (V.null . newPointEvents . events) state = True
@@ -213,10 +214,10 @@ mkState :: [Point'] -> State
 mkState points = State (Events newPEvents PSQ.empty) firstPair firstEdge d
   where
     ps = sortOn snd points
-    newPEvents' = V.imap (\i' (x, y) -> P i' x y) . V.fromList $ ps
+    newPEvents' = V.imap (\i' (x, y) -> Point i' x y) . V.fromList $ ps
     newPEvents = V.tail . V.tail $ newPEvents'
-    p0@(P i _ _) = newPEvents' V.! 0
-    p1@(P j _ d) = newPEvents' V.! 1
+    p0@(Point i _ _) = newPEvents' V.! 0
+    p1@(Point j _ d) = newPEvents' V.! 1
     b1 = Breakpoint p0 p1
     b2 = Breakpoint p1 p0
     firstPair = Node Nil b1 $ Node Nil b2 Nil

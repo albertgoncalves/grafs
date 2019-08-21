@@ -18,17 +18,17 @@ import Prelude hiding (pi, succ)
 type Index = Int
 
 data Point =
-    P !Index !Double !Double
+    Point !Index !Double !Double
     deriving (Show)
 
 data Breakpoint =
     Breakpoint !Point !Point
 
 instance Show Breakpoint where
-    show (Breakpoint (P i _ _) (P j _ _)) = show (i, j)
+    show (Breakpoint (Point i _ _) (Point j _ _)) = show (i, j)
 
 instance Eq Breakpoint where
-    (Breakpoint (P i _ _) (P j _ _)) == (Breakpoint (P i' _ _) (P j' _ _)) =
+    (Breakpoint (Point i _ _) (Point j _ _)) == (Breakpoint (Point i' _ _) (Point j' _ _)) =
         i == i' && j == j'
 
 data BTree
@@ -41,7 +41,7 @@ nilEnd x = Node Nil x Nil
 {-  Find the intersection between the parabolas with focus `f1` and `f2` and
     directrix `d`. -}
 intersection :: Point -> Point -> Double -> Double
-intersection (P _ f1x f1y) (P _ f2x f2y) d =
+intersection (Point _ f1x f1y) (Point _ f2x f2y) d =
     if abs (f1y - f2y) < 0.0000001
         then if f1x < f2x
                  then (f1x + f2x) / 2
@@ -63,33 +63,33 @@ insert x b' d (Node l b r)
     updated = intersection pl pr d
 
 insertPar :: Point -> Double -> BTree -> (BTree, Either Breakpoint Breakpoint)
-insertPar p@(P _ x _) d (Node Nil b Nil)
+insertPar p@(Point _ x _) d (Node Nil b Nil)
     | x < updated = (Node (Node Nil newl (nilEnd newl')) b Nil, Left b)
     | otherwise = (Node Nil b (Node Nil newr (nilEnd newr')), Right b)
   where
-    Breakpoint pl@(P _ _ _) pr@(P _ _ _) = b
+    Breakpoint pl@(Point _ _ _) pr@(Point _ _ _) = b
     updated = intersection pl pr d
     newl = Breakpoint pl p
     newl' = Breakpoint p pl
     newr = Breakpoint pr p
     newr' = Breakpoint p pr
-insertPar p@(P _ x _) d (Node Nil b r)
+insertPar p@(Point _ x _) d (Node Nil b r)
     | x < updated = (Node (Node Nil newl (nilEnd newl')) b r, Left b)
     | otherwise = first (Node Nil b) $ insertPar p d r
   where
-    Breakpoint pl@(P _ _ _) pr = b
+    Breakpoint pl@(Point _ _ _) pr = b
     updated = intersection pl pr d
     newl = Breakpoint pl p
     newl' = Breakpoint p pl
-insertPar p@(P _ x _) d (Node l b Nil)
+insertPar p@(Point _ x _) d (Node l b Nil)
     | x < updated = first (flip (flip Node b) Nil) $ insertPar p d l
     | otherwise = (Node l b $ Node Nil newr (nilEnd newr'), Right b)
   where
-    Breakpoint pl pr@(P _ _ _) = b
+    Breakpoint pl pr@(Point _ _ _) = b
     updated = intersection pl pr d
     newr = Breakpoint pr p
     newr' = Breakpoint p pr
-insertPar p@(P _ x _) d (Node l b r)
+insertPar p@(Point _ x _) d (Node l b r)
     | x < updated = first (flip (flip Node b) r) $ insertPar p d l
     | otherwise = first (Node l b) $ insertPar p d r
   where
@@ -127,8 +127,8 @@ delete b' d n@(Node l b r)
     | x < updated = Node (delete b' d l) b r
     | x >= updated = Node l b (delete b' d r)
   where
-    Breakpoint pl@(P i _ _) pr@(P j _ _) = b
-    Breakpoint pl'@(P i' _ _) pr'@(P j' _ _) = b'
+    Breakpoint pl@(Point i _ _) pr@(Point j _ _) = b
+    Breakpoint pl'@(Point i' _ _) pr'@(Point j' _ _) = b'
     updated = intersection pl pr d
     x = intersection pl' pr' d
 delete _ _ (Node _ _ _) = undefined
@@ -143,9 +143,9 @@ delete2 b1 b2 d n@(Node l b r)
     | x1 < u = Node (delete b1 d l) b (delete b2 d r)
     | otherwise = Node (delete b2 d l) b (delete b1 d r)
   where
-    Breakpoint pl1@(P i1 _ _) pr1@(P j1 _ _) = b1
-    Breakpoint pl2@(P i2 _ _) pr2@(P j2 _ _) = b2
-    Breakpoint pl@(P i _ _) pr@(P j _ _) = b
+    Breakpoint pl1@(Point i1 _ _) pr1@(Point j1 _ _) = b1
+    Breakpoint pl2@(Point i2 _ _) pr2@(Point j2 _ _) = b2
+    Breakpoint pl@(Point i _ _) pr@(Point j _ _) = b
     u = intersection pl pr d
     x1 = intersection pl1 pr1 d
     x2 = intersection pl2 pr2 d
@@ -160,8 +160,8 @@ joinPairAt ::
     -> BTree
 joinPairAt x b1 b2 d d' tree = insert x newB d $ delete2 b1 b2 d' tree
   where
-    Breakpoint pi@(P _ _ _) _ = b1
-    Breakpoint _ pk@(P _ _ _) = b2
+    Breakpoint pi@(Point _ _ _) _ = b1
+    Breakpoint _ pk@(Point _ _ _) = b2
     newB = Breakpoint pi pk
 
 lookFor :: Breakpoint -> Double -> BTree -> BTree
@@ -172,8 +172,8 @@ lookFor b' d n@(Node l b r)
     | x >= updated = lookFor b' d r
     | otherwise = error "lookFor: Breakpoint does not exist."
   where
-    Breakpoint pl@(P i _ _) pr@(P j _ _) = b
-    Breakpoint pl'@(P i' _ _) pr'@(P j' _ _) = b'
+    Breakpoint pl@(Point i _ _) pr@(Point j _ _) = b
+    Breakpoint pl'@(Point i' _ _) pr'@(Point j' _ _) = b'
     updated = intersection pl pr d
     x = intersection pl' pr' d
 
@@ -181,7 +181,7 @@ inOrderSuccessor :: Breakpoint -> Double -> BTree -> Breakpoint
 inOrderSuccessor b' d tree =
     case lookFor b' d tree of
         Node _ _ n@Node {} -> leftistElement n
-        _ -> go (Breakpoint (P 0 0 0) (P 0 0 0)) tree
+        _ -> go (Breakpoint (Point 0 0 0) (Point 0 0 0)) tree
   where
     go s Nil = s
     go succ (Node l b r)
@@ -190,8 +190,8 @@ inOrderSuccessor b' d tree =
         | x > updated = go succ r
         | otherwise = succ
       where
-        Breakpoint pl@(P i _ _) pr@(P j _ _) = b
-        Breakpoint pl'@(P i' _ _) pr'@(P j' _ _) = b'
+        Breakpoint pl@(Point i _ _) pr@(Point j _ _) = b
+        Breakpoint pl'@(Point i' _ _) pr'@(Point j' _ _) = b'
         updated = intersection pl pr d
         x = intersection pl' pr' d
 
@@ -199,7 +199,7 @@ inOrderPredecessor :: Breakpoint -> Double -> BTree -> Breakpoint
 inOrderPredecessor b' d tree =
     case lookFor b' d tree of
         Node n@Node {} _ _ -> rightestElement n
-        _ -> go (Breakpoint (P 0 0 0) (P 0 0 0)) tree
+        _ -> go (Breakpoint (Point 0 0 0) (Point 0 0 0)) tree
   where
     go s Nil = s
     go succ (Node l b r)
@@ -208,8 +208,8 @@ inOrderPredecessor b' d tree =
         | x > updated = go b r
         | otherwise = succ
       where
-        Breakpoint pl@(P i _ _) pr@(P j _ _) = b
-        Breakpoint pl'@(P i' _ _) pr'@(P j' _ _) = b'
+        Breakpoint pl@(Point i _ _) pr@(Point j _ _) = b
+        Breakpoint pl'@(Point i' _ _) pr'@(Point j' _ _) = b'
         updated = intersection pl pr d
         x = intersection pl' pr' d
 
