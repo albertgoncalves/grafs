@@ -25,4 +25,16 @@ lint() {
     echo ""
 }
 
+indent () {
+    if [ -d "$1" ]; then
+        if ls "$1"/*.ml >/dev/null 2>&1; then
+            for x in "$1"/*.ml; do
+                echo "$x"
+                ocp-indent -i "$x"
+            done
+        fi
+    fi
+}
+
+export -f indent
 alias flake8="flake8 --ignore=E722"

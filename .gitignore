@@ -4,6 +4,7 @@
 !.shellhook
 !src/
 !*.hs
+!*.ml
 !scripts/
 !*.py
 !main

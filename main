@@ -2,10 +2,20 @@
 
 set -eu
 
-cd "$WD/build"
-for f in src/BreakpointTree.hs src/Fortune.hs src/Main.hs; do
-    cp "$WD/$f" ./
-done
-ghc -Wall BreakpointTree.hs Fortune.hs Main.hs -o "$WD/bin/Main"
+if [ $1 == "hs" ]; then
+    cd "$WD/build"
+    for f in src/BreakpointTree.hs src/Fortune.hs src/Main.hs; do
+        cp "$WD/$f" ./
+    done
+    ghc -Wall BreakpointTree.hs Fortune.hs Main.hs -o "$WD/bin/hs"
 
-"$WD/bin/Main"
+    "$WD/bin/hs"
+else
+    cd "$WD/build"
+    for f in src/breakpoint.ml; do
+        cp "$WD/$f" ./
+    done
+    ocamlc breakpoint.ml -w +1..66-4-48 -o "$WD/bin/ml"
+
+    "$WD/bin/ml"
+fi
