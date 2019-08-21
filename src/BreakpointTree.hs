@@ -13,6 +13,7 @@ module BreakpointTree
     ) where
 
 import Control.Arrow (first)
+import Prelude hiding (pi, succ)
 
 type Index = Int
 
@@ -101,7 +102,7 @@ insertPar p@(P _ x _) d (Node Nil b r)
     | x < updated = (Node (Node Nil newl (nilEnd newl')) b r, Left b)
     | otherwise = first (Node Nil b) $ insertPar p d r
   where
-    Breakpoint pl@(P i _ _) pr = b
+    Breakpoint pl@(P _ _ _) pr = b
     updated = intersection pl pr d
     newl = Breakpoint pl p
     newl' = Breakpoint p pl
@@ -134,6 +135,7 @@ leftistElement Nil = undefined
 rightestElement :: BTree -> Breakpoint
 rightestElement (Node _ b Nil) = b
 rightestElement (Node _ _ r) = rightestElement r
+rightestElement Nil = undefined
 
 deleteX :: BTree -> BTree
 deleteX Nil = error "deleteX: Cannot delete Nil"
@@ -154,6 +156,7 @@ delete b' d n@(Node l b r)
     Breakpoint pl'@(P i' _ _) pr'@(P j' _ _) = b'
     updated = intersection pl pr d
     x = intersection pl' pr' d
+delete _ _ (Node _ _ _) = undefined
 
 delete2 :: Breakpoint -> Breakpoint -> Double -> BTree -> BTree
 delete2 _ _ _ Nil = error "delete2: reached nil."
@@ -183,8 +186,8 @@ joinPairAt ::
     -> BTree
 joinPairAt x b1 b2 d d' tree = insert x newB d $ delete2 b1 b2 d' tree
   where
-    Breakpoint pi@(P i _ _) _ = b1
-    Breakpoint _ pk@(P k _ _) = b2
+    Breakpoint pi@(P _ _ _) _ = b1
+    Breakpoint _ pk@(P _ _ _) = b2
     newB = Breakpoint pi pk
 
 lookFor :: Breakpoint -> Double -> BTree -> BTree

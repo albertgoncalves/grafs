@@ -4,7 +4,7 @@
 module Fortune
     ( voronoi
     , Edge'(..)
-    , Point'(..)
+    , Point'
     ) where
 
 import BreakpointTree
@@ -22,7 +22,7 @@ import Data.Map.Strict (Map)
 import qualified Data.HashPSQ as PSQ
 import Data.HashPSQ (HashPSQ)
 
-import Prelude hiding (map, succ)
+import Prelude hiding (map, pi, succ)
 
 type Index = Int
 
@@ -68,39 +68,44 @@ data State =
     > removeCEvent i j k events
     Remove a CircleEvent identified by the 3 indexes /i j k/ from /events/.
 -}
-removeCEvent :: Point -> Point -> Point -> [CircleEvent] -> [CircleEvent]
-removeCEvent (P i _ _) (P j _ _) (P k _ _) events =
-    let predicate x =
-            let CircleEvent (P i' _ _) (P j' _ _) (P k' _ _) _ _ = x
-             in i' == i && j' == j && k' == k
-        (ls, rs) = break predicate events
-     in if not (null rs)
-            then ls ++ tail rs
-            else ls
+-- removeCEvent :: Point -> Point -> Point -> [CircleEvent] -> [CircleEvent]
+-- removeCEvent (P i _ _) (P j _ _) (P k _ _) events =
+--     let predicate x =
+--             let CircleEvent (P i' _ _) (P j' _ _) (P k' _ _) _ _ = x
+--              in i' == i && j' == j && k' == k
+--         (ls, rs) = break predicate events
+--      in if not (null rs)
+--             then ls ++ tail rs
+--             else ls
 
 {- |
     > insertEvents newEvents events
     Inserts each Event in /newEvents/ into /events/, keeping the list sorted.
  -}
-insertEvents :: [CircleEvent] -> [CircleEvent] -> [CircleEvent]
-insertEvents toAdd events =
-    let insertEvent toAdd' events' =
-            let CircleEvent _ _ _ y _ = toAdd'
-                (ls, rs) = span (\(CircleEvent _ _ _ y' _) -> y' < y) events'
-             in if y /= 0
-                    then ls ++ toAdd' : rs
-                    else events'
-     in foldr insertEvent events toAdd
+-- insertEvents :: [CircleEvent] -> [CircleEvent] -> [CircleEvent]
+-- insertEvents toAdd events =
+--     let insertEvent toAdd' events' =
+--             let CircleEvent _ _ _ y _ = toAdd'
+--                 (ls, rs) = span (\(CircleEvent _ _ _ y' _) -> y' < y) events'
+--              in if y /= 0
+--                     then ls ++ toAdd' : rs
+--                     else events'
+--      in foldr insertEvent events toAdd
 
 -- ** Helper Functions
+pindex :: Point -> Index
 pindex (P i _ _) = i
 
+breakNull :: Breakpoint -> Bool
 breakNull (Breakpoint (P i _ _) (P j _ _)) = i == 0 && j == 0
 
+pointAtLeftOf :: Breakpoint -> Point
 pointAtLeftOf (Breakpoint l _) = l
 
+pointAtRightOf :: Breakpoint -> Point
 pointAtRightOf (Breakpoint _ r) = r
 
+sortPair :: Ord b => b -> b -> (b, b)
 sortPair a b =
     if a < b
         then (a, b)
@@ -109,6 +114,7 @@ sortPair a b =
 setVert :: Point' -> Edge -> Edge
 setVert p EmptyEdge = IEdge p
 setVert p (IEdge p') = Edge p' p
+setVert _ (Edge _ _) = undefined
 
 -- | Returns (Just) the (center, radius) of the circle defined by three given
 --   points.
@@ -146,7 +152,7 @@ processCircleEvent state
   -- process breakpoint
         bl = Breakpoint pi pj
         br = Breakpoint pj pk
-        newBreak = Breakpoint pi pk
+        -- newBreak = Breakpoint pi pk
         newBTree = joinPairAt (fst p) bl br d d' bTree
   -- process events
         Breakpoint prev@(P previ _ _) (P prevj _ _) =
@@ -214,10 +220,8 @@ processNewPointEvent state
                 Right b -> pointAtRightOf b
         newCEvents' =
             catMaybes
-                [ do pi <- pi
-                     circleEvent pi pj newp
-                , do pk <- pk
-                     circleEvent newp pj pk
+                [ pi >>= \pi' -> circleEvent pi' pj newp
+                , pk >>= circleEvent newp pj
                 ]
         toRemove = (pi, pj, pk)
         insert' ev@(CircleEvent pi pj pk y _) =
