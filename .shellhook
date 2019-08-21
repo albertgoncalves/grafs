@@ -18,10 +18,10 @@ done
 
 lint() {
     hlint "$1"
-    # for f in "$1"/*.hs; do
-    #     echo "$f"
-    #     hindent --indent-size 4 --sort-imports --line-length 78 "$f"
-    # done
+    for f in "$1"/*.hs; do
+        echo "$f"
+        hindent --indent-size 4 --sort-imports --line-length 78 "$f"
+    done
     echo ""
 }
 

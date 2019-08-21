@@ -1,6 +1,6 @@
 module Main where
 
-import Fortune (Edge' (..), Point', voronoi)
+import Fortune (Edge'(..), Point', voronoi)
 
 floatsFromEdge :: Edge' -> ((Float, Float), (Float, Float))
 floatsFromEdge (Edge' _ _ a b) =
@@ -24,6 +24,4 @@ main = print xs >> print (map floatsFromEdge $ voronoi xs)
         , (0.4, 0.2)
         , (1.0, 0.35)
         , (0.8, 0.5)
-        , (1.1, 1.2)
-        , (1.5, 0.6)
         ] :: [Point']
