@@ -75,7 +75,8 @@ insertPar p@(Point _ x _) d (Node Nil b Nil)
     newr' = Breakpoint p pr
 insertPar p@(Point _ x _) d (Node Nil b r)
     | x < updated = (Node (Node Nil newl (nilEnd newl')) b r, Left b)
-    | otherwise = first (Node Nil b) $ insertPar p d r
+    -- first :: a b c -> a (b, d) (c, d)
+    | otherwise = first (Node Nil b) (insertPar p d r)
   where
     Breakpoint pl@(Point _ _ _) pr = b
     updated = intersection pl pr d
@@ -91,7 +92,9 @@ insertPar p@(Point _ x _) d (Node l b Nil)
     newr' = Breakpoint p pr
 insertPar p@(Point _ x _) d (Node l b r)
     | x < updated = first (flip (flip Node b) r) $ insertPar p d l
-    | otherwise = first (Node l b) $ insertPar p d r
+    | otherwise =
+        let next = insertPar p d r -- first (Node l b) $ insertPar p d r
+         in (Node l b (fst next), snd next)
   where
     Breakpoint pl pr = b
     updated = intersection pl pr d
@@ -116,9 +119,7 @@ deleteX :: BTree -> BTree
 deleteX Nil = error "deleteX: Cannot delete Nil"
 deleteX (Node Nil _ r) = r
 deleteX (Node l _ Nil) = l
-deleteX (Node l _ r) = Node l r' $ tail' r
-  where
-    r' = leftistElement r
+deleteX (Node l _ r) = Node l (leftistElement r) (tail' r)
 
 delete :: Breakpoint -> Double -> BTree -> BTree
 delete _ _ Nil = error "delete: Reached Nil"
