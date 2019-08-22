@@ -41,14 +41,14 @@ let intersect (a : point) (b : point) (f : float) : float =
         let last : float = (a.x *. (f -. b.y)) -. (b.x *. f) in
         ((b.y *. a.x) +. sqrt +. last) /. (a.y -. b.y)
 
-let rec insert (b : breakpoint) (f1 : float) (f2 : float) : (btree -> btree) =
+let rec insert (f1 : float) (b : breakpoint) (f2 : float) : (btree -> btree) =
     function
         | Nil -> Node (Nil, b, Nil)
-        | Node (l, t, r) ->
+        | Node (l, b', r) ->
             if f1 < (intersect b.l b.r f2) then
-                Node (insert b f1 f2 l, t, r)
+                Node (insert f1 b f2 l, b', r)
             else
-                Node (l, t, insert b f1 f2 r)
+                Node (l, b', insert f1 b f2 r)
 
 let rec insert_par (p : point) (f : float) : (btree -> btree * either_btree) =
     function
@@ -106,6 +106,52 @@ let delete_x : (btree -> btree) = function
     | Node (l, _, Nil) -> l
     | Node (l, _, r) -> Node (l, (left_branch r), (tail_btree r))
     | Nil -> BreakpointError "delete_x" |> raise
+
+let rec delete (b : breakpoint) (f : float) : (btree -> btree) = function
+    | Node (l, b', r) as n ->
+        if eq_breakpoint b b' then
+            delete_x n
+        else if (intersect b'.l b'.r f) < (intersect b.l b.r f) then
+            Node (delete b' f l, b, r)
+        else
+            Node (l, b, delete b' f r)
+    | _ -> BreakpointError "delete" |> raise
+
+let rec delete_2 (b1 : breakpoint) (b2 : breakpoint) (f : float)
+    : (btree -> btree) = function
+    | Node (l, b, r) as n ->
+        if eq_breakpoint b b1 then
+            delete b2 f (delete_x n)
+        else if eq_breakpoint b b1 then
+            delete b1 f (delete_x n)
+        else
+            let i : float = intersect b.l b.r f in
+            let i1 : float = intersect b1.l b1.r f in
+            let i2 : float = intersect b2.l b2.r f in
+            if i1 < i then
+                if i2 < i then
+                    Node (delete_2 b1 b2 f l, b, r)
+                else
+                    Node (delete b1 f l, b, delete b2 f r)
+            else if i2 < i then
+                Node (delete b2 f l, b, delete b1 f r)
+            else
+                Node (l, b, delete_2 b1 b2 f r)
+    | _ -> BreakpointError "delete_2" |> raise
+
+let join_pair_at (x : float) (b1 : breakpoint) (b2 : breakpoint) (f1 : float)
+        (f2 : float) (t : btree) : btree =
+    insert x {l = b1.l; r = b2.r} f1 (delete_2 b1 b2 f2 t)
+
+let rec look_for (b : breakpoint) (f : float) : btree -> btree = function
+    | Nil -> Nil
+    | Node (l, b', r) as n ->
+        if eq_breakpoint b b' then
+            n
+        else if (intersect b'.l b'.r f) < (intersect b.l b.r f) then
+            look_for b' f l
+        else
+            look_for b' f r
 
 let (_ : 'a) : unit =
     let p : point = {index = 1; x = 0.0; y = 0.0} in

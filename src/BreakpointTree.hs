@@ -27,9 +27,9 @@ data Breakpoint =
 instance Show Breakpoint where
     show (Breakpoint (Point i _ _) (Point j _ _)) = show (i, j)
 
-instance Eq Breakpoint where
-    (Breakpoint (Point i _ _) (Point j _ _)) == (Breakpoint (Point i' _ _) (Point j' _ _)) =
-        i == i' && j == j'
+-- instance Eq Breakpoint where
+--     (Breakpoint (Point i _ _) (Point j _ _)) == (Breakpoint (Point i' _ _) (Point j' _ _)) =
+--         i == i' && j == j'
 
 data BTree
     = Nil
@@ -122,7 +122,6 @@ deleteX (Node l _ Nil) = l
 deleteX (Node l _ r) = Node l (leftistElement r) (tail' r)
 
 delete :: Breakpoint -> Double -> BTree -> BTree
-delete _ _ Nil = error "delete: Reached Nil"
 delete b' d n@(Node l b r)
     | i == i' && j == j' = deleteX n
     | x < updated = Node (delete b' d l) b r
@@ -132,17 +131,18 @@ delete b' d n@(Node l b r)
     Breakpoint pl'@(Point i' _ _) pr'@(Point j' _ _) = b'
     updated = intersection pl pr d
     x = intersection pl' pr' d
-delete _ _ (Node _ _ _) = undefined
+delete _ _ _ = error "delete: Reached Nil"
 
 delete2 :: Breakpoint -> Breakpoint -> Double -> BTree -> BTree
-delete2 _ _ _ Nil = error "delete2: reached nil."
 delete2 b1 b2 d n@(Node l b r)
     | i1 == i && j1 == j = delete b2 d $ deleteX n
     | i2 == i && j2 == j = delete b1 d $ deleteX n
-    | x1 < u && x2 < u = Node (delete2 b1 b2 d l) b r
-    | x1 >= u && x2 >= u = Node l b $ delete2 b1 b2 d r
-    | x1 < u = Node (delete b1 d l) b (delete b2 d r)
-    | otherwise = Node (delete b2 d l) b (delete b1 d r)
+    | x1 < u =
+        if x2 < u
+            then Node (delete2 b1 b2 d l) b r
+            else Node (delete b1 d l) b (delete b2 d r)
+    | x2 < u = Node (delete b2 d l) b (delete b1 d r)
+    | otherwise = Node l b $ delete2 b1 b2 d r
   where
     Breakpoint pl1@(Point i1 _ _) pr1@(Point j1 _ _) = b1
     Breakpoint pl2@(Point i2 _ _) pr2@(Point j2 _ _) = b2
@@ -150,6 +150,7 @@ delete2 b1 b2 d n@(Node l b r)
     u = intersection pl pr d
     x1 = intersection pl1 pr1 d
     x2 = intersection pl2 pr2 d
+delete2 _ _ _ Nil = error "delete2: reached nil."
 
 joinPairAt ::
        Double
