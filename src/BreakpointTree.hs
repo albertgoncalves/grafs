@@ -30,7 +30,6 @@ instance Show Breakpoint where
 -- instance Eq Breakpoint where
 --     (Breakpoint (Point i _ _) (Point j _ _)) == (Breakpoint (Point i' _ _) (Point j' _ _)) =
 --         i == i' && j == j'
-
 data BTree
     = Nil
     | Node BTree Breakpoint BTree
@@ -185,6 +184,7 @@ inOrderSuccessor b' d tree =
         Node _ _ n@Node {} -> leftistElement n
         _ -> go (Breakpoint (Point 0 0 0) (Point 0 0 0)) tree
   where
+    go :: Breakpoint -> BTree -> Breakpoint
     go s Nil = s
     go succ (Node l b r)
         | i == i' && j == j' = succ

@@ -153,6 +153,52 @@ let rec look_for (b : breakpoint) (f : float) : btree -> btree = function
         else
             look_for b' f r
 
+let successor (b' : breakpoint) (f : float) (t : btree) : breakpoint =
+    let rec go (b'' : breakpoint) : (btree -> breakpoint) = function
+        | Nil -> b''
+        | Node (l, b, r) ->
+            if eq_breakpoint b b' then
+                b''
+            else
+                let i : float = intersect b.l b.r f in
+                let i' : float = intersect b'.l b'.r f in
+                if i' < i then
+                    go b l
+                else if i' > i then
+                    go b'' r
+                else
+                    b'' in
+    match look_for b' f t with
+        | Node (_, _, n) -> left_branch n
+        | _ ->
+            let p : point = {index = 0; x = 0.0; y = 0.0} in
+            go {l = p; r = p} t
+
+let predecessor (b' : breakpoint) (f : float) (t : btree) : breakpoint =
+    let rec go (b'' : breakpoint) : (btree -> breakpoint) = function
+        | Nil -> b''
+        | Node (l, b, r) ->
+            if eq_breakpoint b b' then
+                b''
+            else
+                let i : float = intersect b.l b.r f in
+                let i' : float = intersect b'.l b'.r f in
+                if i' < i then
+                    go b'' l
+                else if i' > i then
+                    go b r
+                else
+                    b'' in
+    match look_for b' f t with
+        | Node (_, _, n) -> right_branch n
+        | _ ->
+            let p : point = {index = 0; x = 0.0; y = 0.0} in
+            go {l = p; r = p} t
+
+let rec in_order : (btree -> breakpoint list) = function
+    | Nil -> []
+    | Node (l, b, r) -> (in_order l) @ [b] @ (in_order r)
+
 let (_ : 'a) : unit =
     let p : point = {index = 1; x = 0.0; y = 0.0} in
     let b : breakpoint = {l = p; r = p} in
