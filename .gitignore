@@ -2,6 +2,7 @@
 !.gitignore
 !shell.nix
 !.shellhook
+!.ocp-indent
 !src/
 !*.hs
 !*.ml
