@@ -14,6 +14,7 @@ mkShell {
             findlib
             ocaml
             ocp-indent
+            psq
         ])
         (python37.withPackages(ps: with ps; [
             flake8
