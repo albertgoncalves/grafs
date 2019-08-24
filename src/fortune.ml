@@ -238,3 +238,26 @@ let process_event (state : state) : state =
         else
             process_point state
 
+let initialize (points : P.point list) : state =
+    let sorted : P.point list =
+        List.sort (fun a b -> compare a.P.y b.P.y) points in
+    let point_events : B.index_point list =
+        List.mapi
+            (fun index xy -> {B.index = index; B.x = xy.P.x; B.y = xy.P.y})
+            sorted in
+    let tail : B.index_point list = point_events |> List.tl in
+    let first : B.index_point = point_events |> List.hd in
+    let second : B.index_point = tail |> List.hd in
+    let b1 : B.breakpoint = {B.l = first; B.r = second} in
+    let b2 : B.breakpoint = {B.l = second; B.r = first} in
+    let first_pair : B.btree = B.Node (B.Nil, b1, B.Node (B.Nil, b2, B.Nil)) in
+    Hashtbl.add edges (sort_pair (first.B.index, second.B.index)) Empty;
+    let events : events = {points = List.tl tail; circles = P.PSQ.empty} in
+    {
+        events = events;
+        breaks = first_pair;
+        prev_distance = second.B.y;
+    }
+
+(* let voronoi (points : P.point list) : index_edge list = *)
+
