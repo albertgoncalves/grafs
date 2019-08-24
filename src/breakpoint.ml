@@ -2,17 +2,17 @@ exception BreakpointError of string
 
 type index = int
 
-type point =
+type index_point =
     {
-        index: index;
-        x: float;
-        y: float;
+        index : index;
+        x : float;
+        y : float;
     }
 
 type breakpoint =
     {
-        l: point;
-        r: point;
+        l : index_point;
+        r : index_point;
     }
 
 type btree =
@@ -28,7 +28,7 @@ let eq_breakpoint (a : breakpoint) (b : breakpoint) : bool =
 
 let nil_end (x : breakpoint) : btree = Node (Nil, x, Nil)
 
-let intersect (a : point) (b : point) (f : float) : float =
+let intersect (a : index_point) (b : index_point) (f : float) : float =
     if abs_float (a.y -. b.y) < min_float  then
         if a.x < b.x then
             (a.x +. b.x) /. 2.0
@@ -50,7 +50,7 @@ let rec insert (f1 : float) (b : breakpoint) (f2 : float) : (btree -> btree) =
             else
                 Node (l, b', insert f1 b f2 r)
 
-let rec insert_par (p : point) (f : float) : (btree -> btree * either_btree) =
+let rec insert_par (p : index_point) (f : float) : (btree -> btree * either_btree) =
     function
         | Node (Nil, b, Nil) ->
             if p.x < (intersect b.l b.r f) then
@@ -171,7 +171,7 @@ let successor (b' : breakpoint) (f : float) (t : btree) : breakpoint =
     match look_for b' f t with
         | Node (_, _, n) -> left_branch n
         | _ ->
-            let p : point = {index = 0; x = 0.0; y = 0.0} in
+            let p : index_point = {index = 0; x = 0.0; y = 0.0} in
             go {l = p; r = p} t
 
 let predecessor (b' : breakpoint) (f : float) (t : btree) : breakpoint =
@@ -192,15 +192,9 @@ let predecessor (b' : breakpoint) (f : float) (t : btree) : breakpoint =
     match look_for b' f t with
         | Node (_, _, n) -> right_branch n
         | _ ->
-            let p : point = {index = 0; x = 0.0; y = 0.0} in
+            let p : index_point = {index = 0; x = 0.0; y = 0.0} in
             go {l = p; r = p} t
 
 let rec in_order : (btree -> breakpoint list) = function
     | Nil -> []
     | Node (l, b, r) -> (in_order l) @ [b] @ (in_order r)
-
-let (_ : 'a) : unit =
-    let p : point = {index = 1; x = 0.0; y = 0.0} in
-    let b : breakpoint = {l = p; r = p} in
-    let _ : btree = Node (Nil, b, Nil) in
-    ()
