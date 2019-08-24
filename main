@@ -12,14 +12,15 @@ if [ $1 == "hs" ]; then
     "$WD/bin/hs"
 else
     cd "$WD/build"
-    for f in src/breakpoint.ml src/queue.ml src/main.ml; do
+    for f in src/breakpoint.ml src/psqueue.ml src/fortune.ml src/main.ml; do
         cp "$WD/$f" ./
     done
     ocamlfind \
         ocamlc \
+        breakpoint.ml psqueue.ml fortune.ml \
         -w +1..66-4-42 \
         -package psq \
-        -linkpkg breakpoint.ml queue.ml main.ml \
+        -linkpkg main.ml \
         -o "$WD/bin/ml"
 
     "$WD/bin/ml"

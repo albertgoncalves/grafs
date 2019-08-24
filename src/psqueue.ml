@@ -22,9 +22,6 @@ type key =
         c : B.index;
     }
 
-(*  k|key   -> (B.index, B.index, B.index)
-    p|type  -> float
-    v|value -> circle_event *)
 module K = struct
     type t = key
     let compare (a : t) (b : t) =
@@ -39,6 +36,13 @@ module K = struct
             first
 end
 
+let compare_point (a : point) (b : point) : int =
+    let first : int = compare a.x b.x in
+    if first = 0 then
+        compare a.y b.y
+    else
+        first
+
 module V = struct
     type t = circle_event
     let compare (a : t) (b : t) =
@@ -50,11 +54,7 @@ module V = struct
                 if third = 0 then
                     let fourth : int = compare a.f b.f in
                     if fourth = 0 then
-                        let fifth : int = compare a.p.x b.p.x in
-                        if fifth = 0 then
-                            compare a.p.y b.p.y
-                        else
-                            fifth
+                        compare_point a.p b.p
                     else
                         fourth
                 else
