@@ -259,5 +259,23 @@ let initialize (points : P.point list) : state =
         prev_distance = second.B.y;
     }
 
-(* let voronoi (points : P.point list) : index_edge list = *)
+let edges_to_list (() : unit) : index_edge list =
+    Hashtbl.fold
+        begin
+            fun k v xs ->
+                match v with
+                    | Edge (l, r) -> ({i = fst k; j = snd k; a = l; b = r}::xs)
+                    | _ -> xs
+        end
+        edges
+        []
 
+let voronoi (points : P.point list) : index_edge list =
+    let rec loop (state : state) : index_edge list =
+        let empty_points : bool = (List.length state.events.points) = 0 in
+        let empty_circles : bool = (P.PSQ.size state.events.circles) = 0 in
+        if empty_points && empty_circles then
+            edges_to_list ()
+        else
+            process_event state |> loop in
+    initialize points |> loop
