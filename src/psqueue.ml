@@ -22,6 +22,9 @@ type key =
         c : B.index;
     }
 
+let create_key (a : B.index) (b : B.index) (c : B.index) : key =
+    {a = a; b = b; c = c}
+
 module K = struct
     type t = key
     let compare (a : t) (b : t) =
@@ -36,33 +39,9 @@ module K = struct
             first
 end
 
-let compare_point (a : point) (b : point) : int =
-    let first : int = compare a.x b.x in
-    if first = 0 then
-        compare a.y b.y
-    else
-        first
-
 module V = struct
     type t = circle_event
-    let compare (a : t) (b : t) =
-        let first : int = compare a.a.B.index b.a.B.index in
-        if first = 0 then
-            let second : int = compare a.b.B.index b.b.B.index in
-            if second = 0 then
-                let third : int = compare a.c.B.index b.c.B.index in
-                if third = 0 then
-                    let fourth : int = compare a.f b.f in
-                    if fourth = 0 then
-                        compare_point a.p b.p
-                    else
-                        fourth
-                else
-                    third
-            else
-                second
-        else
-            first
+    let compare (a : t) (b : t) = compare a.f b.f
 end
 
 module PSQ = Psq.Make (K) (V)
