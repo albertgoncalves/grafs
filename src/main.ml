@@ -8,7 +8,7 @@ let (_ : 'a) : unit =
     let _ : B.btree = B.Node (B.Nil, b, B.Nil) in
     let _ : F.events =
         {
-            F.new_points = [|{P.x = 0.0; P.y = 0.0}|];
-            F.circle_events = P.PSQ.empty;
+            F.points = [p];
+            F.circles = P.PSQ.empty;
         } in
     ()
