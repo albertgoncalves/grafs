@@ -138,10 +138,15 @@ let process_circle (state : state) : state =
             List.iter
                 begin
                     fun key ->
-                        Hashtbl.replace
-                            edges
-                            key
-                            (set_vert value.P.p (Hashtbl.find edges key))
+                        match Hashtbl.find_opt edges key with
+                            | None -> ()
+                            | Some _ ->
+                                let value =
+                                    set_vert
+                                        value.P.p
+                                        (Hashtbl.find edges key) in
+                                Hashtbl.replace edges key value
+
                 end
                 [
                     sort_pair (a.B.index, b.B.index);
@@ -222,12 +227,10 @@ let process_event (state : state) : state =
     else
         let next : bool =
             match P.PSQ.min state.events.circles with
-                | None -> FortuneError "process_event" |> raise
+                | None -> false
                 | Some (_, circle) ->
                     if empty_points then
                         true
-                    else if empty_circles then
-                        false
                     else
                         let circle_y : float = circle.P.p.P.y in
                         let point_y : float =

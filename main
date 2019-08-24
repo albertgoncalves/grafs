@@ -17,11 +17,16 @@ else
     done
     ocamlfind \
         ocamlc \
+        -g \
         breakpoint.ml psqueue.ml fortune.ml \
         -w +1..66-4-42 \
         -package psq \
         -linkpkg main.ml \
         -o "$WD/bin/ml"
 
-    "$WD/bin/ml"
+    if [ $1 == "debug" ]; then
+        rlwrap ocamldebug "$WD/bin/ml"
+    else
+        "$WD/bin/ml"
+    fi
 fi

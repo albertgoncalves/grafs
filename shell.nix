@@ -21,6 +21,7 @@ mkShell {
             matplotlib
             numpy
         ]))
+        rlwrap
         shellcheck
     ];
     shellHook = ''

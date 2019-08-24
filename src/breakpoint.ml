@@ -33,7 +33,7 @@ let intersect (a : index_point) (b : index_point) (f : float) : float =
         if a.x < b.x then
             (a.x +. b.x) /. 2.0
         else
-            BreakpointError "intersect" |> raise
+            infinity
     else
         let distance : float =
             ((a.x -. b.x) ** 2.0) +. ((a.y -. b.y) ** 2.0) in
@@ -105,7 +105,8 @@ let delete_x : (btree -> btree) = function
     | Node (Nil, _, r) -> r
     | Node (l, _, Nil) -> l
     | Node (l, _, r) -> Node (l, (left_branch r), (tail_btree r))
-    | Nil -> BreakpointError "delete_x" |> raise
+    (* | Nil -> BreakpointError "delete_x" |> raise *)
+    | Nil -> Nil
 
 let rec delete (b : breakpoint) (f : float) : (btree -> btree) = function
     | Node (l, b', r) as n ->
@@ -115,7 +116,8 @@ let rec delete (b : breakpoint) (f : float) : (btree -> btree) = function
             Node (delete b' f l, b, r)
         else
             Node (l, b, delete b' f r)
-    | _ -> BreakpointError "delete" |> raise
+    (* | _ -> BreakpointError "delete" |> raise *)
+    | Nil -> Nil
 
 let rec delete_2 (b1 : breakpoint) (b2 : breakpoint) (f : float)
     : (btree -> btree) = function
@@ -137,7 +139,8 @@ let rec delete_2 (b1 : breakpoint) (b2 : breakpoint) (f : float)
                 Node (delete b2 f l, b, delete b1 f r)
             else
                 Node (l, b, delete_2 b1 b2 f r)
-    | _ -> BreakpointError "delete_2" |> raise
+    (* | _ -> BreakpointError "delete_2" |> raise *)
+    | Nil -> Nil
 
 let join_pair_at (x : float) (b1 : breakpoint) (b2 : breakpoint) (f1 : float)
         (f2 : float) (t : btree) : btree =
