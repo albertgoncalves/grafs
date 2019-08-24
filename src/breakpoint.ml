@@ -50,8 +50,8 @@ let rec insert (f1 : float) (b : breakpoint) (f2 : float) : (btree -> btree) =
             else
                 Node (l, b', insert f1 b f2 r)
 
-let rec insert_par (p : index_point) (f : float) : (btree -> btree * either_btree) =
-    function
+let rec insert_par (p : index_point) (f : float)
+    : (btree -> btree * either_btree) = function
         | Node (Nil, b, Nil) ->
             if p.x < (intersect b.l b.r f) then
                 let branch : btree =
