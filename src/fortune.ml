@@ -48,6 +48,11 @@ let sort_pair ((a, b) : (int * int)) : (int * int) =
 
 let flip (f : 'a -> 'b -> 'c) : ('b -> 'a -> 'c) = fun b a -> f a b
 
+let bind (a : 'a option) (f : 'a -> 'b option) : 'b option =
+    match a with
+        | Some a -> f a
+        | None -> None
+
 let break_null (b : B.breakpoint) : bool =
     (b.B.l.B.index = 0) && (b.B.r.B.index = 0)
 
@@ -120,8 +125,7 @@ let process_circle_event (state : state) : state =
             let inserted : P.PSQ.t =
                 List.fold_left
                     begin
-                        fun circles circle_event ->
-                            let circle_event : P.PSQ.p = circle_event in
+                        fun (circles : P.PSQ.t) (circle_event : P.PSQ.p) ->
                             let key : P.PSQ.k =
                                 P.create_key
                                     circle_event.P.a.B.index
@@ -157,21 +161,55 @@ let process_new_point_event (state : state) : state =
     let head : B.index_point = List.hd state.events.points in
     let tail : B.index_point list = List.tl state.events.points in
     let circles : P.PSQ.t = state.events.circles in
-    let events : events = state.events in
-    let (btree, fallen_on) : (B.btree * B.either_btree) =
-        B.insert_par head head.y state.breaks in
+    let (new_btree, fallen_on) : (B.btree * B.either_btree) =
+        B.insert_par head head.B.y state.breaks in
     let (prev, next, j) : (B.breakpoint * B.breakpoint * B.index_point) =
         match fallen_on with
-            | B.Left b -> (B.predecessor b head.y state.breaks, b, b.l)
-            | B.Right b -> (b, B.successor b head.y state.breaks, b.r) in
+            | B.Left b -> (B.predecessor b head.B.y state.breaks, b, b.B.l)
+            | B.Right b -> (b, B.successor b head.B.y state.breaks, b.B.r) in
     let i : B.index_point option =
         if break_null prev then
             None
         else
-            Some (prev.l) in
+            Some (prev.B.l) in
     let k : B.index_point option =
         if break_null next then
             None
         else
-            Some (next.r) in
-    state
+            Some (next.B.r) in
+    let new_circles : P.circle_event list =
+        concat_options
+            [
+                bind i (fun i -> circle_from i j head);
+                bind k (circle_from head j);
+            ] in
+    let removed : P.PSQ.t =
+        match (i, j, k) with
+            | (Some i, j, Some k) ->
+                P.PSQ.remove
+                    (P.create_key i.B.index j.B.index k.B.index)
+                    circles
+            | _ -> circles in
+
+    let inserted : P.PSQ.t =
+        List.fold_left
+            begin
+                fun (circles : P.PSQ.t) (circle_event : P.PSQ.p) ->
+                    let key : P.PSQ.k =
+                        P.create_key
+                            circle_event.P.a.B.index
+                            circle_event.P.b.B.index
+                            circle_event.P.c.B.index in
+                    P.PSQ.add key circle_event circles
+            end
+            removed
+            new_circles in
+    Hashtbl.add
+        edges
+        (sort_pair (head.B.index, j.B.index))
+        Empty;
+    {
+        breaks = new_btree;
+        events = {points = tail; circles = inserted};
+        prev_distance = head.B.y;
+    }
