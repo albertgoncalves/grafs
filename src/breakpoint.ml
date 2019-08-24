@@ -105,26 +105,24 @@ let delete_x : (btree -> btree) = function
     | Node (Nil, _, r) -> r
     | Node (l, _, Nil) -> l
     | Node (l, _, r) -> Node (l, (left_branch r), (tail_btree r))
-    (* | Nil -> BreakpointError "delete_x" |> raise *)
-    | Nil -> Nil
+    | Nil -> BreakpointError "delete_x" |> raise
 
 let rec delete (b : breakpoint) (f : float) : (btree -> btree) = function
-    | Node (l, b', r) as n ->
-        if eq_breakpoint b b' then
-            delete_x n
-        else if (intersect b'.l b'.r f) < (intersect b.l b.r f) then
-            Node (delete b' f l, b, r)
+    | Node (l, b', r) as t ->
+        if eq_breakpoint b' b then
+            delete_x t
+        else if (intersect b.l b.r f) < (intersect b'.l b'.r f) then
+            Node (delete b f l, b', r)
         else
-            Node (l, b, delete b' f r)
-    (* | _ -> BreakpointError "delete" |> raise *)
-    | Nil -> Nil
+            Node (l, b', delete b f r)
+    | _ -> BreakpointError "delete" |> raise
 
 let rec delete_2 (b1 : breakpoint) (b2 : breakpoint) (f : float)
     : (btree -> btree) = function
     | Node (l, b, r) as n ->
         if eq_breakpoint b b1 then
             delete b2 f (delete_x n)
-        else if eq_breakpoint b b1 then
+        else if eq_breakpoint b b2 then
             delete b1 f (delete_x n)
         else
             let i : float = intersect b.l b.r f in
@@ -139,8 +137,7 @@ let rec delete_2 (b1 : breakpoint) (b2 : breakpoint) (f : float)
                 Node (delete b2 f l, b, delete b1 f r)
             else
                 Node (l, b, delete_2 b1 b2 f r)
-    (* | _ -> BreakpointError "delete_2" |> raise *)
-    | Nil -> Nil
+    | _ -> BreakpointError "delete_2" |> raise
 
 let join_pair_at (x : float) (b1 : breakpoint) (b2 : breakpoint) (f1 : float)
         (f2 : float) (t : btree) : btree =
@@ -148,52 +145,52 @@ let join_pair_at (x : float) (b1 : breakpoint) (b2 : breakpoint) (f1 : float)
 
 let rec look_for (b : breakpoint) (f : float) : btree -> btree = function
     | Nil -> Nil
-    | Node (l, b', r) as n ->
+    | Node (l, b', r) as t ->
         if eq_breakpoint b b' then
-            n
-        else if (intersect b'.l b'.r f) < (intersect b.l b.r f) then
-            look_for b' f l
+            t
+        else if (intersect b.l b.r f) < (intersect b'.l b'.r f) then
+            look_for b f l
         else
-            look_for b' f r
+            look_for b f r
 
-let successor (b' : breakpoint) (f : float) (t : btree) : breakpoint =
-    let rec go (b'' : breakpoint) : (btree -> breakpoint) = function
-        | Nil -> b''
-        | Node (l, b, r) ->
-            if eq_breakpoint b b' then
-                b''
+let successor (b : breakpoint) (f : float) (t : btree) : breakpoint =
+    let rec go (b' : breakpoint) : (btree -> breakpoint) = function
+        | Nil -> b'
+        | Node (l, b'', r) ->
+            if eq_breakpoint b b'' then
+                b'
             else
-                let i : float = intersect b.l b.r f in
-                let i' : float = intersect b'.l b'.r f in
-                if i' < i then
-                    go b l
-                else if i' > i then
-                    go b'' r
+                let i : float = intersect b''.l b''.r f in
+                let j : float = intersect b.l b.r f in
+                if j < i then
+                    go b'' l
+                else if j > i then
+                    go b' r
                 else
-                    b'' in
-    match look_for b' f t with
-        | Node (_, _, n) -> left_branch n
+                    b' in
+    match look_for b f t with
+        | Node (_, _, t') -> left_branch t'
         | _ ->
             let p : index_point = {index = 0; x = 0.0; y = 0.0} in
             go {l = p; r = p} t
 
-let predecessor (b' : breakpoint) (f : float) (t : btree) : breakpoint =
-    let rec go (b'' : breakpoint) : (btree -> breakpoint) = function
-        | Nil -> b''
-        | Node (l, b, r) ->
-            if eq_breakpoint b b' then
-                b''
+let predecessor (b : breakpoint) (f : float) (t : btree) : breakpoint =
+    let rec go (b' : breakpoint) : (btree -> breakpoint) = function
+        | Nil -> b'
+        | Node (l, b'', r) ->
+            if eq_breakpoint b b'' then
+                b'
             else
-                let i : float = intersect b.l b.r f in
-                let i' : float = intersect b'.l b'.r f in
-                if i' < i then
-                    go b'' l
-                else if i' > i then
-                    go b r
+                let i : float = intersect b''.l b''.r f in
+                let j : float = intersect b.l b.r f in
+                if j < i then
+                    go b' l
+                else if j > i then
+                    go b'' r
                 else
-                    b'' in
-    match look_for b' f t with
-        | Node (_, _, n) -> right_branch n
+                    b' in
+    match look_for b f t with
+        | Node (_, _, t') -> right_branch t'
         | _ ->
             let p : index_point = {index = 0; x = 0.0; y = 0.0} in
             go {l = p; r = p} t

@@ -105,7 +105,7 @@ let process_circle (state : state) : state =
             let (new_circles, to_remove)
                 : ((P.circle_event) list * (P.PSQ.k list)) =
                 let i : (P.circle_event) option =
-                    circle_from a value.P.c next.B.r in
+                    circle_from a c next.B.r in
                 let j : (P.circle_event) option =
                     circle_from prev.B.l a c in
                 let ijk : P.PSQ.k =
@@ -116,7 +116,7 @@ let process_circle (state : state) : state =
                     P.create_key b.B.index c.B.index next.B.r.B.index in
                 if (prev.B.l.B.index = 0) && (prev.B.r.B.index = 0) then
                     (i |> option_to_list, [ijk; next_jk])
-                else if (next.B.l.B.index = 0) && (prev.B.r.B.index = 0) then
+                else if (next.B.l.B.index = 0) && (next.B.r.B.index = 0) then
                     (j |> option_to_list, [ijk; prev_ij])
                 else
                     (concat_options [i; j], [ijk; prev_ij; next_jk]) in
@@ -163,9 +163,10 @@ let process_circle (state : state) : state =
             }
 
 let process_point (state : state) : state =
-    let head : B.index_point = List.hd state.events.points in
-    let tail : B.index_point list = List.tl state.events.points in
+    let points : B.index_point list = state.events.points in
     let circles : P.PSQ.t = state.events.circles in
+    let head : B.index_point = List.hd points in
+    let tail : B.index_point list = List.tl points in
     let (new_btree, fallen_on) : (B.btree * B.either_btree) =
         B.insert_par head head.B.y state.breaks in
     let (prev, next, j) : (B.breakpoint * B.breakpoint * B.index_point) =
@@ -195,7 +196,6 @@ let process_point (state : state) : state =
                     (P.create_key i.B.index j.B.index k.B.index)
                     circles
             | _ -> circles in
-
     let inserted : P.PSQ.t =
         List.fold_left
             begin
@@ -232,7 +232,8 @@ let process_event (state : state) : state =
                     if empty_points then
                         true
                     else
-                        let circle_y : float = circle.P.p.P.y in
+                        (* let circle_y : float = circle.P.p.P.y in *)
+                        let circle_y : float = circle.P.f in
                         let point_y : float =
                             (List.hd state.events.points).B.y in
                         circle_y <= point_y in
@@ -242,14 +243,12 @@ let process_event (state : state) : state =
             process_point state
 
 let initialize (points : P.point list) : state =
-    let sorted : P.point list =
-        List.sort (fun a b -> compare a.P.y b.P.y) points in
-    let point_events : B.index_point list =
+    let index_points : B.index_point list =
         List.mapi
             (fun index xy -> {B.index = index; B.x = xy.P.x; B.y = xy.P.y})
-            sorted in
-    let tail : B.index_point list = point_events |> List.tl in
-    let first : B.index_point = point_events |> List.hd in
+            (List.sort (fun a b -> compare a.P.y b.P.y) points) in
+    let tail : B.index_point list = index_points |> List.tl in
+    let first : B.index_point = index_points |> List.hd in
     let second : B.index_point = tail |> List.hd in
     let b1 : B.breakpoint = {B.l = first; B.r = second} in
     let b2 : B.breakpoint = {B.l = second; B.r = first} in
