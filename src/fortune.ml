@@ -86,7 +86,7 @@ let circle_from (a : B.index_point) (b : B.index_point) (c : B.index_point)
                 P.p = {P.x = x; P.y = y};
             }
 
-let process_circle_event (state : state) : state =
+let process_circle (state : state) : state =
     let min_view : ((P.PSQ.k * P.PSQ.p) * P.PSQ.t) option =
         P.PSQ.pop state.events.circles in
     match min_view with
@@ -157,7 +157,7 @@ let process_circle_event (state : state) : state =
                 prev_distance = value.P.f;
             }
 
-let process_new_point_event (state : state) : state =
+let process_point (state : state) : state =
     let head : B.index_point = List.hd state.events.points in
     let tail : B.index_point list = List.tl state.events.points in
     let circles : P.PSQ.t = state.events.circles in
@@ -213,3 +213,28 @@ let process_new_point_event (state : state) : state =
         events = {points = tail; circles = inserted};
         prev_distance = head.B.y;
     }
+
+let process_event (state : state) : state =
+    let empty_points : bool = (List.length state.events.points) = 0 in
+    let empty_circles : bool = (P.PSQ.size state.events.circles) = 0 in
+    if empty_points && empty_circles then
+        state
+    else
+        let next : bool =
+            match P.PSQ.min state.events.circles with
+                | None -> FortuneError "process_event" |> raise
+                | Some (_, circle) ->
+                    if empty_points then
+                        true
+                    else if empty_circles then
+                        false
+                    else
+                        let circle_y : float = circle.P.p.P.y in
+                        let point_y : float =
+                            (List.hd state.events.points).B.y in
+                        circle_y <= point_y in
+        if next then
+            process_circle state
+        else
+            process_point state
+
