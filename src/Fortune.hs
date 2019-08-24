@@ -8,18 +8,16 @@ module Fortune
     ) where
 
 import BreakpointTree
-import qualified Data.HashPSQ as PSQ
-import Data.HashPSQ (HashPSQ)
 import Data.List (sortOn)
 import qualified Data.Map.Strict as Map
 import Data.Map.Strict (Map)
 import Data.Maybe (catMaybes, maybeToList)
+import qualified Data.OrdPSQ as PSQ
+import Data.OrdPSQ (OrdPSQ)
 import qualified Data.Vector as V
 import Prelude hiding (map, pi, succ)
 
 type Index = Int
-
-type Coord = Double
 
 type Point' = (Double, Double)
 
@@ -35,7 +33,7 @@ data Edge' =
 type NewPointEvent = Point
 
 data CircleEvent =
-    CircleEvent !Point !Point !Point !Coord !Point'
+    CircleEvent !Point !Point !Point !Double !Point'
 
 instance Show CircleEvent where
     show (CircleEvent pi pj pk _ _) = show (pindex pi, pindex pj, pindex pk)
@@ -43,7 +41,7 @@ instance Show CircleEvent where
 data Events =
     Events
         { newPointEvents :: V.Vector NewPointEvent
-        , circleEvents :: HashPSQ (Index, Index, Index) Coord CircleEvent
+        , circleEvents :: OrdPSQ (Index, Index, Index) Double CircleEvent
         }
 
 data State =
