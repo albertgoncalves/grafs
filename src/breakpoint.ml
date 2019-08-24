@@ -52,39 +52,39 @@ let rec insert (f1 : float) (b : breakpoint) (f2 : float) : (btree -> btree) =
 
 let rec insert_par (p : index_point) (f : float)
     : (btree -> btree * either_btree) = function
-        | Node (Nil, b, Nil) ->
-            if p.x < (intersect b.l b.r f) then
-                let branch : btree =
-                    Node (Nil, {l = b.l; r = p}, nil_end {l = p; r = b.l}) in
-                (Node (branch, b, Nil), Left b)
-            else
-                let branch : btree =
-                    Node (Nil, {l = b.r; r = p}, nil_end {l = p; r = b.r}) in
-                (Node (Nil, b, branch), Right b)
-        | Node (Nil, b, r) ->
-            if p.x < (intersect b.l b.r f) then
-                let branch : btree =
-                    Node (Nil, {l = b.l; r = p}, nil_end {l = p; r = b.l}) in
-                (Node (branch, b, r), Left b)
-            else
-                let next : (btree * either_btree) = insert_par p f r in
-                (Node (Nil, b, fst next), snd next)
-        | Node (l, b, Nil) ->
-            if p.x < (intersect b.l b.r f) then
-                let next : (btree * either_btree) = insert_par p f l in
-                (Node (fst next, b, Nil), snd next)
-            else
-                let branch : btree =
-                    Node (Nil, {l = b.r; r = p}, nil_end {l = p; r = b.r}) in
-                (Node (l, b, branch), Right b)
-        | Node (l, b, r) ->
-            if p.x < (intersect b.l b.r f) then
-                let next : (btree * either_btree) = insert_par p f l in
-                (Node (fst next, b, r), snd next)
-            else
-                let next : (btree * either_btree) = insert_par p f r in
-                (Node (l, b, fst next), snd next)
-        | _ -> BreakpointError "insert_par" |> raise
+    | Node (Nil, b, Nil) ->
+        if p.x < (intersect b.l b.r f) then
+            let branch : btree =
+                Node (Nil, {l = b.l; r = p}, nil_end {l = p; r = b.l}) in
+            (Node (branch, b, Nil), Left b)
+        else
+            let branch : btree =
+                Node (Nil, {l = b.r; r = p}, nil_end {l = p; r = b.r}) in
+            (Node (Nil, b, branch), Right b)
+    | Node (Nil, b, r) ->
+        if p.x < (intersect b.l b.r f) then
+            let branch : btree =
+                Node (Nil, {l = b.l; r = p}, nil_end {l = p; r = b.l}) in
+            (Node (branch, b, r), Left b)
+        else
+            let next : (btree * either_btree) = insert_par p f r in
+            (Node (Nil, b, fst next), snd next)
+    | Node (l, b, Nil) ->
+        if p.x < (intersect b.l b.r f) then
+            let next : (btree * either_btree) = insert_par p f l in
+            (Node (fst next, b, Nil), snd next)
+        else
+            let branch : btree =
+                Node (Nil, {l = b.r; r = p}, nil_end {l = p; r = b.r}) in
+            (Node (l, b, branch), Right b)
+    | Node (l, b, r) ->
+        if p.x < (intersect b.l b.r f) then
+            let next : (btree * either_btree) = insert_par p f l in
+            (Node (fst next, b, r), snd next)
+        else
+            let next : (btree * either_btree) = insert_par p f r in
+            (Node (l, b, fst next), snd next)
+    | _ -> BreakpointError "insert_par" |> raise
 
 let rec tail_btree : (btree -> btree) = function
     | Node (Nil, _, r) -> r

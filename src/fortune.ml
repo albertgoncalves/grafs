@@ -119,24 +119,28 @@ let process_circle_event (state : state) : state =
                 List.fold_left (flip P.PSQ.remove) circle_events to_remove in
             let inserted : P.PSQ.t =
                 List.fold_left
-                    (fun circle_events circle_event ->
-                        let circle_event : P.PSQ.p = circle_event in
-                        let key : P.PSQ.k =
-                            P.create_key
-                                circle_event.P.a.B.index
-                                circle_event.P.b.B.index
-                                circle_event.P.c.B.index in
-                        P.PSQ.add key circle_event circle_events)
+                    begin
+                        fun circle_events circle_event ->
+                            let circle_event : P.PSQ.p = circle_event in
+                            let key : P.PSQ.k =
+                                P.create_key
+                                    circle_event.P.a.B.index
+                                    circle_event.P.b.B.index
+                                    circle_event.P.c.B.index in
+                            P.PSQ.add key circle_event circle_events
+                    end
                     removed
                     new_circle_events in
             let new_events : events =
                 {state.events with circle_events = inserted} in
             List.iter
-                (fun key ->
-                    Hashtbl.replace
-                        edges
-                        key
-                        (set_vert value.P.p (Hashtbl.find edges key)))
+                begin
+                    fun key ->
+                        Hashtbl.replace
+                            edges
+                            key
+                            (set_vert value.P.p (Hashtbl.find edges key))
+                end
                 [
                     sort_pair (a.B.index, b.B.index);
                     sort_pair (b.B.index, c.B.index);
