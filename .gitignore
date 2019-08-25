@@ -2,9 +2,5 @@
 !.gitignore
 !shell.nix
 !.shellhook
-!.ocp-indent
 !src/
-!*.ml
-!scripts/
 !*.py
-!main

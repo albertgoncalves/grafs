@@ -10,31 +10,8 @@ fi
 export WD
 WD=$(pwd)
 
-for f in bin build out; do
-    if [ ! -d "$WD/$f" ]; then
-        mkdir "$WD/$f"
-    fi
-done
+if [ ! -d "$WD/out" ]; then
+    mkdir "$WD/out"
+fi
 
-lint() {
-    hlint "$1"
-    for f in "$1"/*.hs; do
-        echo "$f"
-        hindent --indent-size 4 --sort-imports --line-length 78 "$f"
-    done
-    echo ""
-}
-
-indent () {
-    if [ -d "$1" ]; then
-        if ls "$1"/*.ml >/dev/null 2>&1; then
-            for x in "$1"/*.ml; do
-                echo "$x"
-                ocp-indent -i "$x"
-            done
-        fi
-    fi
-}
-
-export -f indent
 alias flake8="flake8 --ignore=E722"
