@@ -1,6 +1,10 @@
 module B = Breakpoint
 module P = Psqueue
 module F = Fortune
+module E = struct
+    let edges : ((B.index * B.index), F.edge) Hashtbl.t = Hashtbl.create 256
+end
+module V = F.Voronoi (E)
 
 let create_point ((x, y) : (float * float)) : P.point = {P.x = x; P.y = y}
 
@@ -37,7 +41,7 @@ let (_ : 'a) : unit =
                 (-0.9, 1.1);
                 (0.1, 1.2);
             ] in
-    List.map print_index_edge (F.voronoi points)
+    List.map print_index_edge (V.voronoi points)
     |> String.concat ",\n"
-    |> fun x -> "[" ^ x ^ "]"
-                |> print_endline
+    |> (fun x -> "[" ^ x ^ "]")
+    |> print_endline

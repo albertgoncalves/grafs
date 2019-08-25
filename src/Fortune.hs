@@ -16,6 +16,7 @@ import qualified Data.OrdPSQ as PSQ
 import Data.OrdPSQ (OrdPSQ)
 import qualified Data.Vector as V
 import Prelude hiding (map, pi, succ)
+-- import System.IO.Unsafe (unsafePerformIO)
 
 type Index = Int
 
@@ -24,7 +25,7 @@ type Point' = (Double, Double)
 data Edge
     = EmptyEdge
     | IEdge !Point'
-    | Edge !Point' !Point'
+    | Edge !Point' !Point' deriving (Show)
 
 data Edge' =
     Edge' !Index !Index !Point' !Point'
@@ -42,7 +43,7 @@ data Events =
     Events
         { newPointEvents :: V.Vector NewPointEvent
         , circleEvents :: OrdPSQ (Index, Index, Index) Double CircleEvent
-        }
+        } deriving (Show)
 
 data State =
     State
@@ -50,7 +51,7 @@ data State =
         , breaks :: BTree
         , edges :: Map (Index, Index) Edge
         , prevd :: Double
-        }
+        } deriving (Show)
 
 pindex :: Point -> Index
 pindex (Point i _ _) = i
@@ -144,8 +145,12 @@ processNewPointEvent state =
     newPEvents = V.tail . newPointEvents . events $ state
     cEvents = circleEvents . events $ state
     events' = events state
+    -- bTree =
+    --     let t = breaks state in unsafePerformIO (print t >> return t :: IO BTree)
     bTree = breaks state
     (newBTree, fallenOn) = insertPar newp d bTree
+    -- (newBTree, fallenOn') = insertPar newp d bTree
+    -- fallenOn = unsafePerformIO (print fallenOn' >> return fallenOn' :: IO (Either Breakpoint Breakpoint))
     (prev, next) =
         case fallenOn of
             Left b -> (inOrderPredecessor b d bTree, b)
@@ -209,7 +214,8 @@ voronoi = go . mkState
             else go (processEvent state)
 
 mkState :: [Point'] -> State
-mkState points = State (Events newPEvents PSQ.empty) firstPair firstEdge d
+mkState points = -- unsafePerformIO (print state >> return state :: IO State)
+    state
   where
     ps = sortOn snd points
     newPEvents' = V.imap (\i' (x, y) -> Point i' x y) . V.fromList $ ps
@@ -220,6 +226,7 @@ mkState points = State (Events newPEvents PSQ.empty) firstPair firstEdge d
     b2 = Breakpoint p1 p0
     firstPair = Node Nil b1 $ Node Nil b2 Nil
     firstEdge = Map.singleton (sortPair i j) EmptyEdge
+    state = State (Events newPEvents PSQ.empty) firstPair firstEdge d
 
 mapToList :: Map (Index, Index) Edge -> [Edge']
 mapToList map = fmap edge' list

@@ -29,7 +29,8 @@ let eq_breakpoint (a : breakpoint) (b : breakpoint) : bool =
 let nil_end (x : breakpoint) : btree = Node (Nil, x, Nil)
 
 let intersect (a : index_point) (b : index_point) (f : float) : float =
-    if abs_float (a.y -. b.y) < min_float  then
+    print_endline "intersect";
+    if (abs_float (a.y -. b.y)) < min_float then
         if a.x < b.x then
             (a.x +. b.x) /. 2.0
         else
@@ -39,9 +40,13 @@ let intersect (a : index_point) (b : index_point) (f : float) : float =
             ((a.x -. b.x) ** 2.0) +. ((a.y -. b.y) ** 2.0) in
         let sqrt : float = distance *. (a.y -. f) *. (b.y -. f) |> sqrt in
         let last : float = (a.x *. (f -. b.y)) -. (b.x *. f) in
-        ((b.y *. a.x) +. sqrt +. last) /. (a.y -. b.y)
+        let x : float = ((a.y *. b.x) +. sqrt +. last) /. (a.y -. b.y) in
+        string_of_float x |> print_endline;
+        x
+
 
 let rec insert (f1 : float) (b : breakpoint) (f2 : float) : (btree -> btree) =
+    print_endline "insert";
     function
         | Nil -> Node (Nil, b, Nil)
         | Node (l, b', r) ->
@@ -51,7 +56,9 @@ let rec insert (f1 : float) (b : breakpoint) (f2 : float) : (btree -> btree) =
                 Node (l, b', insert f1 b f2 r)
 
 let rec insert_par (p : index_point) (f : float)
-    : (btree -> btree * either_btree) = function
+    : (btree -> btree * either_btree) =
+    print_endline "insert_par";
+    function
     | Node (Nil, b, Nil) ->
         if p.x < (intersect b.l b.r f) then
             let branch : btree =

@@ -14,6 +14,7 @@ module BreakpointTree
 
 import Control.Arrow (first)
 import Prelude hiding (pi, succ)
+-- import System.IO.Unsafe (unsafePerformIO)
 
 type Index = Int
 
@@ -27,12 +28,31 @@ data Breakpoint =
 instance Show Breakpoint where
     show (Breakpoint (Point i _ _) (Point j _ _)) = show (i, j)
 
+{-
+instance Show BTree where
+  show t = drawTree t ++ "\n" ++ show (inOrder t)
+
+drawTree :: BTree -> String
+drawTree = unlines . draw
+
+draw :: BTree -> [String]
+draw Nil = ["#"]
+draw (Node l x r) =  (show x) : drawSubTrees [l, r]
+  where
+    drawSubTrees [] = []
+    drawSubTrees [t] =
+      "|" : shift "`- " "   " (draw t)
+    drawSubTrees (t:ts) =
+      "|" : shift "+- " "|  " (draw t) ++ drawSubTrees ts
+    shift first other = zipWith (++) (first : repeat other)
+-}
+
 -- instance Eq Breakpoint where
 --     (Breakpoint (Point i _ _) (Point j _ _)) == (Breakpoint (Point i' _ _) (Point j' _ _)) =
 --         i == i' && j == j'
 data BTree
     = Nil
-    | Node BTree Breakpoint BTree
+    | Node BTree Breakpoint BTree deriving (Show)
 
 nilEnd :: Breakpoint -> BTree
 nilEnd x = Node Nil x Nil
@@ -45,12 +65,14 @@ intersection (Point _ f1x f1y) (Point _ f2x f2y) d =
         then if f1x < f2x
                  then (f1x + f2x) / 2
                  else 1 / 0
-        else x
+        else x'
   where
     dist = (f1x - f2x) * (f1x - f2x) + (f1y - f2y) * (f1y - f2y)
     sqroot = sqrt $ dist * (f1y - d) * (f2y - d)
     lastterm = f1x * (d - f2y) - f2x * d
-    x = (f1y * f2x + sqroot + lastterm) / (f1y - f2y)
+    x' = (f1y * f2x + sqroot + lastterm) / (f1y - f2y)
+    -- x = unsafePerformIO (print x' >> return x' :: IO Double)
+
 
 insert :: Double -> Breakpoint -> Double -> BTree -> BTree
 insert _ b' _ Nil = Node Nil b' Nil
