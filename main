@@ -3,6 +3,7 @@
 set -e
 
 xs=(
+    src/components.ml
     src/main.ml
 )
 
@@ -12,6 +13,7 @@ for f in "${xs[@]}"; do
 done
 ocamlfind \
     ocamlc \
+    components.ml \
     -w +1..66 \
     -linkpkg main.ml \
     -o "$WD/bin/grafs"
