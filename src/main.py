@@ -5,7 +5,7 @@ from random import seed
 
 from matplotlib.pyplot import close, savefig, subplots, tight_layout
 
-from algos import convex_hull
+from algo import convex_hull
 from gen import random_points
 
 
