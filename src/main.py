@@ -64,9 +64,9 @@ def main():
             insert(tree, lt, leaf(xs[i]))
         show(tree)
 
-    # demo_convex_hulls(50)
+    demo_convex_hulls(50)
     demo_point_of_intersection(50)
-    # demo_bst(15, 0)
+    demo_bst(15, 0)
 
 
 if __name__ == "__main__":
