@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 
 from os import environ
-from random import random, seed
+from random import seed
 
 from matplotlib.pyplot import close, savefig, subplots, tight_layout
 
 from algos import convex_hull
-
-
-def random_points(n):
-    return [(random(), random()) for _ in range(n)]
+from gen import random_points
 
 
 def init_plot():
@@ -41,9 +38,9 @@ def plot_convex_hull(points, filename):
 
 
 def main():
-    seed(4)
+    seed(8)
     plot_convex_hull(
-        random_points(250),
+        random_points(50),
         "{}/out/convex_hull.png".format(environ["WD"]),
     )
 
