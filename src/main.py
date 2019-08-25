@@ -7,7 +7,7 @@ from random import seed, shuffle
 from matplotlib.pyplot import close, savefig, subplots, tight_layout
 
 from algo import convex_hull
-from bst import insert, leaf, show
+from bst import BST
 from gen import random_lines, random_points
 from geom import point_of_intersection
 
@@ -59,14 +59,16 @@ def main():
         seed(s)
         xs = list(range(n))
         shuffle(xs)
-        tree = leaf(xs[0])
+        tree = BST(lt, xs[0])
         for i in range(1, n):
-            insert(tree, lt, leaf(xs[i]))
-        show(tree)
+            tree.insert(xs[i])
+        print(tree)
+        if n > 2:
+            print(tree.lookup(n - 2))
 
     demo_convex_hulls(50)
     demo_point_of_intersection(50)
-    demo_bst(15, 0)
+    demo_bst(15, 1)
 
 
 if __name__ == "__main__":

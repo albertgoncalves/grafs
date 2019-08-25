@@ -20,11 +20,12 @@ def convex_hull(points):
 
 
 def sweep_sorting(lines):
-    def f(ab):
+    def max_y_desc(ab):
         ((ax, ay), (bx, by)) = ab
         if ay > by:
             return ((ay, ax), (by, bx))
         else:
             return ((by, bx), (ay, ax))
+
     # order by ((max y, associated x), (min y, associated x)) descending
-    return sorted(lines, reverse=True, key=f)
+    return sorted(lines, reverse=True, key=max_y_desc)
