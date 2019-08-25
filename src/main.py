@@ -11,8 +11,6 @@ from bst import insert, leaf, show
 from gen import random_lines, random_points
 from geom import point_of_intersection
 
-WD = environ["WD"]
-
 
 def init_plot():
     _, ax = subplots(figsize=(8, 8))
@@ -36,6 +34,8 @@ def export(filename):
 
 
 def main():
+    out = "{}/out".format(environ["WD"])
+
     def demo_convex_hulls(n):
         for i in range(n):
             seed(i)
@@ -43,7 +43,7 @@ def main():
             ax = init_plot()
             plot_points(ax, points)
             plot_lines(ax, convex_hull(points))
-            export("{}/out/convex_hull_{}.png".format(WD, i))
+            export("{}/convex_hull_{}.png".format(out, i))
 
     def demo_point_of_intersection(n):
         for i in range(n):
@@ -53,7 +53,7 @@ def main():
             if point:
                 plot_points(ax, [point])
             plot_lines(ax, lines)
-            export("{}/out/point_of_intersection_{}.png".format(WD, i))
+            export("{}/point_of_intersection_{}.png".format(out, i))
 
     def demo_bst(n, s):
         seed(s)
