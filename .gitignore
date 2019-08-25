@@ -4,7 +4,6 @@
 !.shellhook
 !.ocp-indent
 !src/
-!*.hs
 !*.ml
 !scripts/
 !*.py
