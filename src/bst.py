@@ -12,15 +12,15 @@ class BST:
     def __str__(self):
         stack = []
 
-        def closure(self):
-            if self.left is not None:
-                closure(self.left)
+        def closure(node):
+            if node.left is not None:
+                closure(node.left)
             stack.append("{:10}\t[ {} ]".format(
-                str(self.key),
-                ", ".join(map(str, self.values)),
+                str(node.key),
+                ", ".join(map(str, node.values)),
             ))
-            if self.right is not None:
-                closure(self.right)
+            if node.right is not None:
+                closure(node.right)
 
         closure(self)
         return "\n".join(map(
