@@ -57,17 +57,18 @@ def main():
 
     def demo_bst(n, s):
         seed(s)
-        xs = list(range(n))
-        shuffle(xs)
-        tree = BST(lt, xs[0])
+        values = list(range(n))
+        shuffle(values)
+        tree = BST(lt, values[0])
         for i in range(1, n):
-            tree.insert(xs[i])
+            tree.insert(values[i])
         print(tree)
         if n > 2:
-            print(tree.lookup(n - 2))
+            (node, _) = tree.lookup(n - 2)
+            print(node)
 
-    demo_convex_hulls(50)
-    demo_point_of_intersection(50)
+    # demo_convex_hulls(50)
+    # demo_point_of_intersection(50)
     demo_bst(15, 1)
 
 

@@ -21,7 +21,7 @@ class BST:
                 closure(self.right, False, i + 1)
 
         closure(self, True, 1)
-        return "\n{}\n".format("\n".join(stack))
+        return "BST\n===\n{}\n".format("\n".join(stack))
 
     def insert(self, value):
         if self.compare(self.value, value):
@@ -35,16 +35,62 @@ class BST:
             else:
                 self.right.insert(value)
 
-    def lookup(self, value):
+    def lookup(self, value, parent=None):
         if self.value == value:
-            return self
+            return (self, parent)
         elif self.compare(self.value, value):
             if self.left is None:
-                return None
+                return (None, None)
             else:
-                return self.left.lookup(value)
+                return self.left.lookup(value, self)
         else:
             if self.right is None:
-                return None
+                return (None, None)
             else:
-                return self.right.lookup(value)
+                return self.right.lookup(value, self)
+
+    def _count_children(self):
+        n = 0
+        if self.left is not None:
+            n += 1
+        if self.right is not None:
+            n += 1
+        return n
+
+    def delete(self, value):
+        (node, parent) = self.lookup(value)
+        if node is not None:
+            n = node._count_children()
+            if n == 0:
+                if parent is not None:
+                    if parent.left is node:
+                        parent.left = None
+                    else:
+                        parent.right = None
+                else:
+                    self = None
+            elif n == 1:
+                if node.left is not None:
+                    n = node.left
+                else:
+                    n = node.right
+                if parent is not None:
+                    if parent.left is node:
+                        parent.left = n
+                    else:
+                        parent.right = n
+                else:
+                    self.left = n.left
+                    self.right = n.right
+                    self.value = n.value
+            else:
+                parent = node
+                successor = node.right
+                while successor.left is not None:
+                    parent = successor
+                    successor = successor.left
+                node.value = successor.value
+                if parent.left == successor:
+                    parent.left = successor.right
+                else:
+                    parent.right = successor.right
