@@ -23,12 +23,7 @@ def convex_hull(points):
 def sweep_intersections(segments):
     def select_end(ab):
         ((ax, ay), (bx, by)) = ab
-        if ay == by:
-            if ax < bx:
-                return (ax, ay)
-            else:
-                return (bx, by)
-        elif by > ay:
+        if (ay < by) or ((ay == by) and (ax > bx)):
             return (bx, by)
         else:
             return (ax, ay)
