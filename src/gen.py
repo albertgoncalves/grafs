@@ -14,5 +14,5 @@ def random_points(n):
     return [random_point() for _ in range(n)]
 
 
-def random_lines(n):
+def random_segments(n):
     return [(random_point(), random_point()) for _ in range(n)]

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from bst import BST
 from geom import ccw
 
 
@@ -19,13 +20,28 @@ def convex_hull(points):
     return [upper + lower[:1], lower]
 
 
-def sweep_sorting(lines):
-    def max_y_desc(ab):
+def sweep_intersections(segments):
+    def upper(ab):
         ((ax, ay), (bx, by)) = ab
         if ay > by:
-            return ((ay, ax), (by, bx))
+            return (ax, ay)
         else:
-            return ((by, bx), (ay, ax))
+            return (bx, by)
 
-    # order by ((max y, associated x), (min y, associated x)) descending
-    return sorted(lines, reverse=True, key=max_y_desc)
+    def compare_segments(ab, cd):
+        (abx, aby) = upper(ab)
+        (cdx, cdy) = upper(cd)
+        if aby == cdy:
+            # when tied, take lower x
+            return abx > cdx
+        else:
+            return aby < cdy
+
+    event_queue = BST(compare_segments)
+    for segment in segments:
+        event_queue.push(segment)
+    while not event_queue.empty():
+        print(event_queue.pop())
+    for segment in segments:
+        event_queue.push(segment)
+    print(event_queue)

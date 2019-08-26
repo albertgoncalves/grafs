@@ -2,38 +2,40 @@
 
 
 class BST:
-    def __init__(self, compare, value):
+    def __init__(self, compare):
         self.left = None
         self.right = None
-        self.value = value
+        self.value = None
         self.compare = compare
 
     def __str__(self):
-        margin = 4
         stack = []
 
-        def closure(self, flag, i):
+        def closure(self):
             if self.left is not None:
-                closure(self.left, True, i + 1)
-            stem = "_/" if flag else "\\_"
-            stack.append((" {}{}".format(stem, self.value).rjust(margin * i)))
+                closure(self.left)
+            stack.append("{}".format(self.value))
             if self.right is not None:
-                closure(self.right, False, i + 1)
+                closure(self.right)
 
-        closure(self, True, 1)
-        return "BST\n===\n{}\n".format("\n".join(stack))
+        closure(self)
+        return "\n".join(map(
+            lambda ab: "{}\t{}".format(ab[0], ab[1]),
+            zip(range(len(stack)), stack),
+        ))
 
-    def insert(self, value):
-        if self.compare(self.value, value):
-            if self.left is None:
-                self.left = BST(self.compare, value)
-            else:
-                self.left.insert(value)
+    def push(self, value):
+        if self.value is None:
+            self.value = value
         else:
-            if self.right is None:
-                self.right = BST(self.compare, value)
+            if self.compare(self.value, value):
+                if self.left is None:
+                    self.left = BST(self.compare)
+                self.left.push(value)
             else:
-                self.right.insert(value)
+                if self.right is None:
+                    self.right = BST(self.compare)
+                self.right.push(value)
 
     def __lookup(self, value, parent):
         if self.value == value:
@@ -50,7 +52,10 @@ class BST:
                 return self.right.__lookup(value, self)
 
     def lookup(self, value):
-        return self.__lookup(value, None)
+        if self.value is not None:
+            return self.__lookup(value, None)
+        else:
+            return (None, None)
 
     def __count(self):
         n = 0
@@ -71,7 +76,7 @@ class BST:
                     else:
                         parent.right = None
                 else:
-                    self = None
+                    self.value = None
             elif n == 1:
                 if node.left is not None:
                     n = node.left
@@ -97,3 +102,20 @@ class BST:
                     parent.left = successor.right
                 else:
                     parent.right = successor.right
+
+    def __pop(self, parent):
+        if self.left is not None:
+            return self.left.__pop(self)
+        else:
+            value = self.value
+            if parent is not None:
+                parent.delete(value)
+            else:
+                self.delete(value)
+            return value
+
+    def pop(self):
+        return self.__pop(None)
+
+    def empty(self):
+        return self.value is None
