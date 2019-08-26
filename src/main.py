@@ -67,8 +67,8 @@ def main():
             (node, _) = tree.lookup(n - 2)
             print(node)
 
-    # demo_convex_hulls(50)
-    # demo_point_of_intersection(50)
+    demo_convex_hulls(50)
+    demo_point_of_intersection(50)
     demo_bst(15, 1)
 
 

@@ -35,21 +35,24 @@ class BST:
             else:
                 self.right.insert(value)
 
-    def lookup(self, value, parent=None):
+    def __lookup(self, value, parent):
         if self.value == value:
             return (self, parent)
         elif self.compare(self.value, value):
             if self.left is None:
                 return (None, None)
             else:
-                return self.left.lookup(value, self)
+                return self.left.__lookup(value, self)
         else:
             if self.right is None:
                 return (None, None)
             else:
-                return self.right.lookup(value, self)
+                return self.right.__lookup(value, self)
 
-    def _count_children(self):
+    def lookup(self, value):
+        return self.__lookup(value, None)
+
+    def __count(self):
         n = 0
         if self.left is not None:
             n += 1
@@ -58,9 +61,9 @@ class BST:
         return n
 
     def delete(self, value):
-        (node, parent) = self.lookup(value)
+        (node, parent) = self.__lookup(value, None)
         if node is not None:
-            n = node._count_children()
+            n = node.__count()
             if n == 0:
                 if parent is not None:
                     if parent.left is node:
