@@ -59,21 +59,18 @@ def main():
         seed(s)
         values = list(range(n))
         shuffle(values)
-        tree = BST(lt, values[0])
+        tree = BST(lt)
         for i in range(1, n):
-            tree.insert(values[i])
+            tree.push(values[i], None)
         print(tree)
-        if n > 2:
-            (node, _) = tree.lookup(n - 2)
-            print(node)
 
     def demo_sweep_intersections(n, s):
         seed(s)
         sweep_intersections(random_segments(n))
 
-    # demo_convex_hulls(50)
-    # demo_point_of_intersection(50)
-    # demo_bst(15, 1)
+    demo_convex_hulls(50)
+    demo_point_of_intersection(50)
+    demo_bst(15, 1)
     demo_sweep_intersections(20, 0)
 
 
