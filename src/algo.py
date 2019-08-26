@@ -21,27 +21,31 @@ def convex_hull(points):
 
 
 def sweep_intersections(segments):
-    def upper(ab):
+    def select_end(ab):
         ((ax, ay), (bx, by)) = ab
-        if ay > by:
-            return (ax, ay)
-        else:
+        if ay == by:
+            if ax < bx:
+                return (ax, ay)
+            else:
+                return (bx, by)
+        elif by > ay:
             return (bx, by)
-
-    def compare_segments(ab, cd):
-        (abx, aby) = upper(ab)
-        (cdx, cdy) = upper(cd)
-        if aby == cdy:
-            # when tied, take lower x
-            return abx > cdx
         else:
-            return aby < cdy
+            return (ax, ay)
 
-    event_queue = BST(compare_segments)
+    def compare(a, b):
+        (ax, ay) = a
+        (bx, by) = b
+        if ay == by:
+            return ax > bx
+        else:
+            return ay < by
+
+    event_queue = BST(compare)
     for segment in segments:
-        event_queue.push(segment)
+        event_queue.push(select_end(segment), segment)
     while not event_queue.empty():
         print(event_queue.pop())
     for segment in segments:
-        event_queue.push(segment)
+        event_queue.push(select_end(segment), segment)
     print(event_queue)
