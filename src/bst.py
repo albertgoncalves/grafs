@@ -25,13 +25,13 @@ class Node:
             else:
                 self.right.push(key, value)
 
-    def find(self, key):
+    def find(self, key, parent):
         if self.key == key:
-            return self.values
+            return (self, parent)
         elif self.less_than(key, self.key):
-            return self.left.find(key)
+            return self.left.find(key, self)
         else:
-            return self.right.find(key)
+            return self.right.find(key, self)
 
     def head(self, parent):
         if self.right is None:
@@ -39,7 +39,7 @@ class Node:
         else:
             return self.right.head(self)
 
-    def swap(self, replacement, parent):
+    def local_swap(self, replacement, parent):
         # parent => Node()
         if hasattr(parent, "left"):
             if self == parent.left:
@@ -53,11 +53,11 @@ class Node:
     def delete(self, key, parent):
         if self.key == key:
             if (self.left is None) and (self.right is None):
-                self.swap(None, parent)
+                self.local_swap(None, parent)
             elif self.left is None:
-                self.swap(self.right, parent)
+                self.local_swap(self.right, parent)
             elif self.right is None:
-                self.swap(self.left, parent)
+                self.local_swap(self.left, parent)
             else:
                 (replacement, parent) = self.left.head(self)
                 self.key = replacement.key
@@ -84,9 +84,9 @@ class Tree:
 
     def find(self, key):
         if self.root is None:
-            return None
+            return (None, None)
         else:
-            return self.root.find(key)
+            return self.root.find(key, None)
 
     def delete(self, key):
         if self.root is not None:
@@ -122,6 +122,16 @@ class Tree:
                     node = stack.pop()
                     yield (node.key, node.values)
                     node = node.left
+
+    def swap(self, key_a, key_b):
+        (node_a, _) = self.find(key_a)
+        (node_b, _) = self.find(key_b)
+        tmp_key = node_a.key
+        tmp_values = node_a.values
+        node_a.key = node_b.key
+        node_a.values = node_b.values
+        node_b.key = tmp_key
+        node_b.values = tmp_values
 
     def __str__(self):
         if self.root is None:
