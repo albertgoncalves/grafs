@@ -73,8 +73,10 @@ class Tree:
     def __init__(self, less_than):
         self.root = None
         self.less_than = less_than
+        self.size = 0
 
     def push(self, key, value):
+        self.size += 1
         if self.root is None:
             self.root = Node(key, value, self.less_than)
         else:
@@ -88,6 +90,7 @@ class Tree:
 
     def delete(self, key):
         if self.root is not None:
+            self.size -= 1
             self.root.delete(key, self)
 
     def head(self):
@@ -108,16 +111,17 @@ class Tree:
         return self.root is None
 
     def iter(self):
-        stack = []
-        node = self.root
-        while (stack != []) or (node is not None):
-            if node is not None:
-                stack.append(node)
-                node = node.right
-            else:
-                node = stack.pop()
-                yield (node.key, node.values)
-                node = node.left
+        if self.root is not None:
+            stack = []
+            node = self.root
+            while (stack != []) or (node is not None):
+                if node is not None:
+                    stack.append(node)
+                    node = node.right
+                else:
+                    node = stack.pop()
+                    yield (node.key, node.values)
+                    node = node.left
 
     def __str__(self):
         if self.root is None:
