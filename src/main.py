@@ -60,7 +60,7 @@ def main():
         values = list(range(n))
         shuffle(values)
         tree = Tree(lt)
-        for i in range(1, n):
+        for i in range(n):
             tree.push(values[i], None)
         print(tree, "\n")
 
