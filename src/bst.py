@@ -2,6 +2,7 @@
 
 # based on https://github.com/AppliedGo/bintree/blob/master/bintree.go
 
+
 class Node:
     def __init__(self, key, value, less_than):
         self.key = key
