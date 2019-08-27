@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from bst import BST
+from bst import Tree
 from geom import ccw
 
 
@@ -36,11 +36,12 @@ def sweep_intersections(segments):
         else:
             return ay < by
 
-    event_queue = BST(compare)
+    event_queue = Tree(compare)
     for segment in segments:
         event_queue.push(select_end(segment), segment)
+    print(event_queue, "\n")
     while not event_queue.empty():
-        print(event_queue.pop())
+        print(event_queue.pop(), "\n")
     for segment in segments:
         event_queue.push(select_end(segment), segment)
     print(event_queue)

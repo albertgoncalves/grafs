@@ -1,131 +1,125 @@
 #!/usr/bin/env python
 
+# based on https://github.com/AppliedGo/bintree/blob/master/bintree.go
 
-class BST:
-    def __init__(self, compare):
-        self.left = None
-        self.right = None
-        self.key = None
-        self.values = []
-        self.compare = compare
-
-    def __str__(self):
-        stack = []
-
-        def closure(node):
-            if node.left is not None:
-                closure(node.left)
-            stack.append("{:10}\t[ {} ]".format(
-                str(node.key),
-                ", ".join(map(str, node.values)),
-            ))
-            if node.right is not None:
-                closure(node.right)
-
-        closure(self)
-        return "\n".join(map(
-            lambda ab: "{}\t{}".format(ab[0], ab[1]),
-            zip(range(len(stack)), stack),
-        ))
+class Node:
+    def __init__(self, key, value, less_than):
+        self.key = key
+        self.values = [value]
+        self.right = None   # higher
+        self.left = None    # lower
+        self.less_than = less_than
 
     def push(self, key, value):
-        if self.key is None:
-            self.key = key
-            self.values.append(value)
-        elif self.key == key:
-            self.values.append(value)
-        elif self.compare(self.key, key):
-            if self.left is None:
-                self.left = BST(self.compare)
-            self.left.push(key, value)
-        else:
-            if self.right is None:
-                self.right = BST(self.compare)
-            self.right.push(key, value)
-
-    def __lookup(self, key, parent):
         if self.key == key:
-            return (self, parent)
-        elif self.compare(self.key, key):
+            self.values.append(value)
+        elif self.less_than(key, self.key):
             if self.left is None:
-                return (None, None)
+                self.left = Node(key, value, self.less_than)
             else:
-                return self.left.__lookup(key, self)
+                self.left.push(key, value)
         else:
             if self.right is None:
-                return (None, None)
+                self.right = Node(key, value, self.less_than)
             else:
-                return self.right.__lookup(key, self)
+                self.right.push(key, value)
 
-    def lookup(self, key):
-        if self.key is not None:
-            return self.__lookup(key, None)
+    def find(self, key):
+        if self.key == key:
+            return self.values
+        elif self.less_than(key, self.key):
+            return self.left.find(key)
         else:
-            return (None, None)
+            return self.right.find(key)
 
-    def __count(self):
-        n = 0
-        if self.left is not None:
-            n += 1
-        if self.right is not None:
-            n += 1
-        return n
+    def head(self, parent):
+        if self.right is None:
+            return (self, parent)
+        else:
+            return self.right.head(self)
+
+    def swap(self, replacement, parent):
+        # parent => Node()
+        if hasattr(parent, "left"):
+            if self == parent.left:
+                parent.left = replacement
+            else:
+                parent.right = replacement
+        # parent => Tree()
+        else:
+            parent.root = replacement
+
+    def delete(self, key, parent):
+        if self.key == key:
+            if (self.left is None) and (self.right is None):
+                self.swap(None, parent)
+            elif self.left is None:
+                self.swap(self.right, parent)
+            elif self.right is None:
+                self.swap(self.left, parent)
+            else:
+                (replacement, parent) = self.left.head(self)
+                self.key = replacement.key
+                self.values = replacement.values
+                replacement.delete(replacement.key, parent)
+        elif self.less_than(key, self.key):
+            self.left.delete(key, self)
+        else:
+            self.right.delete(key, self)
+
+
+class Tree:
+    def __init__(self, less_than):
+        self.root = None
+        self.less_than = less_than
+
+    def push(self, key, value):
+        if self.root is None:
+            self.root = Node(key, value, self.less_than)
+        else:
+            self.root.push(key, value)
+
+    def find(self, key):
+        if self.root is None:
+            return None
+        else:
+            return self.root.find(key)
 
     def delete(self, key):
-        (node, parent) = self.__lookup(key, None)
-        if node is not None:
-            n = node.__count()
-            if n == 0:
-                if parent is not None:
-                    if parent.left is node:
-                        parent.left = None
-                    else:
-                        parent.right = None
-                else:
-                    self.key = None
-                    self.values = []
-            elif n == 1:
-                if node.left is not None:
-                    n = node.left
-                else:
-                    n = node.right
-                if parent is not None:
-                    if parent.left is node:
-                        parent.left = n
-                    else:
-                        parent.right = n
-                else:
-                    self.left = n.left
-                    self.right = n.right
-                    self.key = n.key
-                    self.values = n.values
-            else:
-                parent = node
-                successor = node.right
-                while successor.left is not None:
-                    parent = successor
-                    successor = successor.left
-                node.key = successor.key
-                node.values = successor.values
-                if parent.left == successor:
-                    parent.left = successor.right
-                else:
-                    parent.right = successor.right
+        if self.root is not None:
+            self.root.delete(key, self)
 
-    def __pop(self, parent):
-        if self.left is not None:
-            return self.left.__pop(self)
+    def head(self):
+        if self.root is None:
+            return None
         else:
-            key = self.key
-            values = self.values
-            if parent is not None:
-                parent.delete(key)
-            else:
-                self.delete(key)
-            return (key, values)
+            return self.root.head(self)
 
     def pop(self):
-        return self.__pop(None)
+        if self.root is None:
+            return None
+        else:
+            (node, parent) = self.head()
+            node.delete(node.key, parent)
+            return (node.key, node.values)
 
     def empty(self):
-        return self.key is None
+        return self.root is None
+
+    def iter(self):
+        stack = []
+        node = self.root
+        while (stack != []) or (node is not None):
+            if node is not None:
+                stack.append(node)
+                node = node.right
+            else:
+                node = stack.pop()
+                yield (node.key, node.values)
+                node = node.left
+
+    def __str__(self):
+        if self.root is None:
+            return str(None)
+        else:
+            return "\n".join(map(str, self.iter()))

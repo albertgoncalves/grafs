@@ -7,7 +7,7 @@ from random import seed, shuffle
 from matplotlib.pyplot import close, savefig, subplots, tight_layout
 
 from algo import convex_hull, sweep_intersections
-from bst import BST
+from bst import Tree
 from gen import random_segments, random_points
 from geom import point_of_intersection
 
@@ -59,10 +59,10 @@ def main():
         seed(s)
         values = list(range(n))
         shuffle(values)
-        tree = BST(lt)
+        tree = Tree(lt)
         for i in range(1, n):
             tree.push(values[i], None)
-        print(tree)
+        print(tree, "\n")
 
     def demo_sweep_intersections(n, s):
         seed(s)
