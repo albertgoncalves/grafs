@@ -65,7 +65,9 @@ def main():
         tree = Tree(lt)
         for i in range(n):
             tree.insert(values[i], i)
-        tree.swap(2, 3)
+        tree.swap_values(2, 3)
+        print(tree.key_left(1))
+        print(tree.key_right(1), "\n")
         print(tree, "\n")
 
     def demo_sweep_intersections(n, s):

@@ -79,7 +79,6 @@ def sweep_intersections(segments):
                         points.append(point)
                         event_queue.insert(point, None)
                 status_queue.insert(value, None)
-        candidates = list(status_queue.iter())
         for (candidate, _) in status_queue.iter():
             (_, y) = lower_end(*candidate)
             if y > horizontal:

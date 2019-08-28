@@ -34,11 +34,49 @@ class Node:
         else:
             return self.right.find(key, self)
 
-    def head(self, parent):
+    def first(self, parent):
         if self.right is None:
             return (self, parent)
         else:
-            return self.right.head(self)
+            return self.right.first(self)
+
+    def last(self, parent):
+        if self.left is None:
+            return (self, parent)
+        else:
+            return self.left.last(self)
+
+    def next_left(self, parent):
+        if self.left is not None:
+            (node, _) = self.left.first(self)
+            return node
+        elif parent is not None:
+            if self != parent.left:
+                if parent.left is None:
+                    return parent
+                else:
+                    (node, _) = parent.left.first(parent)
+                    return node
+            else:
+                return None
+        else:
+            return None
+
+    def next_right(self, parent):
+        if self.right is not None:
+            (node, _) = self.right.last(self)
+            return node
+        elif parent is not None:
+            if self != parent.right:
+                if parent.right is None:
+                    return parent
+                else:
+                    (node, _) = parent.right.last(parent)
+                    return node
+            else:
+                return None
+        else:
+            return None
 
     def local_swap(self, replacement, parent):
         # parent => Node()
@@ -60,7 +98,7 @@ class Node:
             elif self.right is None:
                 self.local_swap(self.left, parent)
             else:
-                (replacement, parent) = self.left.head(self)
+                (replacement, parent) = self.left.first(self)
                 self.key = replacement.key
                 self.values = replacement.values
                 replacement.delete(replacement.key, parent)
@@ -81,27 +119,49 @@ class Tree:
         else:
             self.root.insert(key, value)
 
-    def find(self, key):
-        if self.root is None:
-            return (None, None)
-        else:
-            return self.root.find(key, None)
-
     def delete(self, key):
         if self.root is not None:
             self.root.delete(key, self)
 
-    def head(self):
+    def first(self):
         if self.root is None:
             return None
         else:
-            return self.root.head(self)
+            return self.root.first(self)
+
+    def last(self):
+        if self.root is None:
+            return None
+        else:
+            return self.root.last(self)
+
+    def key_left(self, key):
+        if self.root is None:
+            return (None, None)
+        else:
+            (node, parent) = self.root.find(key, None)
+            neighbor = node.next_left(parent)
+            if neighbor is not None:
+                return (neighbor.key, neighbor.values)
+            else:
+                return (None, None)
+
+    def key_right(self, key):
+        if self.root is None:
+            return (None, None)
+        else:
+            (node, parent) = self.root.find(key, None)
+            neighbor = node.next_right(parent)
+            if neighbor is not None:
+                return (neighbor.key, neighbor.values)
+            else:
+                return (None, None)
 
     def pop(self):
         if self.root is None:
             return None
         else:
-            (node, parent) = self.head()
+            (node, parent) = self.first()
             node.delete(node.key, parent)
             return (node.key, node.values)
 
@@ -122,11 +182,12 @@ class Tree:
                     node = node.left
 
     def swap_values(self, key_a, key_b):
-        (node_a, _) = self.find(key_a)
-        (node_b, _) = self.find(key_b)
-        tmp_values = node_a.values
-        node_a.values = node_b.values
-        node_b.values = tmp_values
+        if self.root is not None:
+            (node_a, _) = self.root.find(key_a, None)
+            (node_b, _) = self.root.find(key_b, None)
+            tmp_values = node_a.values
+            node_a.values = node_b.values
+            node_b.values = tmp_values
 
     def __str__(self):
         if self.root is None:
