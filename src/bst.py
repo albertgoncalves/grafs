@@ -11,22 +11,23 @@ class Node:
         self.left = None    # lower
         self.less_than = less_than
 
-    def push(self, key, value):
+    def insert(self, key, value):
         if self.key == key:
-            self.values.append(value)
+            if value is not None:
+                self.values.append(value)
         elif self.less_than(key, self.key):
             if self.left is None:
                 self.left = Node(key, value, self.less_than)
             else:
-                self.left.push(key, value)
+                self.left.insert(key, value)
         else:
             if self.right is None:
                 self.right = Node(key, value, self.less_than)
             else:
-                self.right.push(key, value)
+                self.right.insert(key, value)
 
     def find(self, key, parent):
-        if self.key == key:
+        if (self.key is None) or (self.key == key):
             return (self, parent)
         elif self.less_than(key, self.key):
             return self.left.find(key, self)
@@ -73,14 +74,12 @@ class Tree:
     def __init__(self, less_than):
         self.root = None
         self.less_than = less_than
-        self.size = 0
 
-    def push(self, key, value):
-        self.size += 1
+    def insert(self, key, value):
         if self.root is None:
             self.root = Node(key, value, self.less_than)
         else:
-            self.root.push(key, value)
+            self.root.insert(key, value)
 
     def find(self, key):
         if self.root is None:
@@ -90,7 +89,6 @@ class Tree:
 
     def delete(self, key):
         if self.root is not None:
-            self.size -= 1
             self.root.delete(key, self)
 
     def head(self):
@@ -123,14 +121,11 @@ class Tree:
                     yield (node.key, node.values)
                     node = node.left
 
-    def swap(self, key_a, key_b):
+    def swap_values(self, key_a, key_b):
         (node_a, _) = self.find(key_a)
         (node_b, _) = self.find(key_b)
-        tmp_key = node_a.key
         tmp_values = node_a.values
-        node_a.key = node_b.key
         node_a.values = node_b.values
-        node_b.key = tmp_key
         node_b.values = tmp_values
 
     def __str__(self):

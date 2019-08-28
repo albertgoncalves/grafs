@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from bst import Tree
-from geom import ccw
+from geom import ccw, point_of_intersection
 
 
 def convex_hull(points):
@@ -21,14 +21,31 @@ def convex_hull(points):
 
 
 def sweep_intersections(segments):
-    def select_end(ab):
-        ((ax, ay), (bx, by)) = ab
-        if (ay < by) or ((ay == by) and (ax > bx)):
-            return (bx, by)
+    def upper_end(a, b):
+        (_, ay) = a
+        (_, by) = b
+        if ay < by:
+            return b
         else:
-            return (ax, ay)
+            return a
 
-    def compare(a, b):
+    def lower_end(a, b):
+        (_, ay) = a
+        (_, by) = b
+        if ay < by:
+            return a
+        else:
+            return b
+
+    def event_point(a, b):
+        (ax, ay) = a
+        (bx, by) = b
+        if (ay < by) or ((ay == by) and (ax > bx)):
+            return b
+        else:
+            return a
+
+    def compare_event(a, b):
         (ax, ay) = a
         (bx, by) = b
         if ay == by:
@@ -36,12 +53,37 @@ def sweep_intersections(segments):
         else:
             return ay < by
 
-    event_queue = Tree(compare)
+    def compare_status(ab, cd):
+        (u1, _) = upper_end(*ab)
+        (u2, _) = upper_end(*cd)
+        if u1 == u2:
+            (l1, _) = lower_end(*ab)
+            (l2, _) = lower_end(*cd)
+            return l1 < l2
+        else:
+            return u1 < u2
+
+    points = []
+    event_queue = Tree(compare_event)
+    status_queue = Tree(compare_status)
     for segment in segments:
-        event_queue.push(select_end(segment), segment)
-    print(event_queue, "\n")
+        event_queue.insert(event_point(*segment), segment)
     while not event_queue.empty():
-        print(event_queue.pop(), "\n")
-    for segment in segments:
-        event_queue.push(select_end(segment), segment)
-    print(event_queue)
+        (key, values) = event_queue.pop()
+        (vertical, horizontal) = key
+        for value in values:
+            if value is not None:
+                status_queue.insert(value, None)
+        candidates = list(status_queue.iter())
+        n = len(candidates)
+        for i in range(n - 1):
+            (ab, _) = candidates[i]
+            (cd, _) = candidates[i + 1]
+            point = point_of_intersection(ab, cd)
+            if point is not None:
+                points.append(point)
+        for (candidate, _) in status_queue.iter():
+            (_, y) = lower_end(*candidate)
+            if y > horizontal:
+                status_queue.delete(candidate)
+    return (segments, points)

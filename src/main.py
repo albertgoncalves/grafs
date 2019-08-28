@@ -19,7 +19,8 @@ def init_plot():
 
 
 def plot_points(ax, points):
-    ax.scatter(*zip(*points), zorder=1)
+    if len(points) > 0:
+        ax.scatter(*zip(*points), zorder=1)
 
 
 def plot_segments(ax, segments):
@@ -61,17 +62,22 @@ def main():
         shuffle(values)
         tree = Tree(lt)
         for i in range(n):
-            tree.push(values[i], None)
+            tree.insert(values[i], i)
+        tree.swap(2, 3)
         print(tree, "\n")
 
     def demo_sweep_intersections(n, s):
         seed(s)
-        sweep_intersections(random_segments(n))
+        (segments, points) = sweep_intersections(random_segments(n))
+        ax = init_plot()
+        plot_points(ax, points)
+        plot_segments(ax, segments)
+        export("{}/sweep_intersections.png".format(out))
 
     demo_convex_hulls(50)
     demo_point_of_intersection(50)
     demo_bst(15, 1)
-    demo_sweep_intersections(20, 0)
+    demo_sweep_intersections(10, 1)
 
 
 if __name__ == "__main__":
