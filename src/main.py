@@ -74,9 +74,9 @@ def main():
         plot_segments(ax, segments)
         export("{}/sweep_intersections.png".format(out))
 
-    demo_convex_hulls(50)
-    demo_point_of_intersection(50)
-    demo_bst(15, 1)
+    # demo_convex_hulls(50)
+    # demo_point_of_intersection(50)
+    # demo_bst(15, 1)
     demo_sweep_intersections(10, 1)
 
 

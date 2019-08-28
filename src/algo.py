@@ -63,6 +63,7 @@ def sweep_intersections(segments):
         else:
             return u1 < u2
 
+    counter = 0
     points = []
     event_queue = Tree(compare_event)
     status_queue = Tree(compare_status)
@@ -70,20 +71,49 @@ def sweep_intersections(segments):
         event_queue.insert(event_point(*segment), segment)
     while not event_queue.empty():
         (key, values) = event_queue.pop()
-        (vertical, horizontal) = key
+        (_, horizontal) = key
         for value in values:
             if value is not None:
                 status_queue.insert(value, None)
         candidates = list(status_queue.iter())
         n = len(candidates)
+        deletes = []
+        inserts = []
         for i in range(n - 1):
-            (ab, _) = candidates[i]
-            (cd, _) = candidates[i + 1]
-            point = point_of_intersection(ab, cd)
-            if point is not None:
-                points.append(point)
+            for j in range(i + 1, n):
+                counter += 1
+                (ab, _) = candidates[i]
+                (cd, _) = candidates[j]
+                point = point_of_intersection(ab, cd)
+                if point is not None:
+                    points.append(point)
+                    (_, y) = point
+                    if y <= horizontal:
+                        deletes.extend([ab, cd])
+                        inserts.extend([(point, ab), (point, cd)])
+                else:
+                    break
+            for j in range(i - 1, -1, -1):
+                counter += 1
+                (ab, _) = candidates[i + 1]
+                (cd, _) = candidates[j]
+                point = point_of_intersection(ab, cd)
+                if point is not None:
+                    points.append(point)
+                    (_, y) = point
+                    if y <= horizontal:
+                        deletes.extend([ab, cd])
+                        inserts.extend([(point, ab), (point, cd)])
+                else:
+                    break
+        for segment in set(deletes):
+            status_queue.delete(segment)
+        for (point, segment) in set(inserts):
+            event_queue.insert(point, None)
+            status_queue.insert((point, lower_end(*segment)), None)
         for (candidate, _) in status_queue.iter():
             (_, y) = lower_end(*candidate)
             if y > horizontal:
                 status_queue.delete(candidate)
+    print(counter)
     return (segments, points)
