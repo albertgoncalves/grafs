@@ -2,7 +2,7 @@
 
 from operator import lt
 from os import environ
-from random import seed, shuffle
+from random import randint, seed, shuffle
 
 from matplotlib.pyplot import close, savefig, subplots, tight_layout
 
@@ -19,13 +19,15 @@ def init_plot():
 
 
 def plot_points(ax, points):
-    if len(points) > 0:
-        ax.scatter(*zip(*points), zorder=1)
+    n = len(points)
+    if n > 0:
+        color = [randint(0, 10) for _ in range(n)]
+        ax.scatter(*zip(*points), c=color, cmap="Accent", zorder=1)
 
 
 def plot_segments(ax, segments):
     for segment in segments:
-        ax.plot(*zip(*segment), zorder=0)
+        ax.plot(*zip(*segment), alpha=0.75, zorder=0)
 
 
 def export(filename):
@@ -74,10 +76,10 @@ def main():
         plot_segments(ax, segments)
         export("{}/sweep_intersections.png".format(out))
 
-    # demo_convex_hulls(50)
-    # demo_point_of_intersection(50)
-    # demo_bst(15, 1)
-    demo_sweep_intersections(10, 1)
+    demo_convex_hulls(50)
+    demo_point_of_intersection(50)
+    demo_bst(15, 1)
+    demo_sweep_intersections(15, 3)
 
 
 if __name__ == "__main__":
