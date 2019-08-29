@@ -72,16 +72,25 @@ def main():
 
     def demo_sweep_intersections(n, s):
         seed(s)
-        (segments, points) = sweep_intersections(random_segments(n))
+        manual_segments = [
+            ((2, 8), (3, 4)),
+            ((4, 1), (5, 7)),
+            ((5, 2), (8, 7)),
+            ((5, 8), (7, 3)),
+            ((4, 6), (5, 4)),
+            ((4, 4), (8, 1)),
+        ]
+        # (segments, points) = sweep_intersections(random_segments(n))
+        (segments, points) = sweep_intersections(manual_segments)
         ax = init_plot()
         plot_points(ax, points)
         plot_segments(ax, segments)
         export("{}/sweep_intersections.png".format(out))
 
-    demo_convex_hulls(50)
-    demo_point_of_intersection(50)
-    demo_bst(15, 1)
-    demo_sweep_intersections(15, 3)
+    # demo_convex_hulls(50)
+    # demo_point_of_intersection(50)
+    # demo_bst(15, 1)
+    demo_sweep_intersections(20, 5)
 
 
 if __name__ == "__main__":

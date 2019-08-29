@@ -135,28 +135,6 @@ class Tree:
         else:
             return self.root.last(self)
 
-    def key_left(self, key):
-        if self.root is None:
-            return (None, None)
-        else:
-            (node, parent) = self.root.find(key, None)
-            neighbor = node.next_left(parent)
-            if neighbor is not None:
-                return (neighbor.key, neighbor.values)
-            else:
-                return (None, None)
-
-    def key_right(self, key):
-        if self.root is None:
-            return (None, None)
-        else:
-            (node, parent) = self.root.find(key, None)
-            neighbor = node.next_right(parent)
-            if neighbor is not None:
-                return (neighbor.key, neighbor.values)
-            else:
-                return (None, None)
-
     def pop(self):
         if self.root is None:
             return None
