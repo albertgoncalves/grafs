@@ -65,10 +65,10 @@ def main():
         tree = Tree(lt)
         for i in range(n):
             tree.insert(values[i], i)
-        tree.swap_values(2, 3)
-        print(tree.key_left(1))
-        print(tree.key_right(1), "\n")
         print(tree, "\n")
+        for i in range(n):
+            print(i, tree.neighbors(i))
+        # tree.swap_values(2, 3)
 
     def demo_sweep_intersections(n, s):
         seed(s)
@@ -78,10 +78,10 @@ def main():
         plot_segments(ax, segments)
         export("{}/sweep_intersections.png".format(out))
 
-    demo_convex_hulls(50)
-    demo_point_of_intersection(50)
+    # demo_convex_hulls(50)
+    # demo_point_of_intersection(50)
     demo_bst(15, 1)
-    demo_sweep_intersections(15, 3)
+    # demo_sweep_intersections(15, 3)
 
 
 if __name__ == "__main__":

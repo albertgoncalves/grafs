@@ -34,6 +34,61 @@ class Node:
         else:
             return self.right.find(key, self)
 
+    def neighbors(self, key):
+        (node, parent) = self.find(key, None)
+        if (node.left is not None) and (node.right is not None):
+            (left, _) = node.left.first(node)
+            (right, _) = node.right.last(node)
+            return (left, right)
+        elif (parent is not None) and (node.left is None) \
+                and (node.right is None):
+            (_, grandparent) = self.find(parent.key, None)
+            if grandparent is not None:
+                if self.less_than(parent.key, grandparent.key):
+                    return (parent, grandparent)
+                else:
+                    return (grandparent, parent)
+            else:
+                return (None, None)
+        elif (parent is not None) and (node.left is not None) \
+                and (node.right is None):
+            (left, _) = node.left.first(node)
+            if self.less_than(left.key, key) \
+                    and self.less_than(key, parent.key):
+                return (left, parent)
+            else:
+                (_, grandparent) = self.find(parent.key, None)
+                if (grandparent is not None) \
+                        and self.less_than(left.key, key) \
+                        and self.less_than(key, grandparent.key):
+                    return (left, grandparent)
+                else:
+                    (None, None)
+        elif (parent is not None) and (node.left is None) \
+                and (node.right is not None):
+            (right, _) = node.right.last(node)
+            if self.less_than(parent.key, key) \
+                    and self.less_than(key, right.key):
+                return (parent, right)
+            else:
+                (_, grandparent) = self.find(parent.key, None)
+                if (grandparent is not None) \
+                        and self.less_than(grandparent.key, key) \
+                        and self.less_than(key, right.key):
+                    return (grandparent, right)
+                else:
+                    if self.less_than(key, right.key) \
+                            and self.less_than(key, parent.key):
+                        if self.left is not None:
+                            (left, _) = self.left.last(self)
+                            if (left is not None) and (left.key != key):
+                                return (left, right)
+                        return (None, right)
+                    else:
+                        return (None, None)
+        else:
+            return (None, None)
+
     def first(self, parent):
         if self.right is None:
             return (self, parent)
@@ -45,38 +100,6 @@ class Node:
             return (self, parent)
         else:
             return self.left.last(self)
-
-    def next_left(self, parent):
-        if self.left is not None:
-            (node, _) = self.left.first(self)
-            return node
-        elif parent is not None:
-            if self != parent.left:
-                if parent.left is None:
-                    return parent
-                else:
-                    (node, _) = parent.left.first(parent)
-                    return node
-            else:
-                return None
-        else:
-            return None
-
-    def next_right(self, parent):
-        if self.right is not None:
-            (node, _) = self.right.last(self)
-            return node
-        elif parent is not None:
-            if self != parent.right:
-                if parent.right is None:
-                    return parent
-                else:
-                    (node, _) = parent.right.last(parent)
-                    return node
-            else:
-                return None
-        else:
-            return None
 
     def local_swap(self, replacement, parent):
         # parent => Node()
@@ -135,28 +158,6 @@ class Tree:
         else:
             return self.root.last(self)
 
-    def key_left(self, key):
-        if self.root is None:
-            return (None, None)
-        else:
-            (node, parent) = self.root.find(key, None)
-            neighbor = node.next_left(parent)
-            if neighbor is not None:
-                return (neighbor.key, neighbor.values)
-            else:
-                return (None, None)
-
-    def key_right(self, key):
-        if self.root is None:
-            return (None, None)
-        else:
-            (node, parent) = self.root.find(key, None)
-            neighbor = node.next_right(parent)
-            if neighbor is not None:
-                return (neighbor.key, neighbor.values)
-            else:
-                return (None, None)
-
     def pop(self):
         if self.root is None:
             return None
@@ -188,6 +189,17 @@ class Tree:
             tmp_values = node_a.values
             node_a.values = node_b.values
             node_b.values = tmp_values
+
+    def neighbors(self, key):
+        if self.root is not None:
+            (left, right) = self.root.neighbors(key)
+            if (left is not None) and (right is not None):
+                return (left.key, right.key)
+            elif left is not None:
+                return (left.key, None)
+            elif right is not None:
+                return (None, right.key)
+        return (None, None)
 
     def __str__(self):
         if self.root is None:
