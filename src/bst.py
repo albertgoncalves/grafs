@@ -34,75 +34,6 @@ class Node:
         else:
             return self.right.find(key, self)
 
-    def neighbors(self, key):
-        (node, parent) = self.find(key, None)
-        if (node.left is not None) and (node.right is not None):
-            (left, _) = node.left.first(node)
-            (right, _) = node.right.last(node)
-            return (left, right)
-        elif (parent is not None) and (node.left is None) \
-                and (node.right is None):
-            if (parent.right is not None):
-                (right, _) = parent.right.last(parent)
-                print(4)
-                return (parent, right)
-            elif (parent.left is not None):
-                (left, _) = parent.right.first(parent)
-                print(3)
-                return (left, parent)
-            else:
-                (_, grandparent) = self.find(parent.key, None)
-                if grandparent is not None:
-                    if self.less_than(parent.key, grandparent.key):
-                        print(1)
-                        return (parent, grandparent)
-                    else:
-                        print(2)
-                        return (grandparent, parent)
-                else:
-                    return (None, parent)
-        elif (parent is not None) and (node.left is not None) \
-                and (node.right is None):
-            (left, _) = node.left.first(node)
-            if self.less_than(left.key, key) \
-                    and self.less_than(key, parent.key):
-                return (left, parent)
-            else:
-                (_, grandparent) = self.find(parent.key, None)
-                if (grandparent is not None) \
-                        and self.less_than(left.key, key) \
-                        and self.less_than(key, grandparent.key):
-                    return (left, grandparent)
-                else:
-                    print(2)
-                    return (None, None)
-        elif (parent is not None) and (node.left is None) \
-                and (node.right is not None):
-            (right, _) = node.right.last(node)
-            if self.less_than(parent.key, key) \
-                    and self.less_than(key, right.key):
-                return (parent, right)
-            else:
-                (_, grandparent) = self.find(parent.key, None)
-                if (grandparent is not None) \
-                        and self.less_than(grandparent.key, key) \
-                        and self.less_than(key, right.key):
-                    return (grandparent, right)
-                else:
-                    if self.less_than(key, right.key) \
-                            and self.less_than(key, parent.key):
-                        if self.left is not None:
-                            (left, _) = self.left.last(self)
-                            if (left is not None) and (left.key != key):
-                                return (left, right)
-                        return (None, right)
-                    else:
-                        print(3)
-                        return (None, None)
-        else:
-            print("end")
-            return (None, None)
-
     def first(self, parent):
         if self.right is None:
             return (self, parent)
@@ -206,9 +137,28 @@ class Tree:
             node_a.values = node_b.values
             node_b.values = tmp_values
 
+    def __neighbors(self, key):
+        key_right = None
+        nodes = self.iter()
+        for (key_next, _) in nodes:
+            if key_next == key:
+                break
+            else:
+                key_right = key_next
+        try:
+            (key_left, _) = next(nodes)
+            (left, _) = self.root.find(key_left, None)
+        except StopIteration:
+            left = None
+        if key_right is None:
+            right = None
+        else:
+            (right, _) = self.root.find(key_right, None)
+        return (left, right)
+
     def neighbors(self, key):
         if self.root is not None:
-            (left, right) = self.root.neighbors(key)
+            (left, right) = self.__neighbors(key)
             if (left is not None) and (right is not None):
                 return (left.key, right.key)
             elif left is not None:
