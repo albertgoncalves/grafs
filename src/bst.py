@@ -150,19 +150,21 @@ class Tree:
         if self.root is None:
             return None
         else:
-            return self.root.first(self)
+            (node, _) = self.root.first(self)
+            return (node.key, node.values)
 
     def last(self):
         if self.root is None:
             return None
         else:
-            return self.root.last(self)
+            (node, _) = self.root.last(self)
+            return (node.key, node.values)
 
     def pop(self):
         if self.root is None:
             return None
         else:
-            (node, parent) = self.first()
+            (node, parent) = self.root.first(None)
             node.delete(node.key, parent)
             return (node.key, node.values)
 
