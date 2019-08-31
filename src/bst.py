@@ -140,6 +140,7 @@ class Tree:
     def __neighbors(self, key):
         # tree is iterated from right to left
         key_right = None
+        right = None
         nodes = self.iter()
         for (key_next, _) in nodes:
             if key_next == key:
@@ -161,11 +162,11 @@ class Tree:
         if self.root is not None:
             (left, right) = self.__neighbors(key)
             if (left is not None) and (right is not None):
-                return (left.key, right.key)
+                return ((left.key, left.values), (right.key, right.values))
             elif left is not None:
-                return (left.key, None)
+                return ((left.key, left.values), None)
             elif right is not None:
-                return (None, right.key)
+                return (None, (right.key, right.values))
         return (None, None)
 
     def __str__(self):
