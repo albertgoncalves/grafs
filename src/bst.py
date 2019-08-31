@@ -106,7 +106,7 @@ class Node:
         if hasattr(parent, "left"):
             if self == parent.left:
                 parent.left = replacement
-            else:
+            elif self == parent.right:
                 parent.right = replacement
         # parent => Tree()
         else:
@@ -164,7 +164,7 @@ class Tree:
         if self.root is None:
             return None
         else:
-            (node, parent) = self.root.first(None)
+            (node, parent) = self.root.first(self)
             node.delete(node.key, parent)
             return (node.key, node.values)
 
