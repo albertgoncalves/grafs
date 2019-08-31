@@ -76,3 +76,15 @@ class TestTree:
         tree.swap_values(0, 2)
         assert tree.first() == (2, ["0"])
         assert tree.last() == (0, ["2", "2"])
+
+    def test_neighbors(self):
+        tree = self.seed_none(self.xs)
+        assert tree.neighbors(0) == (None, 1)
+        assert tree.neighbors(1) == (0, 2)
+        assert tree.neighbors(2) == (1, 3)
+        assert tree.neighbors(3) == (2, 4)
+        assert tree.neighbors(4) == (3, 5)
+        assert tree.neighbors(5) == (4, 6)
+        assert tree.neighbors(6) == (5, 7)
+        assert tree.neighbors(7) == (6, 8)
+        assert tree.neighbors(8) == (7, None)

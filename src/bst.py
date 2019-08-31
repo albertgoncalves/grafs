@@ -42,14 +42,25 @@ class Node:
             return (left, right)
         elif (parent is not None) and (node.left is None) \
                 and (node.right is None):
-            (_, grandparent) = self.find(parent.key, None)
-            if grandparent is not None:
-                if self.less_than(parent.key, grandparent.key):
-                    return (parent, grandparent)
-                else:
-                    return (grandparent, parent)
+            if (parent.right is not None):
+                (right, _) = parent.right.last(parent)
+                print(4)
+                return (parent, right)
+            elif (parent.left is not None):
+                (left, _) = parent.right.first(parent)
+                print(3)
+                return (left, parent)
             else:
-                return (None, None)
+                (_, grandparent) = self.find(parent.key, None)
+                if grandparent is not None:
+                    if self.less_than(parent.key, grandparent.key):
+                        print(1)
+                        return (parent, grandparent)
+                    else:
+                        print(2)
+                        return (grandparent, parent)
+                else:
+                    return (None, parent)
         elif (parent is not None) and (node.left is not None) \
                 and (node.right is None):
             (left, _) = node.left.first(node)
@@ -63,7 +74,8 @@ class Node:
                         and self.less_than(key, grandparent.key):
                     return (left, grandparent)
                 else:
-                    (None, None)
+                    print(2)
+                    return (None, None)
         elif (parent is not None) and (node.left is None) \
                 and (node.right is not None):
             (right, _) = node.right.last(node)
@@ -85,8 +97,10 @@ class Node:
                                 return (left, right)
                         return (None, right)
                     else:
+                        print(3)
                         return (None, None)
         else:
+            print("end")
             return (None, None)
 
     def first(self, parent):
