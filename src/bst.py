@@ -138,10 +138,15 @@ class Tree:
             node_b.values = tmp_values
 
     def __neighbors(self, key):
+        # tree is iterated from right to left
         key_right = None
         nodes = self.iter()
         for (key_next, _) in nodes:
             if key_next == key:
+                if key_right is None:
+                    right = None
+                else:
+                    (right, _) = self.root.find(key_right, None)
                 break
             else:
                 key_right = key_next
@@ -150,10 +155,6 @@ class Tree:
             (left, _) = self.root.find(key_left, None)
         except StopIteration:
             left = None
-        if key_right is None:
-            right = None
-        else:
-            (right, _) = self.root.find(key_right, None)
         return (left, right)
 
     def neighbors(self, key):
