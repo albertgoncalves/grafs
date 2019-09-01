@@ -107,7 +107,10 @@ def sweep_intersections(segments):
         finally:
             return (left, right)
 
+    stack = []
+
     def update_events(event_queue, event, left, right):
+        stack.append(None)
         point = point_of_intersection(left, right)
         if (point is not None):
             (ex, ey) = event
@@ -152,12 +155,14 @@ def sweep_intersections(segments):
                     update_events(event_queue, event, inner_left, left)
                     (far_left, _) = sweep_neighbors(status_queue, x, y, inner_left)
                     if far_left is not None:
+                        update_events(event_queue, event, far_left, left)
                         update_events(event_queue, event, far_left, inner_left)
                 (_, inner_right) = sweep_neighbors(status_queue, x, y, right)
                 if inner_right is not None:
                     update_events(event_queue, event, right, inner_right)
                     (_, far_right) = sweep_neighbors(status_queue, x, y, inner_right)
                     if far_right is not None:
+                        update_events(event_queue, event, right, far_right)
                         update_events(event_queue, event, inner_right, far_right)
                 if (inner_left is not None) and (inner_right is not None):
                     update_events(event_queue, event, inner_left, inner_right)
@@ -169,4 +174,5 @@ def sweep_intersections(segments):
         dupe,
         Terminal.end,
     ))
+    print(len(stack))
     return (segments, list(set(points)))
