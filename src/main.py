@@ -43,7 +43,7 @@ def main():
     out = "{}/out".format(environ["WD"])
     # demo_convex_hulls(50, out)
     # demo_point_of_intersection(50, out)
-    demo_sweep_intersections(10, 9, out)
+    demo_sweep_intersections(100, 10, out)
 
 
 if __name__ == "__main__":
