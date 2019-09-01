@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from operator import lt
+from operator import eq, lt
 
 from bst import Tree
 from geom import ccw, intersect, point_of_intersection
@@ -34,7 +34,7 @@ class TestTree:
     xs = [1, 5, 4, 3, 7, 6, 8, 0, 2]
 
     def seed_none(self, xs):
-        tree = Tree(lt)
+        tree = Tree(eq, lt)
         for x in xs:
             tree.insert(x, None)
         return tree
@@ -58,7 +58,7 @@ class TestTree:
         assert self.seed_none(self.xs).last() == (0, [None])
 
     def test_empty(self):
-        tree = Tree(lt)
+        tree = Tree(eq, lt)
         assert tree.empty()
         assert not self.seed_none(self.xs).empty()
 
@@ -70,7 +70,7 @@ class TestTree:
         assert tree.first() == (6, [None])
 
     def test_swap_values(self):
-        tree = Tree(lt)
+        tree = Tree(eq, lt)
         for (k, v) in [(0, "0"), (2, "2"), (2, "2"), (1, "1")]:
             tree.insert(k, v)
         tree.swap_values(0, 2)

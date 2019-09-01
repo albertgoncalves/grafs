@@ -4,32 +4,33 @@
 
 
 class Node:
-    def __init__(self, key, value, less_than):
+    def __init__(self, key, value, eq, lt):
         self.key = key
         self.values = [value]
         self.right = None   # higher
         self.left = None    # lower
-        self.less_than = less_than
+        self.eq = eq
+        self.lt = lt
 
     def insert(self, key, value):
-        if self.key == key:
+        if self.eq(self.key, key):
             if value is not None:
                 self.values.append(value)
-        elif self.less_than(key, self.key):
+        elif self.lt(key, self.key):
             if self.left is None:
-                self.left = Node(key, value, self.less_than)
+                self.left = Node(key, value, self.eq, self.lt)
             else:
                 self.left.insert(key, value)
         else:
             if self.right is None:
-                self.right = Node(key, value, self.less_than)
+                self.right = Node(key, value, self.eq, self.lt)
             else:
                 self.right.insert(key, value)
 
     def find(self, key, parent):
-        if (self.key is None) or (self.key == key):
+        if (self.key is None) or (self.eq(self.key, key)):
             return (self, parent)
-        elif self.less_than(key, self.key):
+        elif self.lt(key, self.key):
             return self.left.find(key, self)
         else:
             return self.right.find(key, self)
@@ -58,7 +59,7 @@ class Node:
             parent.root = replacement
 
     def delete(self, key, parent):
-        if self.key == key:
+        if self.eq(self.key, key):
             if (self.left is None) and (self.right is None):
                 self.local_swap(None, parent)
             elif self.left is None:
@@ -70,20 +71,21 @@ class Node:
                 self.key = replacement.key
                 self.values = replacement.values
                 replacement.delete(replacement.key, parent)
-        elif self.less_than(key, self.key):
+        elif self.lt(key, self.key):
             self.left.delete(key, self)
         else:
             self.right.delete(key, self)
 
 
 class Tree:
-    def __init__(self, less_than):
+    def __init__(self, eq, lt):
         self.root = None
-        self.less_than = less_than
+        self.eq = eq
+        self.lt = lt
 
     def insert(self, key, value):
         if self.root is None:
-            self.root = Node(key, value, self.less_than)
+            self.root = Node(key, value, self.eq, self.lt)
         else:
             self.root.insert(key, value)
 
