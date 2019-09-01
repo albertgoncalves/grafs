@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
+from operator import eq
+
 from bst import Tree
 from geom import ccw, point_of_intersection
+from term import Terminal
 
 
 def convex_hull(points):
     n = len(points)
-    p = sorted(points, key=lambda a: (a[0], a[1]))
+    p = sorted(points)
     upper = p[:2]
     for i in range(2, n):
         upper.append(p[i])
