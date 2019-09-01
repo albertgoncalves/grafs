@@ -40,7 +40,7 @@ def sweep_intersections(segments):
         else:
             return b
 
-    def compare_event(a, b):
+    def event_lt(a, b):
         (ax, ay) = a
         (bx, by) = b
         if ay == by:
@@ -48,7 +48,7 @@ def sweep_intersections(segments):
         else:
             return ay < by
 
-    def compare_status(ab, cd):
+    def status_lt(ab, cd):
         (u1, _) = upper_end(*ab)
         (u2, _) = upper_end(*cd)
         if u1 == u2:
@@ -62,57 +62,79 @@ def sweep_intersections(segments):
         (_, b) = ab
         return b
 
+    def status_sort(status):
+        (_, [(x, _)]) = status
+        return x
+
+    def sweep_neighbors(status_queue, segment):
+        status_list = iter(sorted(list(status_queue.iter()), key=status_sort))
+        left = None
+        right = None
+        for (next_segment, _) in status_list:
+            if segment == next_segment:
+                break
+            else:
+                left = next_segment
+        try:
+            (right, _) = next(status_list)
+        finally:
+            return (left, right)
+
+    def update_events(event_queue, event, left, right):
+        point = point_of_intersection(left, right)
+        if (point is not None):
+            (ex, ey) = event
+            (px, py) = point
+            if (py < ey) or ((py == ey) and (ex < px)):
+                event_queue.insert(point, (intersection, (left, right)))
+
+    def fst(ab):
+        (a, _) = ab
+        return a
+
     upper = "upper"
     lower = "lower"
     intersection = "intersection"
     points = []
-    event_queue = Tree(compare_event)
-    status_queue = Tree(compare_status)
+    event_queue = Tree(eq, event_lt)
+    status_queue = Tree(eq, status_lt)
     for segment in segments:
         event_queue.insert(upper_end(*segment), (upper, segment))
         event_queue.insert(lower_end(*segment), (lower, segment))
     while not event_queue.empty():
-        (key, values) = event_queue.pop()
-        (_, sweep_line) = key
+        (event, values) = event_queue.pop()
+        print(event)
         for (label, value) in values:
             if label == upper:
-                status_queue.insert(value, value)
-                (l, r) = status_queue.neighbors(value)
-                if l is not None:
-                    (_, [left]) = l
-                    point = point_of_intersection(left, value)
-                    if (point is not None) and (snd(point) < sweep_line):
-                        event_queue.insert(point, (intersection, (left, value)))
-                if r is not None:
-                    (_, [right]) = r
-                    point = point_of_intersection(value, right)
-                    if (point is not None) and (snd(point) < sweep_line):
-                        event_queue.insert(point, (intersection, (value, right)))
+                status_queue.insert(value, event)
+                (left, right) = sweep_neighbors(status_queue, value)
+                if left is not None:
+                    update_events(event_queue, event, left, value)
+                if right is not None:
+                    update_events(event_queue, event, value, right)
             elif label == lower:
-                (l, r) = status_queue.neighbors(value)
+                (left, right) = sweep_neighbors(status_queue, value)
+                if (left is not None) and (right is not None):
+                    update_events(event_queue, event, left, right)
                 status_queue.delete(value)
-                if (l is not None) and (r is not None):
-                    (_, [left]) = l
-                    (_, [right]) = r
-                    point = point_of_intersection(left, right)
-                    if (point is not None) and (snd(point) < sweep_line):
-                        event_queue.insert(point, (intersection, (left, right)))
             else:
-                points.append(key)
-                (left, right) = value
-                (fl, _) = status_queue.neighbors(left)
-                (_, fr) = status_queue.neighbors(right)
-                if fl is not None:
-                    (_, [far_left]) = fl
-                    point = point_of_intersection(far_left, right)
-                    if (point is not None) and (snd(point) < sweep_line):
-                        event_queue.insert(point, (intersection, (far_left, right)))
-                if fr is not None:
-                    (_, [far_right]) = fr
-                    point = point_of_intersection(left, far_right)
-                    if (point is not None) and (snd(point) < sweep_line):
-                        event_queue.insert(point, (intersection, (left, far_right)))
-                # status_queue.swap_values(left, right)
-    print("duplicates:\t{}".format(not len(points) == len(set(points))))
-    list(map(print, sorted(points)))
+                points.append(event)
+                (right, left) = value
+                for segment in [right, left]:
+                    status_queue.delete(segment)
+                    status_queue.insert(segment, event)
+                (far_left, _) = sweep_neighbors(status_queue, left)
+                (_, far_right) = sweep_neighbors(status_queue, right)
+                print(far_left, left, right, far_right)
+                if far_left is not None:
+                    update_events(event_queue, event, far_left, left)
+                if far_right is not None:
+                    update_events(event_queue, event, right, far_right)
+    dupe = not len(points) == len(set(points))
+    print("\n{}duplicates: {}{}{}".format(
+        Terminal.bold,
+        Terminal.red if dupe else Terminal.green,
+        dupe,
+        Terminal.end,
+    ))
     return (segments, list(set(points)))
