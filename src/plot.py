@@ -2,7 +2,7 @@
 
 from random import randint
 
-from matplotlib.pyplot import close, savefig, subplots, tight_layout
+from matplotlib.pyplot import close, grid, savefig, subplots, tight_layout
 
 
 def init_plot():
@@ -24,6 +24,7 @@ def plot_segments(ax, segments):
 
 
 def export(filename):
+    grid()
     tight_layout()
     savefig(filename)
     close()

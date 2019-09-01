@@ -44,7 +44,7 @@ def sweep_intersections(segments):
         (ax, ay) = a
         (bx, by) = b
         if ay == by:
-            return ax > bx
+            return ax < bx
         else:
             return ay < by
 
@@ -62,12 +62,39 @@ def sweep_intersections(segments):
         (_, b) = ab
         return b
 
-    def status_sort(status):
-        (_, [(x, _)]) = status
-        return x
+    def status_sort(min_x, max_x, x, y):
+        def f(status):
+            (segment, _) = status
+            point = point_of_intersection(segment, ((min_x, y), (max_x, y)))
+            (lx, _) = lower_end(*segment)
+            if point is not None:
+                (px, _) = point
+                return (px, lx)
+            else:
+                return (x, lx)
+        return f
 
-    def sweep_neighbors(status_queue, segment):
-        status_list = iter(sorted(list(status_queue.iter()), key=status_sort))
+    def bounds(status_queue):
+        points = []
+        for (segment, _) in status_queue.iter():
+            (ab, cd) = segment
+            points.extend([ab, cd])
+        (min_x, _) = points[0]
+        (max_x, _) = points[0]
+        for point in points[1:]:
+            (x, _) = point
+            if x < min_x:
+                min_x = x
+            if max_x < x:
+                max_x = x
+        return (min_x, max_x)
+
+    def sweep_neighbors(status_queue, x, y, segment):
+        (min_x, max_x) = bounds(status_queue)
+        status_list = iter(sorted(
+            list(status_queue.iter()),
+            key=status_sort(min_x, max_x, x, y)
+        ))
         left = None
         right = None
         for (next_segment, _) in status_list:
@@ -103,33 +130,38 @@ def sweep_intersections(segments):
         event_queue.insert(lower_end(*segment), (lower, segment))
     while not event_queue.empty():
         (event, values) = event_queue.pop()
-        print(event)
+        (x, y) = event
         for (label, value) in values:
             if label == upper:
-                status_queue.insert(value, event)
-                (left, right) = sweep_neighbors(status_queue, value)
+                status_queue.insert(value, None)
+                (left, right) = sweep_neighbors(status_queue, x, y, value)
                 if left is not None:
                     update_events(event_queue, event, left, value)
                 if right is not None:
                     update_events(event_queue, event, value, right)
             elif label == lower:
-                (left, right) = sweep_neighbors(status_queue, value)
+                (left, right) = sweep_neighbors(status_queue, x, y, value)
+                status_queue.delete(value)
                 if (left is not None) and (right is not None):
                     update_events(event_queue, event, left, right)
-                status_queue.delete(value)
             else:
                 points.append(event)
                 (right, left) = value
-                for segment in [right, left]:
-                    status_queue.delete(segment)
-                    status_queue.insert(segment, event)
-                (far_left, _) = sweep_neighbors(status_queue, left)
-                (_, far_right) = sweep_neighbors(status_queue, right)
-                print(far_left, left, right, far_right)
-                if far_left is not None:
-                    update_events(event_queue, event, far_left, left)
-                if far_right is not None:
-                    update_events(event_queue, event, right, far_right)
+                (inner_left, _) = sweep_neighbors(status_queue, x, y, left)
+                if inner_left is not None:
+                    update_events(event_queue, event, inner_left, left)
+                    (far_left, _) = sweep_neighbors(status_queue, x, y, inner_left)
+                    if far_left is not None:
+                        update_events(event_queue, event, far_left, inner_left)
+                (_, inner_right) = sweep_neighbors(status_queue, x, y, right)
+                if inner_right is not None:
+                    update_events(event_queue, event, right, inner_right)
+                    (_, far_right) = sweep_neighbors(status_queue, x, y, inner_right)
+                    if far_right is not None:
+                        update_events(event_queue, event, inner_right, far_right)
+                if (inner_left is not None) and (inner_right is not None):
+                    update_events(event_queue, event, inner_left, inner_right)
+            break
     dupe = not len(points) == len(set(points))
     print("\n{}duplicates: {}{}{}".format(
         Terminal.bold,
