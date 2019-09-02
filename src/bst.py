@@ -4,11 +4,11 @@
 # based on https://github.com/AppliedGo/bintree/blob/master/bintree.go
 class Node:
     def __init__(self, key, value, lt):
+        self.lt = lt
         self.key = key
         self.values = [value]
         self.right = None  # higher
         self.left = None   # lower
-        self.lt = lt
 
     def insert(self, key, value):
         if self.key == key:
@@ -77,8 +77,8 @@ class Node:
 
 class Tree:
     def __init__(self, lt):
-        self.root = None
         self.lt = lt
+        self.root = None
 
     def insert(self, key, value):
         if self.root is None:
