@@ -4,7 +4,7 @@ from os import environ
 from random import seed
 from sys import argv
 
-from algo import convex_hull, sweep_intersections
+from algo import convex_hull, brute_sweep_intersections
 from gen import random_segments, random_points
 from geom import point_of_intersection
 from plot import export, init_plot, plot_points, plot_segments
@@ -32,10 +32,10 @@ def demo_point_of_intersection(n, out):
         export("{}/point_of_intersection_{}.png".format(out, i))
 
 
-def demo_sweep_intersections(n, out):
+def demo_brute_sweep_intersections(n, out):
     for i in range(n):
         seed(i)
-        (segments, points) = sweep_intersections(random_segments(20))
+        (segments, points) = brute_sweep_intersections(random_segments(20))
         ax = init_plot()
         plot_points(ax, points)
         plot_segments(ax, segments)
@@ -51,7 +51,7 @@ def main():
             elif arg == "-p":
                 demo_point_of_intersection(50, out)
             elif arg == "-i":
-                demo_sweep_intersections(50, out)
+                demo_brute_sweep_intersections(50, out)
 
 
 if __name__ == "__main__":
