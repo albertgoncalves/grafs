@@ -3,24 +3,8 @@
 from operator import eq, lt
 
 from bst import Tree
-from geom import ccw, point_of_intersection
+from geom import point_of_intersection
 from term import Terminal
-
-
-def convex_hull(points):
-    n = len(points)
-    p = sorted(points)
-    upper = p[:2]
-    for i in range(2, n):
-        upper.append(p[i])
-        while len(upper) > 2 and not ccw(*upper[-3:]):
-            del upper[-2]
-    lower = [p[-1], p[-2]]
-    for i in range(n - 2, -1, -1):
-        lower.append(p[i])
-        while len(lower) > 2 and not ccw(*lower[-3:]):
-            del lower[-2]
-    return [upper + lower[:1], lower]
 
 
 def upper_end(a, b):
@@ -65,7 +49,8 @@ def brute_sweep_intersections(segments):
     while not event_queue.empty():
         (event, values) = event_queue.pop()
         (_, y) = event
-        for segment in sorted(values):
+        for segment in values:
+            status_queue.insert(segment, None)
             for (other, _) in status_queue.iter():
                 counter += 1
                 if snd(lower_end(*other)) < y:
@@ -74,7 +59,6 @@ def brute_sweep_intersections(segments):
                         points.append(point)
                 else:
                     status_queue.delete(other)
-            status_queue.insert(segment, None)
     dupe = not len(points) == len(set(points))
     print("counter    : {}{}{}\nduplicates : {}{}{}{}".format(
         Terminal.bold,

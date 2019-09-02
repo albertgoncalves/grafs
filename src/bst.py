@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
+
 # based on https://github.com/AppliedGo/bintree/blob/master/bintree.go
-
-
 class Node:
     def __init__(self, key, value, eq, lt):
         self.key = key
         self.values = [value]
-        self.right = None   # higher
-        self.left = None    # lower
+        self.right = None  # higher
+        self.left = None   # lower
         self.eq = eq
         self.lt = lt
 
@@ -48,13 +47,13 @@ class Node:
             return self.left.last(self)
 
     def local_swap(self, replacement, parent):
-        # parent => Node()
+        # parent Node()
         if hasattr(parent, "left"):
             if self == parent.left:
                 parent.left = replacement
             elif self == parent.right:
                 parent.right = replacement
-        # parent => Tree()
+        # parent Tree()
         else:
             parent.root = replacement
 
@@ -140,24 +139,26 @@ class Tree:
             node_b.values = tmp_values
 
     def __neighbors(self, key):
-        # tree is iterated from right to left
+        # tree iterates top down (right to left)
         key_right = None
-        right = None
         nodes = self.iter()
         for (key_next, _) in nodes:
-            if key_next == key:
-                if key_right is None:
-                    right = None
-                else:
-                    (right, _) = self.root.find(key_right, None)
+            if self.eq(key, key_next):
                 break
             else:
                 key_right = key_next
         try:
             (key_left, _) = next(nodes)
-            (left, _) = self.root.find(key_left, None)
         except StopIteration:
+            key_left = None
+        if key_left is not None:
+            (left, _) = self.root.find(key_left, None)
+        else:
             left = None
+        if key_right is not None:
+            (right, _) = self.root.find(key_right, None)
+        else:
+            right = None
         return (left, right)
 
     def neighbors(self, key):

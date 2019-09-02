@@ -4,10 +4,12 @@ from os import environ
 from random import seed
 from sys import argv
 
-from algo import convex_hull, brute_sweep_intersections
+from convex_hull import convex_hull
 from gen import random_segments, random_points
 from geom import point_of_intersection
 from plot import export, init_plot, plot_points, plot_segments
+from sweep_intersections import brute_sweep_intersections
+from term import Terminal
 
 
 def demo_convex_hulls(n, out):
@@ -42,15 +44,22 @@ def demo_brute_sweep_intersections(n, out):
         export("{}/sweep_intersections_{}.png".format(out, i))
 
 
+def banner(highlight, lowlight):
+    return "{}{}{}{}".format(Terminal.bold, highlight, Terminal.end, lowlight)
+
+
 def main():
     if len(argv) > 1:
         out = "{}/out".format(environ["WD"])
         for arg in set(argv[1:]):
             if arg == "-c":
+                print(banner("demo_convex_hulls", "(50, ...)"))
                 demo_convex_hulls(50, out)
             elif arg == "-p":
+                print(banner("demo_point_of_intersection", "(50, ...)"))
                 demo_point_of_intersection(50, out)
             elif arg == "-i":
+                print(banner("demo_brute_sweep_intersections", "(50, ...)"))
                 demo_brute_sweep_intersections(50, out)
 
 
