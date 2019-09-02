@@ -12,7 +12,7 @@ from sweep_intersections import brute_sweep_intersections
 from term import Terminal
 
 
-def demo_convex_hulls(n, out):
+def demo_convex_hull(n, out):
     for i in range(n):
         seed(i)
         points = random_points(50)
@@ -44,8 +44,8 @@ def demo_brute_sweep_intersections(n, out):
         export("{}/sweep_intersections_{}.png".format(out, i))
 
 
-def banner(highlight, lowlight):
-    return "{}{}{}{}".format(Terminal.bold, highlight, Terminal.end, lowlight)
+def bold(text):
+    return "{}{}{}".format(Terminal.bold, text, Terminal.end)
 
 
 def main():
@@ -53,13 +53,13 @@ def main():
         out = "{}/out".format(environ["WD"])
         for arg in set(argv[1:]):
             if arg == "-c":
-                print(banner("demo_convex_hulls", "(50, ...)"))
-                demo_convex_hulls(50, out)
+                print(bold("\n$ demo_convex_hull"))
+                demo_convex_hull(50, out)
             elif arg == "-p":
-                print(banner("demo_point_of_intersection", "(50, ...)"))
+                print(bold("\n$ demo_point_of_intersection"))
                 demo_point_of_intersection(50, out)
             elif arg == "-i":
-                print(banner("demo_brute_sweep_intersections", "(50, ...)"))
+                print(bold("\n$ demo_brute_sweep_intersections"))
                 demo_brute_sweep_intersections(50, out)
 
 
