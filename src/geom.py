@@ -27,12 +27,9 @@ def point_of_intersection(ab, cd):
         xdelta = (ax - bx, cx - dx)
         ydelta = (ay - by, cy - dy)
         denominator = determinant(xdelta, ydelta)
-        if denominator == 0:
-            return None
-        else:
+        if denominator != 0:
             d = (determinant(*ab), determinant(*cd))
             x = determinant(d, xdelta) / denominator
             y = determinant(d, ydelta) / denominator
             return (x, y)
-    else:
-        return None
+    return None

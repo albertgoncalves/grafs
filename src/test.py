@@ -7,28 +7,25 @@ from geom import ccw, intersect, point_of_intersection
 from sweep_intersections import lower_end, upper_end
 
 
-def test_ccw():
-    a = (0, 0)
-    b = (1, 0)
-    c = (1, 1)
-    assert ccw(a, b, c)
-    assert not ccw(a, c, b)
-
-
-def test_interset():
+class TestGeom:
     ab = ((0, 0), (2, 2))
     cd = ((1, 0), (1, 3))
     ef = ((1, 0), (2, 0))
-    assert intersect(ab, cd)
-    assert not intersect(ab, ef)
 
+    def test_ccw(self):
+        a = (0, 0)
+        b = (1, 0)
+        c = (1, 1)
+        assert ccw(a, b, c)
+        assert not ccw(a, c, b)
 
-def test_point_of_intersection():
-    ab = ((0, 0), (2, 2))
-    cd = ((1, 0), (1, 3))
-    ef = ((1, 0), (2, 0))
-    assert point_of_intersection(ab, cd) == (1, 1)
-    assert point_of_intersection(ab, ef) is None
+    def test_interset(self):
+        assert intersect(self.ab, self.cd)
+        assert not intersect(self.ab, self.ef)
+
+    def test_point_of_intersection(self):
+        assert point_of_intersection(self.ab, self.cd) == (1, 1)
+        assert point_of_intersection(self.ab, self.ef) is None
 
 
 class TestTree:
