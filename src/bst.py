@@ -3,31 +3,30 @@
 
 # based on https://github.com/AppliedGo/bintree/blob/master/bintree.go
 class Node:
-    def __init__(self, key, value, eq, lt):
+    def __init__(self, key, value, lt):
         self.key = key
         self.values = [value]
         self.right = None  # higher
         self.left = None   # lower
-        self.eq = eq
         self.lt = lt
 
     def insert(self, key, value):
-        if self.eq(self.key, key):
+        if self.key == key:
             if value is not None:
                 self.values.append(value)
         elif self.lt(key, self.key):
             if self.left is None:
-                self.left = Node(key, value, self.eq, self.lt)
+                self.left = Node(key, value, self.lt)
             else:
                 self.left.insert(key, value)
         else:
             if self.right is None:
-                self.right = Node(key, value, self.eq, self.lt)
+                self.right = Node(key, value, self.lt)
             else:
                 self.right.insert(key, value)
 
     def find(self, key, parent):
-        if (self.key is None) or (self.eq(self.key, key)):
+        if (self.key is None) or (self.key == key):
             return (self, parent)
         elif self.lt(key, self.key):
             return self.left.find(key, self)
@@ -58,7 +57,7 @@ class Node:
             parent.root = replacement
 
     def delete(self, key, parent):
-        if self.eq(self.key, key):
+        if self.key == key:
             if (self.left is None) and (self.right is None):
                 self.local_swap(None, parent)
             elif self.left is None:
@@ -77,14 +76,13 @@ class Node:
 
 
 class Tree:
-    def __init__(self, eq, lt):
+    def __init__(self, lt):
         self.root = None
-        self.eq = eq
         self.lt = lt
 
     def insert(self, key, value):
         if self.root is None:
-            self.root = Node(key, value, self.eq, self.lt)
+            self.root = Node(key, value, self.lt)
         else:
             self.root.insert(key, value)
 
@@ -143,7 +141,7 @@ class Tree:
         key_right = None
         nodes = self.iter()
         for (key_next, _) in nodes:
-            if self.eq(key, key_next):
+            if key == key_next:
                 break
             else:
                 key_right = key_next

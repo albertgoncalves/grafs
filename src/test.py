@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-from operator import eq, lt
+from operator import lt
 
 from bst import Tree
 from geom import ccw, intersect, point_of_intersection
+from sweep_intersections import lower_end, upper_end
 
 
 def test_ccw():
@@ -34,7 +35,7 @@ class TestTree:
     xs = [1, 5, 4, 3, 7, 6, 8, 0, 2]
 
     def seed_none(self, xs):
-        tree = Tree(eq, lt)
+        tree = Tree(lt)
         for x in xs:
             tree.insert(x, None)
         return tree
@@ -58,7 +59,7 @@ class TestTree:
         assert self.seed_none(self.xs).last() == (0, [None])
 
     def test_empty(self):
-        tree = Tree(eq, lt)
+        tree = Tree(lt)
         assert tree.empty()
         assert not self.seed_none(self.xs).empty()
 
@@ -70,7 +71,7 @@ class TestTree:
         assert tree.first() == (6, [None])
 
     def test_swap_values(self):
-        tree = Tree(eq, lt)
+        tree = Tree(lt)
         for (k, v) in [(0, "0"), (2, "2"), (2, "2"), (1, "1")]:
             tree.insert(k, v)
         tree.swap_values(0, 2)
@@ -100,3 +101,26 @@ class TestTree:
         tree.insert(10, None)
         assert tree.neighbors(7) == ((6, [None]), (10, [None]))
         assert tree.neighbors(10) == ((7, [None]), None)
+
+
+class TestSweepIntersections:
+    a = (0, 0)
+    b = (1, 1)
+    c = (0, 1)
+    d = (1, 0)
+
+    def test_upper_end(self):
+        assert upper_end(self.a, self.b) == self.b
+        assert upper_end(self.b, self.a) == self.b
+        assert upper_end(self.a, self.c) == self.c
+        assert upper_end(self.c, self.a) == self.c
+        assert upper_end(self.b, self.c) == self.c
+        assert upper_end(self.c, self.b) == self.c
+
+    def test_lower_end(self):
+        assert lower_end(self.a, self.b) == self.a
+        assert lower_end(self.b, self.a) == self.a
+        assert lower_end(self.a, self.c) == self.a
+        assert lower_end(self.c, self.a) == self.a
+        assert lower_end(self.b, self.c) == self.b
+        assert lower_end(self.c, self.b) == self.b
