@@ -137,7 +137,7 @@ class Tree:
             node_b.values = tmp_values
 
     def __neighbors(self, key):
-        # tree iterates top down (right to left)
+        # Tree.iter() from `high|right` to `low|left`
         key_right = None
         nodes = self.iter()
         for (key_next, _) in nodes:
