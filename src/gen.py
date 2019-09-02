@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 
-from random import randint
-
-MIN = 0
-MAX = 100
+from random import random
 
 
 def random_point():
-    return (randint(MIN, MAX), randint(MIN, MAX))
+    return (random(), random())
 
 
 def random_points(n):

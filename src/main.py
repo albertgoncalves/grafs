@@ -2,6 +2,7 @@
 
 from os import environ
 from random import seed
+from sys import argv
 
 from algo import convex_hull, sweep_intersections
 from gen import random_segments, random_points
@@ -21,6 +22,7 @@ def demo_convex_hulls(n, out):
 
 def demo_point_of_intersection(n, out):
     for i in range(n):
+        seed(i)
         segments = random_segments(2)
         point = point_of_intersection(*segments)
         ax = init_plot()
@@ -30,20 +32,26 @@ def demo_point_of_intersection(n, out):
         export("{}/point_of_intersection_{}.png".format(out, i))
 
 
-def demo_sweep_intersections(n, s, out):
-    seed(s)
-    (segments, points) = sweep_intersections(random_segments(n))
-    ax = init_plot()
-    plot_points(ax, points)
-    plot_segments(ax, segments)
-    export("{}/sweep_intersections.png".format(out))
+def demo_sweep_intersections(n, out):
+    for i in range(n):
+        seed(i)
+        (segments, points) = sweep_intersections(random_segments(20))
+        ax = init_plot()
+        plot_points(ax, points)
+        plot_segments(ax, segments)
+        export("{}/sweep_intersections_{}.png".format(out, i))
 
 
 def main():
-    out = "{}/out".format(environ["WD"])
-    # demo_convex_hulls(50, out)
-    # demo_point_of_intersection(50, out)
-    demo_sweep_intersections(100, 10, out)
+    if len(argv) > 1:
+        out = "{}/out".format(environ["WD"])
+        for arg in set(argv[1:]):
+            if arg == "-c":
+                demo_convex_hulls(50, out)
+            elif arg == "-p":
+                demo_point_of_intersection(50, out)
+            elif arg == "-i":
+                demo_sweep_intersections(50, out)
 
 
 if __name__ == "__main__":

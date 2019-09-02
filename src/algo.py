@@ -23,32 +23,44 @@ def convex_hull(points):
     return [upper + lower[:1], lower]
 
 
-def sweep_intersections(segments):
-    def upper_end(a, b):
-        (_, ay) = a
-        (_, by) = b
-        if ay < by:
-            return b
-        else:
-            return a
+def upper_end(a, b):
+    (_, ay) = a
+    (_, by) = b
+    if ay < by:
+        return b
+    else:
+        return a
 
-    def lower_end(a, b):
-        (_, ay) = a
-        (_, by) = b
-        if ay < by:
-            return a
-        else:
-            return b
 
-    def snd(ab):
-        (_, b) = ab
+def lower_end(a, b):
+    (_, ay) = a
+    (_, by) = b
+    if ay < by:
+        return a
+    else:
         return b
 
+
+def snd(ab):
+    (_, b) = ab
+    return b
+
+
+def event_lt(a, b):
+    (ax, ay) = a
+    (bx, by) = b
+    if ay == by:
+        return ax < bx
+    else:
+        return ay < by
+
+
+def sweep_intersections(segments):
     counter = 0
     points = []
-    event_queue = Tree(eq, lt)
+    event_queue = Tree(eq, event_lt)
     status_queue = Tree(eq, lt)
-    for segment in set(segments):
+    for segment in segments:
         event_queue.insert(upper_end(*segment), segment)
     while not event_queue.empty():
         (event, values) = event_queue.pop()
@@ -56,19 +68,21 @@ def sweep_intersections(segments):
         for segment in sorted(values):
             for (other, _) in status_queue.iter():
                 counter += 1
-                if y <= snd(lower_end(*other)):
-                    status_queue.delete(other)
-                else:
+                if snd(lower_end(*other)) < y:
                     point = point_of_intersection(segment, other)
                     if point is not None:
                         points.append(point)
-            status_queue.insert(segment, event)
-    print(counter)
+                else:
+                    status_queue.delete(other)
+            status_queue.insert(segment, None)
     dupe = not len(points) == len(set(points))
-    print("\n{}duplicates: {}{}{}".format(
+    print("counter    : {}{}{}\nduplicates : {}{}{}{}".format(
+        Terminal.bold,
+        counter,
+        Terminal.end,
         Terminal.bold,
         Terminal.red if dupe else Terminal.green,
         dupe,
         Terminal.end,
     ))
-    return (segments, list(set(points)))
+    return (segments, points)
