@@ -55,7 +55,7 @@ def event_lt(a, b):
         return ay < by
 
 
-def sweep_intersections(segments):
+def brute_sweep_intersections(segments):
     counter = 0
     points = []
     event_queue = Tree(eq, event_lt)
