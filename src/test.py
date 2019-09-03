@@ -3,7 +3,7 @@
 from operator import lt
 
 from bst import Tree
-from geom import ccw, intersect, point_of_intersection
+from geom import ccw, intersect, point_of_intersection, slope_intercept
 from sweep_intersections import lower_end, upper_end
 
 
@@ -19,9 +19,17 @@ class TestGeom:
         assert ccw(a, b, c)
         assert not ccw(a, c, b)
 
-    def test_interset(self):
+    def test_intersect(self):
         assert intersect(self.ab, self.cd)
         assert not intersect(self.ab, self.ef)
+
+    def test_slope_intercept(self):
+        assert slope_intercept(*self.ab) == (1, 0)
+        assert slope_intercept(*self.cd) == (None, None)
+        assert slope_intercept(*self.ef) == (0, 0)
+        assert slope_intercept((0, 0), (2, 4)) == (2, 0)
+        assert slope_intercept((0, 0), (4, 2)) == (0.5, 0)
+        assert slope_intercept((0, 1), (2, 5)) == (2, 1)
 
     def test_point_of_intersection(self):
         assert point_of_intersection(self.ab, self.cd) == (1, 1)
