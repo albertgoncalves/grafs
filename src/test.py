@@ -75,13 +75,13 @@ class TestTree:
         assert tree.pop() == (7, None)
         assert tree.first() == (6, None)
 
-    def test_swap_values(self):
+    def test_find(self):
         tree = Tree(lt)
         for (k, v) in [(0, "0"), (2, "2"), (2, "3"), (1, "1")]:
             tree.insert(k, v)
-        tree.swap_values(0, 2)
-        assert tree.first() == (2, "0")
-        assert tree.last() == (0, "3")
+        assert tree.find(0) == (0, "0")
+        assert tree.find(1) == (1, "1")
+        assert tree.find(2) == (2, "3")
 
     def test_neighbors(self):
         tree = self.seed_none(self.xs)

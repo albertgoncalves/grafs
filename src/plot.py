@@ -24,7 +24,7 @@ def plot_segments(ax, segments):
 
 
 def export(filename):
-    grid()
+    grid(alpha=0.2)
     tight_layout()
     savefig(filename)
     close()

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 
-# based on https://github.com/AppliedGo/bintree/blob/master/bintree.go
 class Node:
     def __init__(self, key, value, lt):
         self.lt = lt
@@ -150,13 +149,13 @@ class Tree:
                     yield (node.key, node.value)
                     node = node.left
 
-    def swap_values(self, key_a, key_b):
+    def find(self, key):
         if self.root is not None:
-            (node_a, _) = self.root.find(key_a, None)
-            (node_b, _) = self.root.find(key_b, None)
-            tmp_value = node_a.value
-            node_a.value = node_b.value
-            node_b.value = tmp_value
+            (node, _) = self.root.find(key, None)
+            if node is not None:
+                return (node.key, node.value)
+            else:
+                return None
 
     def neighbors(self, key):
         if self.root is not None:

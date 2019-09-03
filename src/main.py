@@ -54,8 +54,8 @@ def demo_sweep_intersections(n, out):
         export("{}/sweep_intersections_{}.png".format(out, i))
 
 
-def bold(text):
-    return "{}{}{}".format(Terminal.bold, text, Terminal.end)
+def header(text):
+    return "$ demo_{}{}{}".format(Terminal.bold, text, Terminal.end)
 
 
 def main():
@@ -63,16 +63,16 @@ def main():
         out = "{}/out".format(environ["WD"])
         for arg in set(argv[1:]):
             if arg == "-c":
-                print(bold("\n$ demo_convex_hull"))
+                print(header("convex_hull"))
                 demo_convex_hull(10, out)
             elif arg == "-p":
-                print(bold("\n$ demo_point_of_intersection"))
+                print(header("point_of_intersection"))
                 demo_point_of_intersection(10, out)
             elif arg == "-b":
-                print(bold("\n$ demo_brute_sweep_intersections"))
+                print(header("brute_sweep_intersections"))
                 demo_brute_sweep_intersections(10, out)
             elif arg == "-s":
-                print(bold("\n$ demo_sweep_intersections"))
+                print(header("sweep_intersections"))
                 demo_sweep_intersections(1, out)
 
 
