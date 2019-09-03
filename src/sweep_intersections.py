@@ -71,25 +71,121 @@ def brute_sweep_intersections(segments):
     return (segments, points)
 
 
-def status_lt(ab, cd):
-    (u1, _) = upper_end(*ab)
-    (u2, _) = upper_end(*cd)
-    if u1 == u2:
-        (l1, _) = lower_end(*ab)
-        (l2, _) = lower_end(*cd)
+def status_lt(k1, k2):
+    (x1, s1) = k1
+    (x2, s2) = k2
+    if x1 == x2:
+        (l1, _) = lower_end(*s1)
+        (l2, _) = lower_end(*s2)
         return l1 < l2
     else:
-        return u1 < u2
+        return x1 < x2
 
 
-def update_points(event_queue, y, left, right):
+def update_points(event_queue, y, left, right, status):
     point = point_of_intersection(left, right)
-    intersection = "intersection"
     if point is not None:
         if snd(point) < y:
-            event_queue.insert(point, (intersection, (left, right)))
+            event_queue.insert(point, (status, (left, right)))
 
 
 def sweep_intersections(segments):
+    status = {
+        "upper": 0,
+        "intersection": 1,
+        "lower": 2,
+    }
+    counter = 0
     points = []
+    memo = {}
+    event_queue = Tree(event_lt)
+    status_queue = Tree(status_lt)
+    for segment in segments:
+        event_queue.insert(upper_end(*segment), (status["upper"], segment))
+        event_queue.insert(lower_end(*segment), (status["lower"], segment))
+    while not event_queue.empty():
+        (event, (label, payload)) = event_queue.pop()
+        (_, y) = event
+        if label == status["upper"]:
+            print(event)
+            memo[payload] = event
+            status_queue.insert((event, payload), None)
+            (left, right) = status_queue.neighbors((event, payload))
+            if event == (61, 45):
+                print(left, right)
+            if left is not None:
+                ((_, left_segment), _) = left
+                counter += 1
+                update_points(
+                    event_queue,
+                    y,
+                    left_segment,
+                    payload,
+                    status["intersection"],
+                )
+            if right is not None:
+                ((_, right_segment), _) = right
+                counter += 1
+                update_points(
+                    event_queue,
+                    y,
+                    payload,
+                    right_segment,
+                    status["intersection"],
+                )
+        elif label == status["lower"]:
+            (left, right) = status_queue.neighbors((memo[payload], payload))
+            status_queue.delete((memo[payload], payload))
+            if (left is not None) and (right is not None):
+                ((_, left_segment), _) = left
+                ((_, right_segment), _) = right
+                counter += 1
+                update_points(
+                    event_queue,
+                    y,
+                    left_segment,
+                    right_segment,
+                    status["intersection"],
+                )
+        else:
+            points.append(event)
+            (right, left) = payload
+            status_queue.delete((memo[left], left))
+            status_queue.delete((memo[right], right))
+            memo[left] = event
+            memo[right] = event
+            status_queue.insert((event, right), None)
+            status_queue.insert((event, left), None)
+            (far_left, _) = status_queue.neighbors((event, left))
+            (_, far_right) = status_queue.neighbors((event, right))
+            if far_left is not None:
+                ((_, far_left_segment), _) = far_left
+                counter += 1
+                update_points(
+                    event_queue,
+                    y,
+                    far_left_segment,
+                    left,
+                    status["intersection"],
+                )
+            if far_right is not None:
+                ((_, far_right_segment), _) = far_right
+                counter += 1
+                update_points(
+                    event_queue,
+                    y,
+                    right,
+                    far_right_segment,
+                    status["intersection"],
+                )
+    dupe = not len(points) == len(set(points))
+    print("counter    : {}{}{}\nduplicates : {}{}{}{}".format(
+        Terminal.bold,
+        counter,
+        Terminal.end,
+        Terminal.bold,
+        Terminal.red if dupe else Terminal.green,
+        dupe,
+        Terminal.end,
+    ))
     return (segments, points)

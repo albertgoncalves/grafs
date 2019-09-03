@@ -73,7 +73,7 @@ def main():
                 demo_brute_sweep_intersections(10, out)
             elif arg == "-s":
                 print(header("sweep_intersections"))
-                demo_sweep_intersections(1, out)
+                demo_sweep_intersections(10, out)
 
 
 if __name__ == "__main__":
