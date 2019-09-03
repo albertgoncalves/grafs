@@ -8,7 +8,7 @@ from convex_hull import convex_hull
 from gen import random_segments, random_points
 from geom import point_of_intersection
 from plot import export, init_plot, plot_points, plot_segments
-from sweep_intersections import brute_sweep_intersections
+from sweep_intersections import brute_sweep_intersections, sweep_intersections
 from term import Terminal
 
 
@@ -41,6 +41,16 @@ def demo_brute_sweep_intersections(n, out):
         ax = init_plot()
         plot_points(ax, points)
         plot_segments(ax, segments)
+        export("{}/brute_sweep_intersections_{}.png".format(out, i))
+
+
+def demo_sweep_intersections(n, out):
+    for i in range(n):
+        seed(i)
+        (segments, points) = sweep_intersections(random_segments(10))
+        ax = init_plot()
+        plot_points(ax, points)
+        plot_segments(ax, segments)
         export("{}/sweep_intersections_{}.png".format(out, i))
 
 
@@ -58,9 +68,12 @@ def main():
             elif arg == "-p":
                 print(bold("\n$ demo_point_of_intersection"))
                 demo_point_of_intersection(50, out)
-            elif arg == "-i":
+            elif arg == "-b":
                 print(bold("\n$ demo_brute_sweep_intersections"))
                 demo_brute_sweep_intersections(50, out)
+            elif arg == "-s":
+                print(bold("\n$ demo_sweep_intersections"))
+                demo_sweep_intersections(1, out)
 
 
 if __name__ == "__main__":
