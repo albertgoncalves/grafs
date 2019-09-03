@@ -46,7 +46,7 @@ class TestTree:
         return tree
 
     def iter_none(self, xs):
-        return list(map(lambda x: (x, [None]), sorted(xs)))[::-1]
+        return list(map(lambda x: (x, None), sorted(xs)))[::-1]
 
     def test_insert(self):
         assert list(self.seed_none(self.xs).iter()) == self.iter_none(self.xs)
@@ -58,10 +58,10 @@ class TestTree:
         assert list(tree.iter()) == self.iter_none(self.xs[2:])
 
     def test_first(self):
-        assert self.seed_none(self.xs).first() == (8, [None])
+        assert self.seed_none(self.xs).first() == (8, None)
 
     def test_last(self):
-        assert self.seed_none(self.xs).last() == (0, [None])
+        assert self.seed_none(self.xs).last() == (0, None)
 
     def test_empty(self):
         tree = Tree(lt)
@@ -70,42 +70,42 @@ class TestTree:
 
     def test_pop(self):
         tree = self.seed_none(self.xs)
-        assert tree.pop() == (8, [None])
-        assert tree.first() == (7, [None])
-        assert tree.pop() == (7, [None])
-        assert tree.first() == (6, [None])
+        assert tree.pop() == (8, None)
+        assert tree.first() == (7, None)
+        assert tree.pop() == (7, None)
+        assert tree.first() == (6, None)
 
     def test_swap_values(self):
         tree = Tree(lt)
-        for (k, v) in [(0, "0"), (2, "2"), (2, "2"), (1, "1")]:
+        for (k, v) in [(0, "0"), (2, "2"), (2, "3"), (1, "1")]:
             tree.insert(k, v)
         tree.swap_values(0, 2)
-        assert tree.first() == (2, ["0"])
-        assert tree.last() == (0, ["2", "2"])
+        assert tree.first() == (2, "0")
+        assert tree.last() == (0, "3")
 
     def test_neighbors(self):
         tree = self.seed_none(self.xs)
-        assert tree.neighbors(1) == ((0, [None]), (2, [None]))
-        assert tree.neighbors(2) == ((1, [None]), (3, [None]))
-        assert tree.neighbors(3) == ((2, [None]), (4, [None]))
-        assert tree.neighbors(4) == ((3, [None]), (5, [None]))
-        assert tree.neighbors(5) == ((4, [None]), (6, [None]))
-        assert tree.neighbors(6) == ((5, [None]), (7, [None]))
-        assert tree.neighbors(7) == ((6, [None]), (8, [None]))
-        assert tree.neighbors(0) == (None, (1, [None]))
-        assert tree.neighbors(8) == ((7, [None]), None)
+        assert tree.neighbors(1) == ((0, None), (2, None))
+        assert tree.neighbors(2) == ((1, None), (3, None))
+        assert tree.neighbors(3) == ((2, None), (4, None))
+        assert tree.neighbors(4) == ((3, None), (5, None))
+        assert tree.neighbors(5) == ((4, None), (6, None))
+        assert tree.neighbors(6) == ((5, None), (7, None))
+        assert tree.neighbors(7) == ((6, None), (8, None))
+        assert tree.neighbors(0) == (None, (1, None))
+        assert tree.neighbors(8) == ((7, None), None)
         tree.delete(4)
-        assert tree.neighbors(3) == ((2, [None]), (5, [None]))
-        assert tree.neighbors(5) == ((3, [None]), (6, [None]))
+        assert tree.neighbors(3) == ((2, None), (5, None))
+        assert tree.neighbors(5) == ((3, None), (6, None))
         tree.delete(8)
-        assert tree.neighbors(7) == ((6, [None]), None)
+        assert tree.neighbors(7) == ((6, None), None)
         tree.insert(4, None)
-        assert tree.neighbors(3) == ((2, [None]), (4, [None]))
-        assert tree.neighbors(4) == ((3, [None]), (5, [None]))
-        assert tree.neighbors(5) == ((4, [None]), (6, [None]))
+        assert tree.neighbors(3) == ((2, None), (4, None))
+        assert tree.neighbors(4) == ((3, None), (5, None))
+        assert tree.neighbors(5) == ((4, None), (6, None))
         tree.insert(10, None)
-        assert tree.neighbors(7) == ((6, [None]), (10, [None]))
-        assert tree.neighbors(10) == ((7, [None]), None)
+        assert tree.neighbors(7) == ((6, None), (10, None))
+        assert tree.neighbors(10) == ((7, None), None)
 
 
 class TestSweepIntersections:

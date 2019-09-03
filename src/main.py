@@ -15,7 +15,7 @@ from term import Terminal
 def demo_convex_hull(n, out):
     for i in range(n):
         seed(i)
-        points = random_points(50)
+        points = random_points(25)
         ax = init_plot()
         plot_points(ax, points)
         plot_segments(ax, convex_hull(points))
@@ -37,7 +37,7 @@ def demo_point_of_intersection(n, out):
 def demo_brute_sweep_intersections(n, out):
     for i in range(n):
         seed(i)
-        (segments, points) = brute_sweep_intersections(random_segments(20))
+        (segments, points) = brute_sweep_intersections(random_segments(10))
         ax = init_plot()
         plot_points(ax, points)
         plot_segments(ax, segments)
@@ -64,13 +64,13 @@ def main():
         for arg in set(argv[1:]):
             if arg == "-c":
                 print(bold("\n$ demo_convex_hull"))
-                demo_convex_hull(50, out)
+                demo_convex_hull(10, out)
             elif arg == "-p":
                 print(bold("\n$ demo_point_of_intersection"))
-                demo_point_of_intersection(50, out)
+                demo_point_of_intersection(10, out)
             elif arg == "-b":
                 print(bold("\n$ demo_brute_sweep_intersections"))
-                demo_brute_sweep_intersections(50, out)
+                demo_brute_sweep_intersections(10, out)
             elif arg == "-s":
                 print(bold("\n$ demo_sweep_intersections"))
                 demo_sweep_intersections(1, out)

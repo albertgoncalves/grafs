@@ -6,14 +6,13 @@ class Node:
     def __init__(self, key, value, lt):
         self.lt = lt
         self.key = key
-        self.values = [value]
+        self.value = value
         self.right = None  # higher
         self.left = None   # lower
 
     def insert(self, key, value):
         if self.key == key:
-            if value is not None:
-                self.values.append(value)
+            self.value = value
         elif self.lt(key, self.key):
             if self.left is None:
                 self.left = Node(key, value, self.lt)
@@ -90,7 +89,7 @@ class Node:
             else:
                 (replacement, parent) = self.left.first(self)
                 self.key = replacement.key
-                self.values = replacement.values
+                self.value = replacement.value
                 replacement.delete(replacement.key, parent)
         elif self.lt(key, self.key):
             self.left.delete(key, self)
@@ -118,14 +117,14 @@ class Tree:
             return None
         else:
             (node, _) = self.root.first(self)
-            return (node.key, node.values)
+            return (node.key, node.value)
 
     def last(self):
         if self.root is None:
             return None
         else:
             (node, _) = self.root.last(self)
-            return (node.key, node.values)
+            return (node.key, node.value)
 
     def pop(self):
         if self.root is None:
@@ -133,7 +132,7 @@ class Tree:
         else:
             (node, parent) = self.root.first(self)
             node.delete(node.key, parent)
-            return (node.key, node.values)
+            return (node.key, node.value)
 
     def empty(self):
         return self.root is None
@@ -148,26 +147,26 @@ class Tree:
                     node = node.right
                 else:
                     node = stack.pop()
-                    yield (node.key, node.values)
+                    yield (node.key, node.value)
                     node = node.left
 
     def swap_values(self, key_a, key_b):
         if self.root is not None:
             (node_a, _) = self.root.find(key_a, None)
             (node_b, _) = self.root.find(key_b, None)
-            tmp_values = node_a.values
-            node_a.values = node_b.values
-            node_b.values = tmp_values
+            tmp_value = node_a.value
+            node_a.value = node_b.value
+            node_b.value = tmp_value
 
     def neighbors(self, key):
         if self.root is not None:
             (left, right) = self.root.neighbors(key, None, None)
             if (left is not None) and (right is not None):
-                return ((left.key, left.values), (right.key, right.values))
+                return ((left.key, left.value), (right.key, right.value))
             elif left is not None:
-                return ((left.key, left.values), None)
+                return ((left.key, left.value), None)
             elif right is not None:
-                return (None, (right.key, right.values))
+                return (None, (right.key, right.value))
             else:
                 return (None, None)
 
