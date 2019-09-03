@@ -33,6 +33,29 @@ class Node:
         else:
             return self.right.find(key, self)
 
+    def neighbors(self, key, left, right):
+        if (self.key is None) or (self.key == key):
+            if self.left is not None:
+                (local_left, _) = self.left.first(self)
+            else:
+                local_left = None
+            if self.right is not None:
+                (local_right, _) = self.right.last(self)
+            else:
+                local_right = None
+            if (local_left is not None) and (local_right is not None):
+                return (local_left, local_right)
+            elif local_left is not None:
+                return (local_left, right)
+            elif local_right is not None:
+                return (left, local_right)
+            else:
+                return (left, right)
+        elif self.lt(key, self.key):
+            return self.left.neighbors(key, left, self)
+        else:
+            return self.right.neighbors(key, self, right)
+
     def first(self, parent):
         if self.right is None:
             return (self, parent)
@@ -136,39 +159,17 @@ class Tree:
             node_a.values = node_b.values
             node_b.values = tmp_values
 
-    def __neighbors(self, key):
-        # Tree.iter() from `high|right` to `low|left`
-        key_right = None
-        nodes = self.iter()
-        for (key_next, _) in nodes:
-            if key == key_next:
-                break
-            else:
-                key_right = key_next
-        try:
-            (key_left, _) = next(nodes)
-        except StopIteration:
-            key_left = None
-        if key_left is not None:
-            (left, _) = self.root.find(key_left, None)
-        else:
-            left = None
-        if key_right is not None:
-            (right, _) = self.root.find(key_right, None)
-        else:
-            right = None
-        return (left, right)
-
     def neighbors(self, key):
         if self.root is not None:
-            (left, right) = self.__neighbors(key)
+            (left, right) = self.root.neighbors(key, None, None)
             if (left is not None) and (right is not None):
                 return ((left.key, left.values), (right.key, right.values))
             elif left is not None:
                 return ((left.key, left.values), None)
             elif right is not None:
                 return (None, (right.key, right.values))
-        return (None, None)
+            else:
+                return (None, None)
 
     def __str__(self):
         if self.root is None:
