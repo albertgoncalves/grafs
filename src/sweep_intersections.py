@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from time import time
+
 from bst import Tree
 from geom import point_of_intersection, slope_intercept
 from term import Terminal
@@ -43,6 +45,7 @@ def event_lt(a, b):
 
 
 def brute_sweep_intersections(segments):
+    start = time()
     counter = 0
     points = []
     event_queue = Tree(event_lt)
@@ -64,7 +67,8 @@ def brute_sweep_intersections(segments):
         for other in set(deletes):
             del status_queue[other]
     dupe = not len(points) == len(set(points))
-    print("counter    : {}{}{}\nduplicates : {}{}{}{}".format(
+    header = "counter    : {}{}{}\nduplicates : {}{}{}{}\nduration   : {}\n"
+    print(header.format(
         Terminal.bold,
         counter,
         Terminal.end,
@@ -72,6 +76,7 @@ def brute_sweep_intersections(segments):
         Terminal.red if dupe else Terminal.green,
         dupe,
         Terminal.end,
+        round(time() - start, 4),
     ))
     return (segments, points)
 
@@ -82,8 +87,8 @@ def status_lt(k1, k2):
     y = y1 if y1 < y2 else y2
     (m1, b1) = slope_intercept(*s1)
     (m2, b2) = slope_intercept(*s2)
-    x1 = round((y - b1) / m1, 4)
-    x2 = round((y - b2) / m2, 4)
+    x1 = round((y - b1) / m1, 8)
+    x2 = round((y - b2) / m2, 8)
     return x1 < x2
 
 
@@ -95,6 +100,7 @@ def update_points(event_queue, y, left, right, status):
 
 
 def sweep_intersections(segments):
+    start = time()
     status = {
         "upper": 0,
         "intersection": 1,
@@ -181,7 +187,8 @@ def sweep_intersections(segments):
                     status["intersection"],
                 )
     dupe = not len(points) == len(set(points))
-    print("counter    : {}{}{}\nduplicates : {}{}{}{}".format(
+    header = "counter    : {}{}{}\nduplicates : {}{}{}{}\nduration   : {}\n"
+    print(header.format(
         Terminal.bold,
         counter,
         Terminal.end,
@@ -189,5 +196,6 @@ def sweep_intersections(segments):
         Terminal.red if dupe else Terminal.green,
         dupe,
         Terminal.end,
+        round(time() - start, 4),
     ))
     return (segments, points)
