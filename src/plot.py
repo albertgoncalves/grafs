@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from random import randint
 
 from matplotlib.pyplot import close, grid, savefig, subplots, tight_layout
+from numpy.random import randint
 
 
 def init_plot():

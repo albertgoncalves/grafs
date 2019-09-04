@@ -10,6 +10,6 @@ Quick start
 ---
 ```
 $ nix-shell
-[nix-shell:path/to/grafs]$ python src/main.py -c -p -b
+[nix-shell:path/to/grafs]$ python src/main.py -c -p -s
 [nix-shell:path/to/grafs]$ open out/
 ```

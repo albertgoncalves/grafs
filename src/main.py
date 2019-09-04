@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 from os import environ
-from random import seed
 from sys import argv
+
+from numpy.random import seed
 
 from convex_hull import convex_hull
 from gen import random_segments, random_points
@@ -34,24 +35,23 @@ def demo_point_of_intersection(n, out):
         export("{}/point_of_intersection_{}.png".format(out, i))
 
 
-def demo_brute_sweep_intersections(n, out):
-    for i in range(n):
-        seed(i)
-        (segments, points) = brute_sweep_intersections(random_segments(10))
-        ax = init_plot()
-        plot_points(ax, points)
-        plot_segments(ax, segments)
-        export("{}/brute_sweep_intersections_{}.png".format(out, i))
-
-
 def demo_sweep_intersections(n, out):
     for i in range(n):
-        seed(i)
-        (segments, points) = sweep_intersections(random_segments(10))
-        ax = init_plot()
-        plot_points(ax, points)
-        plot_segments(ax, segments)
-        export("{}/sweep_intersections_{}.png".format(out, i))
+        try:
+            seed(i)
+            xs = random_segments(30)
+            (segments, points) = sweep_intersections(xs)
+            ax = init_plot()
+            plot_points(ax, points)
+            plot_segments(ax, segments)
+            export("{}/sweep_intersections_{}.png".format(out, i))
+            (segments, points) = brute_sweep_intersections(xs)
+            ax = init_plot()
+            plot_points(ax, points)
+            plot_segments(ax, segments)
+            export("{}/brute_sweep_intersections_{}.png".format(out, i))
+        except:
+            pass
 
 
 def header(text):
@@ -68,12 +68,9 @@ def main():
             elif arg == "-p":
                 print(header("point_of_intersection"))
                 demo_point_of_intersection(10, out)
-            elif arg == "-b":
-                print(header("brute_sweep_intersections"))
-                demo_brute_sweep_intersections(10, out)
             elif arg == "-s":
                 print(header("sweep_intersections"))
-                demo_sweep_intersections(10, out)
+                demo_sweep_intersections(250, out)
 
 
 if __name__ == "__main__":

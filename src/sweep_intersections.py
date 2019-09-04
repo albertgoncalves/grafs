@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from bst import Tree
-from geom import point_of_intersection
+from geom import point_of_intersection, slope_intercept
 from term import Terminal
 
 
@@ -21,6 +21,11 @@ def lower_end(a, b):
         return b
     else:
         return a
+
+
+def fst(ab):
+    (a, _) = ab
+    return a
 
 
 def snd(ab):
@@ -72,14 +77,14 @@ def brute_sweep_intersections(segments):
 
 
 def status_lt(k1, k2):
-    (x1, s1) = k1
-    (x2, s2) = k2
-    if x1 == x2:
-        (l1, _) = lower_end(*s1)
-        (l2, _) = lower_end(*s2)
-        return l1 < l2
-    else:
-        return x1 < x2
+    ((_, y1), s1) = k1
+    ((_, y2), s2) = k2
+    y = y1 if y1 < y2 else y2
+    (m1, b1) = slope_intercept(*s1)
+    (m2, b2) = slope_intercept(*s2)
+    x1 = round((y - b1) / m1, 4)
+    x2 = round((y - b2) / m2, 4)
+    return x1 < x2
 
 
 def update_points(event_queue, y, left, right, status):
@@ -107,12 +112,9 @@ def sweep_intersections(segments):
         (event, (label, payload)) = event_queue.pop()
         (_, y) = event
         if label == status["upper"]:
-            print(event)
             memo[payload] = event
             status_queue.insert((event, payload), None)
             (left, right) = status_queue.neighbors((event, payload))
-            if event == (61, 45):
-                print(left, right)
             if left is not None:
                 ((_, left_segment), _) = left
                 counter += 1
@@ -154,10 +156,10 @@ def sweep_intersections(segments):
             status_queue.delete((memo[right], right))
             memo[left] = event
             memo[right] = event
-            status_queue.insert((event, right), None)
-            status_queue.insert((event, left), None)
-            (far_left, _) = status_queue.neighbors((event, left))
-            (_, far_right) = status_queue.neighbors((event, right))
+            status_queue.insert((memo[left], left), None)
+            status_queue.insert((memo[right], right), None)
+            (far_left, _) = status_queue.neighbors((memo[left], left))
+            (_, far_right) = status_queue.neighbors((memo[right], right))
             if far_left is not None:
                 ((_, far_left_segment), _) = far_left
                 counter += 1
