@@ -38,8 +38,14 @@ def demo_point_of_intersection(n, out):
 def demo_sweep_intersections(n, out):
     for i in range(n):
         try:
+            print("{}{}{}{}".format(
+                Terminal.bold,
+                Terminal.blue,
+                i,
+                Terminal.end,
+            ))
             seed(i)
-            xs = random_segments(30)
+            xs = random_segments(15)
             (segments, points) = sweep_intersections(xs)
             ax = init_plot()
             plot_points(ax, points)
@@ -70,7 +76,7 @@ def main():
                 demo_point_of_intersection(10, out)
             elif arg == "-s":
                 print(header("sweep_intersections"))
-                demo_sweep_intersections(250, out)
+                demo_sweep_intersections(100, out)
 
 
 if __name__ == "__main__":

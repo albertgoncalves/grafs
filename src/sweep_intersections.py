@@ -7,6 +7,28 @@ from geom import point_of_intersection, slope_intercept
 from term import Terminal
 
 
+def results(brute, counter, dupe, start):
+    debrief = [
+        "brute      : {}{}{}",
+        "counter    : {}{}{}",
+        "duplicates : {}{}{}{}",
+        "duration   : {}\n",
+    ]
+    return "\n".join(debrief).format(
+        Terminal.bold,
+        brute,
+        Terminal.end,
+        Terminal.bold,
+        counter,
+        Terminal.end,
+        Terminal.bold,
+        Terminal.red if dupe else Terminal.green,
+        dupe,
+        Terminal.end,
+        round(time() - start, 4),
+    )
+
+
 def upper_end(a, b):
     (ax, ay) = a
     (bx, by) = b
@@ -66,18 +88,7 @@ def brute_sweep_intersections(segments):
         status_queue[segment] = None
         for other in set(deletes):
             del status_queue[other]
-    dupe = not len(points) == len(set(points))
-    header = "counter    : {}{}{}\nduplicates : {}{}{}{}\nduration   : {}\n"
-    print(header.format(
-        Terminal.bold,
-        counter,
-        Terminal.end,
-        Terminal.bold,
-        Terminal.red if dupe else Terminal.green,
-        dupe,
-        Terminal.end,
-        round(time() - start, 4),
-    ))
+    print(results(True, counter, not len(points) == len(set(points)), start))
     return (segments, points)
 
 
@@ -186,16 +197,5 @@ def sweep_intersections(segments):
                     far_right_segment,
                     status["intersection"],
                 )
-    dupe = not len(points) == len(set(points))
-    header = "counter    : {}{}{}\nduplicates : {}{}{}{}\nduration   : {}\n"
-    print(header.format(
-        Terminal.bold,
-        counter,
-        Terminal.end,
-        Terminal.bold,
-        Terminal.red if dupe else Terminal.green,
-        dupe,
-        Terminal.end,
-        round(time() - start, 4),
-    ))
+    print(results(False, counter, not len(points) == len(set(points)), start))
     return (segments, points)
