@@ -9,10 +9,10 @@ from term import Terminal
 
 def results(brute, counter, dupe, start):
     debrief = [
-        "brute      : {}{}{}",
-        "counter    : {}{}{}",
-        "duplicates : {}{}{}{}",
-        "duration   : {}\n",
+        "brute       : {}{}{}",
+        "counter     : {}{}{}",
+        "duplicates  : {}{}{}{}",
+        "duration    : {}\n",
     ]
     return "\n".join(debrief).format(
         Terminal.bold,
@@ -69,25 +69,28 @@ def event_lt(a, b):
 def brute_sweep_intersections(segments):
     start = time()
     counter = 0
+    status = {
+        "upper": 0,
+        "lower": 1,
+    }
     points = []
     event_queue = Tree(event_lt)
     status_queue = {}
     for segment in segments:
-        event_queue.insert(upper_end(*segment), segment)
+        event_queue.insert(upper_end(*segment), (status["upper"], segment))
+        event_queue.insert(lower_end(*segment), (status["lower"], segment))
     while not event_queue.empty():
-        (event, segment) = event_queue.pop()
+        (event, (label, segment)) = event_queue.pop()
         (_, y) = event
-        deletes = []
-        for other in status_queue.keys():
-            counter += 1
-            point = point_of_intersection(segment, other)
-            if point is not None:
-                points.append(point)
-            if y <= snd(lower_end(*other)):
-                deletes.append(other)
-        status_queue[segment] = None
-        for other in set(deletes):
-            del status_queue[other]
+        if label == status["upper"]:
+            for other in list(status_queue.keys()):
+                counter += 1
+                point = point_of_intersection(segment, other)
+                if point is not None:
+                    points.append(point)
+            status_queue[segment] = None
+        else:
+            del status_queue[segment]
     print(results(True, counter, not len(points) == len(set(points)), start))
     return (segments, points)
 
@@ -112,12 +115,12 @@ def update_points(event_queue, y, left, right, status):
 
 def sweep_intersections(segments):
     start = time()
+    counter = 0
     status = {
         "upper": 0,
         "intersection": 1,
         "lower": 2,
     }
-    counter = 0
     points = []
     memo = {}
     event_queue = Tree(event_lt)

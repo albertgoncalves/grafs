@@ -51,11 +51,18 @@ def demo_sweep_intersections(n, out):
             plot_points(ax, points)
             plot_segments(ax, segments)
             export("{}/sweep_intersections_{}.png".format(out, i))
-            (segments, points) = brute_sweep_intersections(xs)
+            (brute_segments, brute_points) = brute_sweep_intersections(xs)
             ax = init_plot()
-            plot_points(ax, points)
-            plot_segments(ax, segments)
+            plot_points(ax, brute_points)
+            plot_segments(ax, brute_segments)
             export("{}/brute_sweep_intersections_{}.png".format(out, i))
+            equal = sorted(points) == sorted(brute_points)
+            print("same points : {}{}{}{}\n\n".format(
+                Terminal.bold,
+                Terminal.green if equal else Terminal.red,
+                equal,
+                Terminal.end,
+            ))
         except:
             pass
 
