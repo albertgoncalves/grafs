@@ -3,7 +3,8 @@
 from operator import lt
 
 from bst import Tree
-from geom import ccw, intersect, point_of_intersection, slope_intercept
+from geom import ccw, intersect, point_of_intersection, points_to_circle, \
+    slope_intercept
 from sweep_intersections import lower_end, upper_end
 
 
@@ -34,6 +35,12 @@ class TestGeom:
     def test_point_of_intersection(self):
         assert point_of_intersection(self.ab, self.cd) == (1, 1)
         assert point_of_intersection(self.ab, self.ef) is None
+
+    def test_points_to_circle(self):
+        assert points_to_circle((-3, 4), (4, 5), (1, -4)) == ((1, 1), 5)
+        assert points_to_circle((-3, 4), (-3, 4), (4, 5)) is None
+        assert points_to_circle((1, -4), (4, 5), (1, -4)) is None
+        assert points_to_circle((-3, 4), (4, 5), (4, 5)) is None
 
 
 class TestTree:

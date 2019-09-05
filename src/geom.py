@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from numpy import sqrt
+
 
 def ccw(a, b, c):
     (ax, ay) = a
@@ -44,3 +46,28 @@ def point_of_intersection(ab, cd):
             y = determinant(d, ydelta) / denominator
             return (x, y)
     return None
+
+
+def points_to_circle(a, b, c):
+    if (a == b) or (b == c) or (a == c):
+        return None
+    else:
+        (ax, ay) = a
+        (bx, by) = b
+        (cx, cy) = c
+        ax2 = ax * ax
+        ay2 = ay * ay
+        bx2 = bx * bx
+        by2 = by * by
+        cx2 = cx * cx
+        cy2 = cy * cy
+        axy2 = ax2 + ay2
+        bxy2 = bx2 + by2
+        cxy2 = cx2 + cy2
+        A2 = 2 * ((ax * (by - cy)) - (ay * (bx - cx)) + (bx * cy) - (cx * by))
+        x = ((axy2 * (by - cy)) + (bxy2 * (cy - ay)) + (cxy2 * (ay - by))) / A2
+        y = ((axy2 * (cx - bx)) + (bxy2 * (ax - cx)) + (cxy2 * (bx - ax))) / A2
+        a = (x - ax)
+        b = (y - ay)
+        r = sqrt((a * a) + (b * b))
+        return ((x, y), r)
