@@ -72,3 +72,28 @@ def circle_of_points(a, b, c):
         b = (y - ay)
         r = sqrt((a * a) + (b * b))
         return ((x, y), r)
+
+
+# def point_in_circle(a, b, c, d):
+#     (ax, ay) = a
+#     (bx, by) = b
+#     (cx, cy) = c
+#     (dx, dy) = d
+#     # | ax ay (ax2 + ay2) 1 |
+#     # | bx by (bx2 + by2) 1 |
+#     # | cx cy (cx2 + cy2) 1 |
+#     # | dx dy (dx2 + dy2) 1 |
+#     ax2 = ax * ax
+#     ay2 = ay * ay
+#     bx2 = bx * bx
+#     by2 = by * by
+#     cx2 = cx * cx
+#     cy2 = cy * cy
+#     dx2 = dx * dx
+#     dy2 = dy * dy
+#     if D < 0:
+#         True   # D within circle(A, B, C)
+#     elif D == 0:
+#         None   # D co-circlular with circle(A, B, C)
+#     else:
+#         False  # D outside circle(A, B, C)
