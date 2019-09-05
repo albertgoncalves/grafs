@@ -48,13 +48,14 @@ def point_of_intersection(ab, cd):
     return None
 
 
-def points_to_circle(a, b, c):
-    if (a == b) or (b == c) or (a == c):
+def circle_of_points(a, b, c):
+    (ax, ay) = a
+    (bx, by) = b
+    (cx, cy) = c
+    if (a == b) or (b == c) or (a == c) or ((ax == bx) and (bx == cx)) \
+            or ((ay == by) and (by == cy)):
         return None
     else:
-        (ax, ay) = a
-        (bx, by) = b
-        (cx, cy) = c
         ax2 = ax * ax
         ay2 = ay * ay
         bx2 = bx * bx
