@@ -46,8 +46,13 @@ class TestGeom:
 
     def test_point_in_circle(self):
         assert point_in_circle((0, 0), (2, 0), (0, 2), (2, 2)) == 0
+        assert point_in_circle((0, 0), (0, 1), (1, 1), (0, 1)) == 0
         assert point_in_circle((0, 0), (2, 0), (0, 2), (2, 1)) > 0
         assert point_in_circle((0, 0), (2, 0), (0, 2), (2, 3)) < 0
+        assert point_in_circle((0, 1), (1, 1), (2, 1), (0, 1)) is None
+        assert point_in_circle((0, 1), (0, 2), (0, 3), (0, 1)) is None
+        assert point_in_circle((0, 0), (0, 0), (0, 0), (0, 1)) is None
+        assert point_in_circle((0, 0), (0, 0), (0, 1), (0, 1)) is None
 
 
 class TestTree:

@@ -99,12 +99,16 @@ def point_in_circle(a, b, c, d):
     (bx, by) = b
     (cx, cy) = c
     (dx, dy) = d
-    # det4(...) <  0  ->  d is within circle(a, b, c)
-    # det4(...) == 0  ->  d is co-circular with a, b, c
-    # det4(...)  > 0  ->  d is outside circle(a, b, c)
-    return det4(
-        (ax, ay, ((ax * ax) + (ay * ay)), 1.0),
-        (bx, by, ((bx * bx) + (by * by)), 1.0),
-        (cx, cy, ((cx * cx) + (cy * cy)), 1.0),
-        (dx, dy, ((dx * dx) + (dy * dy)), 1.0),
-    )
+    if (a == b) or (b == c) or (a == c) or ((ax == bx) and (bx == cx)) \
+            or ((ay == by) and (by == cy)):
+        return None
+    else:
+        # det4(...) <  0  ->  d is within circle(a, b, c)
+        # det4(...) == 0  ->  d is co-circular with a, b, c
+        # det4(...)  > 0  ->  d is outside circle(a, b, c)
+        return det4(
+            (ax, ay, ((ax * ax) + (ay * ay)), 1.0),
+            (bx, by, ((bx * bx) + (by * by)), 1.0),
+            (cx, cy, ((cx * cx) + (cy * cy)), 1.0),
+            (dx, dy, ((dx * dx) + (dy * dy)), 1.0),
+        )
