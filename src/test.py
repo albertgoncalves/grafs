@@ -3,8 +3,8 @@
 from operator import lt
 
 from bst import Tree
-from geom import ccw, intersect, point_of_intersection, circle_of_points, \
-    slope_intercept
+from geom import ccw, circle_of_points, intersect, point_in_circle, \
+    point_of_intersection, slope_intercept
 from sweep_intersections import lower_end, upper_end
 
 
@@ -43,6 +43,11 @@ class TestGeom:
         assert circle_of_points((-3, 4), (4, 5), (4, 5)) is None
         assert circle_of_points((1, 1), (1, 2), (1, 3)) is None
         assert circle_of_points((1, 1), (2, 1), (3, 1)) is None
+
+    def test_point_in_circle(self):
+        assert point_in_circle((0, 0), (2, 0), (0, 2), (2, 2)) == 0
+        assert point_in_circle((0, 0), (2, 0), (0, 2), (2, 1)) > 0
+        assert point_in_circle((0, 0), (2, 0), (0, 2), (2, 3)) < 0
 
 
 class TestTree:
