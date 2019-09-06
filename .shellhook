@@ -8,10 +8,27 @@ else
 fi
 
 export WD
+export GOPATH
 WD=$(pwd)
+GOPATH="$WD/go"
 
-if [ ! -d "$WD/out" ]; then
-    mkdir "$WD/out"
+for f in "$WD/out" "$WD/go/out"; do
+    if [ ! -d $f ]; then
+        mkdir $f
+    fi
+done
+
+if [ ! -f "$WD/go/.init" ]; then
+    go get -v gonum.org/v1/plot
+    touch "$WD/go/.init"
 fi
 
-alias flake8="flake8 --ignore=E722"
+gofmts() {
+    if gofmt -w -s -e "$1"; then
+        awk '{ gsub(/\t/, "    "); print }' < "$1" > tmp
+        cat tmp > "$1"
+        rm tmp
+    fi
+}
+
+export -f gofmts

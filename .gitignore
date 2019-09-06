@@ -6,3 +6,6 @@
 !.shellhook
 !src/
 !*.py
+!go/
+!*.go
+!go/src/geom/

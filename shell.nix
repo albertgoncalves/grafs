@@ -6,6 +6,7 @@ mkShell {
             matplotlib
             pytest
         ]))
+        go
         shellcheck
     ];
     shellHook = ''
