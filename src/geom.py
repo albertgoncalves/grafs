@@ -60,7 +60,7 @@ def point_of_intersection(ab, cd):
         xdelta = (ax - bx, cx - dx)
         ydelta = (ay - by, cy - dy)
         denominator = det2(xdelta, ydelta)
-        if denominator != 0:
+        if denominator != 0.0:
             d = (det2(*ab), det2(*cd))
             x = det2(d, xdelta) / denominator
             y = det2(d, ydelta) / denominator
@@ -85,14 +85,12 @@ def circle_of_points(a, b, c):
         axy2 = ax2 + ay2
         bxy2 = bx2 + by2
         cxy2 = cx2 + cy2
-        A2 = 2 * det3((ax, ay, 1), (bx, by, 1), (cx, cy, 1))
-        B = det3((axy2, ay, 1), (bxy2, by, 1), (cxy2, cy, 1))
-        C = det3((axy2, ax, 1), (bxy2, bx, 1), (cxy2, cx, 1))
+        A2 = 2.0 * det3((ax, ay, 1.0), (bx, by, 1.0), (cx, cy, 1.0))
+        B = det3((axy2, ay, 1.0), (bxy2, by, 1.0), (cxy2, cy, 1.0))
+        C = det3((axy2, ax, 1.0), (bxy2, bx, 1.0), (cxy2, cx, 1.0))
         x = (B / A2)
         y = -(C / A2)
-        a = (x - ax)
-        b = (y - ay)
-        r = sqrt((a * a) + (b * b))
+        r = sqrt(((x - ax) * (x - ax)) + ((y - ay) * (y - ay)))
         return ((x, y), r)
 
 
@@ -101,21 +99,12 @@ def point_in_circle(a, b, c, d):
     (bx, by) = b
     (cx, cy) = c
     (dx, dy) = d
-    ax2 = ax * ax
-    ay2 = ay * ay
-    bx2 = bx * bx
-    by2 = by * by
-    cx2 = cx * cx
-    cy2 = cy * cy
-    dx2 = dx * dx
-    dy2 = dy * dy
-    D = det4(
-        (ax, ay, (ax2 + ay2), 1),
-        (bx, by, (bx2 + by2), 1),
-        (cx, cy, (cx2 + cy2), 1),
-        (dx, dy, (dx2 + dy2), 1),
+    # det4(...) <  0  ->  d is within circle(a, b, c)
+    # det4(...) == 0  ->  d is co-circular with a, b, c
+    # det4(...)  > 0  ->  d is outside circle(a, b, c)
+    return det4(
+        (ax, ay, ((ax * ax) + (ay * ay)), 1.0),
+        (bx, by, ((bx * bx) + (by * by)), 1.0),
+        (cx, cy, ((cx * cx) + (cy * cy)), 1.0),
+        (dx, dy, ((dx * dx) + (dy * dy)), 1.0),
     )
-    # D <  0  ->  D is within circle(A, B, C)
-    # D == 0  ->  D is co-circular with A, B, C
-    # D  > 0  ->  D is outside circle(A, B, C)
-    return D
