@@ -16,29 +16,27 @@ func TestCcw(t *testing.T) {
     }
 }
 
+var A Segment = Segment{Pair{0.0, 0.0}, Pair{2.0, 2.0}}
+var B Segment = Segment{Pair{1.0, 0.0}, Pair{1.0, 3.0}}
+var C Segment = Segment{Pair{1.0, 0.0}, Pair{2.0, 0.0}}
+
 func TestIntersect(t *testing.T) {
-    a := Segment{Pair{0.0, 0.0}, Pair{2.0, 2.0}}
-    b := Segment{Pair{1.0, 0.0}, Pair{1.0, 3.0}}
-    c := Segment{Pair{1.0, 0.0}, Pair{2.0, 0.0}}
-    if !intersect(a, b) {
-        t.Error("intersect(a, b)")
+    if !intersect(A, B) {
+        t.Error("intersect(A, B)")
     }
-    if intersect(a, c) {
-        t.Error("intersect(a, c)")
+    if intersect(A, C) {
+        t.Error("intersect(A, C)")
     }
 }
 
 func TestPointOfIntersection(t *testing.T) {
-    a := Segment{Pair{0.0, 0.0}, Pair{2.0, 2.0}}
-    b := Segment{Pair{1.0, 0.0}, Pair{1.0, 3.0}}
-    c := Segment{Pair{1.0, 0.0}, Pair{2.0, 0.0}}
-    point, _ := PointOfIntersection(a, b)
+    point, _ := PointOfIntersection(A, B)
     expected := Pair{1.0, 1.0}
     if point != expected {
-        t.Error("PointOfIntersection(a, b)")
+        t.Error("PointOfIntersection(A, B)")
     }
-    _, err := PointOfIntersection(a, c)
+    _, err := PointOfIntersection(A, C)
     if err == nil {
-        t.Error("PointOfIntersection(a, c)")
+        t.Error("PointOfIntersection(A, C)")
     }
 }
