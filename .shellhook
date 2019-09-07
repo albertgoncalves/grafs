@@ -20,6 +20,7 @@ done
 
 if [ ! -f "$WD/go/.init" ]; then
     go get -v gonum.org/v1/plot
+    go get -v golang.org/x/lint/golint
     touch "$WD/go/.init"
 fi
 
@@ -31,4 +32,10 @@ gofmts() {
     fi
 }
 
+golint() {
+    "$GOPATH/bin/golint" $1 \
+        | sed -n -e '/exported .* should have comment or be unexported/!p'
+}
+
 export -f gofmts
+export -f golint
