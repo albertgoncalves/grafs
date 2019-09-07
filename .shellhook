@@ -12,16 +12,16 @@ export GOPATH
 WD=$(pwd)
 GOPATH="$WD/go"
 
-for f in "$WD/out" "$WD/go/out"; do
-    if [ ! -d $f ]; then
-        mkdir $f
+for f in "$WD/out" "$GOPATH/out"; do
+    if [ ! -d "$f" ]; then
+        mkdir "$f"
     fi
 done
 
-if [ ! -f "$WD/go/.init" ]; then
+if [ ! -f "$GOPATH/.init" ]; then
     go get -v gonum.org/v1/plot
     go get -v golang.org/x/lint/golint
-    touch "$WD/go/.init"
+    touch "$GOPATH/.init"
 fi
 
 gofmts() {
@@ -33,7 +33,7 @@ gofmts() {
 }
 
 golint() {
-    "$GOPATH/bin/golint" $1 \
+    "$GOPATH/bin/golint" "$1" \
         | sed -n -e '/exported .* should have comment or be unexported/!p'
 }
 
