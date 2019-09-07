@@ -6,26 +6,19 @@ import (
 )
 
 type Pair struct {
-    X float64
-    Y float64
+    X, Y float64
 }
 
 type Segment struct {
-    A Pair
-    B Pair
+    A, B Pair
 }
 
 type Triple struct {
-    X float64
-    Y float64
-    Z float64
+    X, Y, Z float64
 }
 
 type Quad struct {
-    X float64
-    Y float64
-    Z float64
-    W float64
+    X, Y, Z, W float64
 }
 
 func det2(ab Pair, cd Pair) float64 {
