@@ -37,5 +37,19 @@ golint() {
         | sed -n -e '/exported .* should have comment.* or be unexported/!p'
 }
 
+goall() {
+    xs=(
+        "$GOPATH/main.go"
+        "$GOPATH/src/geom/geom.go"
+        "$GOPATH/src/geom/geom_test.go"
+        "$GOPATH/src/gen/gen.go"
+    )
+    for f in "${xs[@]}"; do
+        echo "$f"
+        golint "$f"
+        gofmts "$f"
+    done
+}
+
 export -f gofmts
 export -f golint

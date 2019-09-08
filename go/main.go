@@ -2,18 +2,15 @@ package main
 
 import (
     "fmt"
+    "gen"
     "geom"
+    "math/rand"
 )
 
 func main() {
-    a := geom.Segment{
-        geom.Pair{0.0, 0.0},
-        geom.Pair{1.0, 1.0},
-    }
-    b := geom.Segment{
-        geom.Pair{0.0, 3.0},
-        geom.Pair{1.0, 0.0},
-    }
+    rand.Seed(0)
+    a := gen.RandomSegment()
+    b := gen.RandomSegment()
     point, err := geom.PointOfIntersection(a, b)
     if err == nil {
         fmt.Println(point)
