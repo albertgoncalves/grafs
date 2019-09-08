@@ -1,7 +1,6 @@
 package main
 
 import (
-    "convhull"
     "flag"
     "fmt"
     "gen"
@@ -10,6 +9,7 @@ import (
     "gonum.org/v1/plot/plotter"
     "gonum.org/v1/plot/vg"
     "gonum.org/v1/plot/vg/draw"
+    "hull"
     "image/color"
     "log"
     "math/rand"
@@ -150,7 +150,7 @@ func main() {
         displayInfo(*seed, out)
         rand.Seed(int64(*seed))
         points := gen.RandomPairs(*n)
-        upper, lower := convhull.ConvexHull(points)
+        upper, lower := hull.ConvexHull(points)
         p := initPlot()
         p.Add(plotter.NewGrid())
         addPairs(p, points)

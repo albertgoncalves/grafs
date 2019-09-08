@@ -1,4 +1,4 @@
-package convhull
+package hull
 
 import (
     "geom"
