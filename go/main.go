@@ -82,7 +82,7 @@ func addPairs(p *plot.Plot, pairs []geom.Pair) {
     p.Add(scatter)
 }
 
-func addLine(p *plot.Plot, pairs []geom.Pair) {
+func addPolyLine(p *plot.Plot, pairs []geom.Pair) {
     line, err := plotter.NewLine(pairsToXYs(pairs))
     if err != nil {
         log.Panic(err)
@@ -154,8 +154,8 @@ func main() {
         p := initPlot()
         p.Add(plotter.NewGrid())
         addPairs(p, points)
-        addLine(p, upper)
-        addLine(p, lower)
+        addPolyLine(p, upper)
+        addPolyLine(p, lower)
         savePlot(p, out)
     }
 }
