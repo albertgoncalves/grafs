@@ -11,3 +11,4 @@
 !go/src/geom/
 !go/src/gen/
 !go/src/hull/
+!go/src/bst/
