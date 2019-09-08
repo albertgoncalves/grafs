@@ -130,25 +130,26 @@ func displayInfo(seed int, out string) {
 }
 
 func main() {
-    demoSeed := flag.Int("d", 0, "Plotting Demo")
-    convSeed := flag.Int("c", 0, "Convex Hull")
+    seed := flag.Int("s", 1, "seed")
+    n := flag.Int("n", 10, "n")
+    flag.Bool("d", false, "Plotting Demo")
+    flag.Bool("c", false, "Convex Hull")
     flag.Parse()
     if flagProvided("d") {
         out := destination("demo")
-        displayInfo(*demoSeed, out)
-        rand.Seed(int64(*demoSeed))
-        n := 20
+        displayInfo(*seed, out)
+        rand.Seed(int64(*seed))
         p := initPlot()
         p.Add(plotter.NewGrid())
-        addSegments(p, gen.RandomSegments(n))
-        addPairs(p, gen.RandomPairs(n))
+        addSegments(p, gen.RandomSegments(*n))
+        addPairs(p, gen.RandomPairs(*n))
         savePlot(p, out)
     }
     if flagProvided("c") {
-        out := destination("convex_hull")
-        displayInfo(*convSeed, out)
-        rand.Seed(int64(*convSeed))
-        points := gen.RandomPairs(23)
+        out := destination("hull")
+        displayInfo(*seed, out)
+        rand.Seed(int64(*seed))
+        points := gen.RandomPairs(*n)
         upper, lower := convhull.ConvexHull(points)
         p := initPlot()
         p.Add(plotter.NewGrid())
