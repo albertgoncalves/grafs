@@ -113,21 +113,29 @@ func flagProvided(name string) bool {
     return found
 }
 
+func destination(handle string) string {
+    return fmt.Sprintf("%s/out/%s.png", os.Getenv("GOPATH"), handle)
+}
+
+func displayInfo(seed int, out string) {
+    fmt.Printf(
+        "$ %sDemo%s\n%sseed=%d\n%sout=%s\n",
+        BOLD,
+        END,
+        TAB,
+        seed,
+        TAB,
+        out,
+    )
+}
+
 func main() {
-    demoSeed := flag.Int("d", 0, "seed")
-    convSeed := flag.Int("c", 0, "seed")
+    demoSeed := flag.Int("d", 0, "Plotting Demo")
+    convSeed := flag.Int("c", 0, "Convex Hull")
     flag.Parse()
     if flagProvided("d") {
-        out := fmt.Sprintf("%s/out/demo.png", os.Getenv("GOPATH"))
-        fmt.Printf(
-            "$ %sDemo%s\n%sseed=%d\n%sout=%s\n",
-            BOLD,
-            END,
-            TAB,
-            *demoSeed,
-            TAB,
-            out,
-        )
+        out := destination("demo")
+        displayInfo(*demoSeed, out)
         rand.Seed(int64(*demoSeed))
         n := 20
         p := initPlot()
@@ -137,16 +145,8 @@ func main() {
         savePlot(p, out)
     }
     if flagProvided("c") {
-        out := fmt.Sprintf("%s/out/convex_hull.png", os.Getenv("GOPATH"))
-        fmt.Printf(
-            "$ %sDemo%s\n%sseed=%d\n%sout=%s\n",
-            BOLD,
-            END,
-            TAB,
-            *convSeed,
-            TAB,
-            out,
-        )
+        out := destination("convex_hull")
+        displayInfo(*convSeed, out)
         rand.Seed(int64(*convSeed))
         points := gen.RandomPairs(23)
         upper, lower := convhull.ConvexHull(points)
