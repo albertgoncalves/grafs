@@ -84,7 +84,7 @@ func PointOfIntersection(l, r Segment) (Pair, error) {
             return Pair{x, y}, nil
         }
     }
-    return Pair{}, fmt.Errorf("PointOfIntersectionAlt(%v, %v)", l, r)
+    return Pair{}, fmt.Errorf("PointOfIntersection(%v, %v)", l, r)
 }
 
 func SlopeIntercept(s Segment) (float64, float64, error) {
