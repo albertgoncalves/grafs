@@ -43,7 +43,7 @@ goall() {
         "$GOPATH/src/geom/geom.go"
         "$GOPATH/src/geom/geom_test.go"
         "$GOPATH/src/gen/gen.go"
-        "$GOPATH/src/convhull/convhull.go"
+        "$GOPATH/src/hull/hull.go"
     )
     for f in "${xs[@]}"; do
         echo "$f"
