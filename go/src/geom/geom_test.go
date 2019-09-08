@@ -22,7 +22,7 @@ func TestCcw(t *testing.T) {
 }
 
 func TestPointOfIntersection(t *testing.T) {
-    if point, err := PointOfIntersection(A, B); (point != (Pair{1.0, 1.0})) &&
+    if point, err := PointOfIntersection(A, B); (point != (Pair{1.0, 1.0})) ||
         (err != nil) {
         t.Error("PointOfIntersection(A, B)")
     }
@@ -38,25 +38,26 @@ func BenchmarkPointOfIntersection(b *testing.B) {
 }
 
 func TestSlopeIntercept(t *testing.T) {
-    if m, b, err := SlopeIntercept(A); (m != 1.0) && (b != 0.0) &&
+    if m, b, err := SlopeIntercept(A); (m != 1.0) || (b != 0.0) ||
         (err != nil) {
         t.Error("SlopeIntercept(A)")
     }
     if _, _, err := SlopeIntercept(B); err == nil {
         t.Error("SlopeIntercept(B)")
     }
-    if m, b, err := SlopeIntercept(C); (m != 0.0) && (b != 0.0) &&
+    if m, b, err := SlopeIntercept(C); (m != 0.0) || (b != 0.0) ||
         (err != nil) {
         t.Error("SlopeIntercept(C)")
     }
-    if m, b, err := SlopeIntercept(D); (m != 2.0) && (b != 1.0) &&
+    if m, b, err := SlopeIntercept(D); (m != 2.0) || (b != 1.0) ||
         (err != nil) {
         t.Error("SlopeIntercept(D)")
     }
 }
 
 func TestCircleOfPoints(t *testing.T) {
-    if circle, _ := CircleOfPoints(a, b, c); (circle != Circle{Pair{0.0, 0.0}, 1.0}) {
+    if circle, err := CircleOfPoints(a, b, c); (err != nil) ||
+        (circle != Circle{Pair{0.0, 0.0}, 1.0}) {
         t.Error("CircleOfPoints(a, b, c)")
     }
     if _, err := CircleOfPoints(
@@ -97,36 +98,36 @@ func TestCircleOfPoints(t *testing.T) {
 }
 
 func TestPointInCircle(t *testing.T) {
-    if result, _ := PointInCircle(
+    if result, err := PointInCircle(
         Pair{0.0, 0.0},
         Pair{2.0, 0.0},
         Pair{0.0, 2.0},
         Pair{2.0, 2.0},
-    ); result != 0.0 {
+    ); (result != 0.0) || (err != nil) {
         t.Error("PointInCircle(...)")
     }
-    if result, _ := PointInCircle(
+    if result, err := PointInCircle(
         Pair{0.0, 0.0},
         Pair{0.0, 1.0},
         Pair{1.0, 1.0},
         Pair{0.0, 1.0},
-    ); result != 0 {
+    ); (result != 0) || (err != nil) {
         t.Error("PointInCircle(...)")
     }
-    if result, _ := PointInCircle(
+    if result, err := PointInCircle(
         Pair{0.0, 0.0},
         Pair{2.0, 0.0},
         Pair{0.0, 2.0},
         Pair{2.0, 1.0},
-    ); result <= 0 {
+    ); (result <= 0) || (err != nil) {
         t.Error("PointInCircle(...)")
     }
-    if result, _ := PointInCircle(
+    if result, err := PointInCircle(
         Pair{0.0, 0.0},
         Pair{2.0, 0.0},
         Pair{0.0, 2.0},
         Pair{2.0, 3.0},
-    ); result >= 0 {
+    ); (result >= 0) || (err != nil) {
         t.Error("PointInCircle(...)")
     }
     if _, err := PointInCircle(
@@ -161,5 +162,4 @@ func TestPointInCircle(t *testing.T) {
     ); err == nil {
         t.Error("PointInCircle(...)")
     }
-
 }

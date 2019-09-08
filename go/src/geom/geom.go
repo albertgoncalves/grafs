@@ -26,8 +26,8 @@ type Circle struct {
     Radius float64
 }
 
-func det2(ab Pair, cd Pair) float64 {
-    return (ab.X * cd.Y) - (ab.Y * cd.X)
+func det2(a Pair, b Pair) float64 {
+    return (a.X * b.Y) - (a.Y * b.X)
 }
 
 func det3(a, b, c Triple) float64 {
@@ -64,16 +64,16 @@ func Ccw(a, b, c Pair) bool {
     return ((c.Y - a.Y) * (b.X - a.X)) > ((b.Y - a.Y) * (c.X - a.X))
 }
 
-func PointOfIntersection(l, r Segment) (Pair, error) {
+func PointOfIntersection(a, b Segment) (Pair, error) {
     // https://en.wikipedia.org/wiki/Line–line_intersection
-    x1 := l.A.X
-    x2 := l.B.X
-    x3 := r.A.X
-    x4 := r.B.X
-    y1 := l.A.Y
-    y2 := l.B.Y
-    y3 := r.A.Y
-    y4 := r.B.Y
+    x1 := a.A.X
+    x2 := a.B.X
+    x3 := b.A.X
+    x4 := b.B.X
+    y1 := a.A.Y
+    y2 := a.B.Y
+    y3 := b.A.Y
+    y4 := b.B.Y
     denominator := ((x1 - x2) * (y3 - y4)) - ((y1 - y2) * (x3 - x4))
     if denominator != 0.0 {
         t := (((x1 - x3) * (y3 - y4)) - ((y1 - y3) * (x3 - x4))) / denominator
@@ -84,15 +84,15 @@ func PointOfIntersection(l, r Segment) (Pair, error) {
             return Pair{x, y}, nil
         }
     }
-    return Pair{}, fmt.Errorf("PointOfIntersection(%v, %v)", l, r)
+    return Pair{}, fmt.Errorf("PointOfIntersection(%v, %v)", a, b)
 }
 
-func SlopeIntercept(s Segment) (float64, float64, error) {
-    if s.A.X == s.B.X {
-        return 0.0, 0.0, fmt.Errorf("SlopeIntercept(%v)", s)
+func SlopeIntercept(a Segment) (float64, float64, error) {
+    if a.A.X == a.B.X {
+        return 0.0, 0.0, fmt.Errorf("SlopeIntercept(%v)", a)
     }
-    m := (s.B.Y - s.A.Y) / (s.B.X - s.A.X)
-    b := s.A.Y - (m * s.A.X)
+    m := (a.B.Y - a.A.Y) / (a.B.X - a.A.X)
+    b := a.A.Y - (m * a.A.X)
     return m, b, nil
 }
 
