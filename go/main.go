@@ -1,6 +1,7 @@
 package main
 
 import (
+    "convhull"
     "flag"
     "fmt"
     "gen"
@@ -81,6 +82,14 @@ func addPairs(p *plot.Plot, pairs []geom.Pair) {
     p.Add(scatter)
 }
 
+func addLine(p *plot.Plot, pairs []geom.Pair) {
+    line, err := plotter.NewLine(pairsToXYs(pairs))
+    if err != nil {
+        log.Panic(err)
+    }
+    p.Add(line)
+}
+
 func addSegments(p *plot.Plot, segments []geom.Segment) {
     lines := segmentsToXYs(segments)
     for _, line := range lines {
@@ -106,6 +115,7 @@ func flagProvided(name string) bool {
 
 func main() {
     demoSeed := flag.Int("d", 0, "seed")
+    convSeed := flag.Int("c", 0, "seed")
     flag.Parse()
     if flagProvided("d") {
         out := fmt.Sprintf("%s/out/demo.png", os.Getenv("GOPATH"))
@@ -124,6 +134,27 @@ func main() {
         p.Add(plotter.NewGrid())
         addSegments(p, gen.RandomSegments(n))
         addPairs(p, gen.RandomPairs(n))
+        savePlot(p, out)
+    }
+    if flagProvided("c") {
+        out := fmt.Sprintf("%s/out/convex_hull.png", os.Getenv("GOPATH"))
+        fmt.Printf(
+            "$ %sDemo%s\n%sseed=%d\n%sout=%s\n",
+            BOLD,
+            END,
+            TAB,
+            *convSeed,
+            TAB,
+            out,
+        )
+        rand.Seed(int64(*convSeed))
+        points := gen.RandomPairs(23)
+        upper, lower := convhull.ConvexHull(points)
+        p := initPlot()
+        p.Add(plotter.NewGrid())
+        addPairs(p, points)
+        addLine(p, upper)
+        addLine(p, lower)
         savePlot(p, out)
     }
 }

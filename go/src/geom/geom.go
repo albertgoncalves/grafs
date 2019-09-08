@@ -9,6 +9,23 @@ type Pair struct {
     X, Y float64
 }
 
+type PairByX []Pair
+
+func (p PairByX) Len() int {
+    return len(p)
+}
+
+func (p PairByX) Swap(i, j int) {
+    p[i], p[j] = p[j], p[i]
+}
+
+func (p PairByX) Less(i, j int) bool {
+    if p[i].X == p[j].X {
+        return p[i].Y < p[j].Y
+    }
+    return p[i].X < p[j].X
+}
+
 type Segment struct {
     A, B Pair
 }
