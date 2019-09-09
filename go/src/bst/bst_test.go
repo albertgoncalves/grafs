@@ -127,3 +127,38 @@ func TestDelete(t *testing.T) {
         t.Error("tree.Delete(...)")
     }
 }
+
+func TestEmpty(t *testing.T) {
+    if tree := (&Tree{}); !tree.Empty() {
+        t.Error("tree.Empty()")
+    }
+    if tree := initTree(); tree.Empty() {
+        t.Error("tree.Empty()")
+    }
+}
+
+func popPipeline(
+    t *testing.T,
+    tree *Tree,
+    item KeyValue,
+    remainingItems []KeyValue,
+) {
+    if key, value, err := tree.Pop(); (key != item.Key) ||
+        (value != item.Value) || (err != nil) ||
+        (!compareKeyValues(tree.Collect(), remainingItems)) {
+        t.Error("tree.Pop()")
+    }
+}
+
+func TestPop(t *testing.T) {
+    tree := initTree()
+    n := len(items)
+    var m int
+    for i := 1; i < 5; i++ {
+        m = n - i
+        popPipeline(t, tree, items[m], items[:m])
+    }
+    if _, _, err := tree.Pop(); err == nil {
+        t.Error("tree.Pop()")
+    }
+}

@@ -66,14 +66,24 @@ func (node *Node) Find(key Key) (Value, error) {
     return node.Right.Find(key)
 }
 
-func (node *Node) findMax(parent *Node) (*Node, *Node) {
+func (node *Node) last(parent *Node) (*Node, *Node) {
+    if node == nil {
+        return nil, parent
+    }
+    if node.Left == nil {
+        return node, parent
+    }
+    return node.Left.last(node)
+}
+
+func (node *Node) first(parent *Node) (*Node, *Node) {
     if node == nil {
         return nil, parent
     }
     if node.Right == nil {
         return node, parent
     }
-    return node.Right.findMax(node)
+    return node.Right.first(node)
 }
 
 func (node *Node) replaceNode(parent, replacement *Node) error {
@@ -110,7 +120,7 @@ func (node *Node) Delete(key Key, parent *Node) error {
             node.replaceNode(parent, node.Left)
             return nil
         }
-        replacement, replParent := node.Left.findMax(node)
+        replacement, replParent := node.Left.first(node)
         node.Key = replacement.Key
         node.Value = replacement.Value
         return replacement.Delete(replacement.Key, replParent)
@@ -149,30 +159,51 @@ func (tree *Tree) Find(key Key) (Value, error) {
     return nil, err
 }
 
+func (tree *Tree) Pop() (Key, Value, error) {
+    if tree.Root == nil {
+        return nil, nil, fmt.Errorf("(%v).Pop()", tree)
+    }
+    node, parent := tree.Root.Right.first(tree.Root)
+    if node == nil {
+        key := tree.Root.Key
+        value := tree.Root.Value
+        tree.Root = nil
+        return key, value, nil
+    }
+    key := node.Key
+    value := node.Value
+    node.Delete(node.Key, parent)
+    return key, value, nil
+}
+
+func (tree *Tree) Empty() bool {
+    return tree.Root == nil
+}
+
 func (tree *Tree) Delete(key Key) error {
     if tree.Root == nil {
         return fmt.Errorf("(%v).Delete(%v)", tree, key)
     }
-    fakeParent := &Node{Right: tree.Root}
-    if err := tree.Root.Delete(key, fakeParent); err != nil {
+    pseudoParent := &Node{Right: tree.Root}
+    if err := tree.Root.Delete(key, pseudoParent); err != nil {
         return err
     }
-    tree.Root = fakeParent.Right
+    tree.Root = pseudoParent.Right
     return nil
 }
 
-func (tree *Tree) Traverse(node *Node) {
+func (tree *Tree) traverse(node *Node) {
     if node != nil {
-        tree.Traverse(node.Left)
+        tree.traverse(node.Left)
         tree.Stack = append(tree.Stack, KeyValue{node.Key, node.Value})
-        tree.Traverse(node.Right)
+        tree.traverse(node.Right)
     }
 }
 
 func (tree *Tree) Collect() []KeyValue {
     tree.Stack = make([]KeyValue, 0)
     if tree.Root != nil {
-        tree.Traverse(tree.Root)
+        tree.traverse(tree.Root)
     }
     return tree.Stack
 }
