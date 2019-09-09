@@ -7,8 +7,8 @@ import (
 type Value interface{}
 
 type Key interface {
-    equal(Key) bool
-    less(Key) bool
+    equal(Key) (bool, error)
+    less(Key) (bool, error)
 }
 
 type KeyValue struct {
@@ -27,37 +27,43 @@ func (node *Node) Insert(key Key, value Value) error {
     if node == nil {
         return fmt.Errorf("(%v).Insert(%v, %v)", node, key, value)
     }
-    switch {
-    case key.equal(node.Key):
+    if result, err := key.equal(node.Key); result && (err == nil) {
         node.Value = value
         return nil
-    case key.less(node.Key):
+    } else if err != nil {
+        return err
+    }
+    if result, err := key.less(node.Key); result && (err == nil) {
         if node.Left == nil {
             node.Left = &Node{Key: key, Value: value}
             return nil
         }
         return node.Left.Insert(key, value)
-    default:
-        if node.Right == nil {
-            node.Right = &Node{Key: key, Value: value}
-            return nil
-        }
-        return node.Right.Insert(key, value)
+    } else if err != nil {
+        return fmt.Errorf("(%v).Insert(%v, %v)", node, key, value)
     }
+    if node.Right == nil {
+        node.Right = &Node{Key: key, Value: value}
+        return nil
+    }
+    return node.Right.Insert(key, value)
 }
 
-func (node *Node) Find(key Key) (Value, bool) {
+func (node *Node) Find(key Key) (Value, error) {
     if node == nil {
-        return nil, false
+        return nil, fmt.Errorf("(%v).Find(%v)", node, key)
     }
-    switch {
-    case key.equal(node.Key):
-        return node.Value, true
-    case key.less(node.Key):
+    if result, err := key.equal(node.Key); result && (err == nil) {
+        return node.Value, nil
+    } else if err != nil {
+        return node.Value, err
+    }
+    if result, err := key.less(node.Key); result && (err == nil) {
         return node.Left.Find(key)
-    default:
-        return node.Right.Find(key)
+    } else if err != nil {
+        return node.Value, err
     }
+    return node.Right.Find(key)
 }
 
 func (node *Node) findMax(parent *Node) (*Node, *Node) {
@@ -91,10 +97,12 @@ func (node *Node) Delete(key Key, parent *Node) error {
     if node == nil {
         return fmt.Errorf("(%v).Delete(%v, %v)", node, key, parent)
     }
-    switch {
-    case key.less(node.Key):
+    if result, err := key.less(node.Key); result && (err == nil) {
         return node.Left.Delete(key, node)
-    case key.equal(node.Key):
+    } else if err != nil {
+        return err
+    }
+    if result, err := key.equal(node.Key); result && (err == nil) {
         if node.Left == nil && node.Right == nil {
             node.replaceNode(parent, nil)
             return nil
@@ -111,9 +119,10 @@ func (node *Node) Delete(key Key, parent *Node) error {
         node.Key = replacement.Key
         node.Value = replacement.Value
         return replacement.Delete(replacement.Key, replParent)
-    default:
-        return node.Right.Delete(key, node)
+    } else if err != nil {
+        return err
     }
+    return node.Right.Delete(key, node)
 }
 
 type Tree struct {
@@ -129,11 +138,15 @@ func (tree *Tree) Insert(key Key, value Value) error {
     return tree.Root.Insert(key, value)
 }
 
-func (tree *Tree) Find(key Key) (Value, bool) {
+func (tree *Tree) Find(key Key) (Value, error) {
     if tree.Root == nil {
-        return nil, false
+        return nil, fmt.Errorf("(%v).Find(%v)", tree, key)
     }
-    return tree.Root.Find(key)
+    value, err := tree.Root.Find(key)
+    if err == nil {
+        return value, nil
+    }
+    return nil, err
 }
 
 func (tree *Tree) Delete(key Key) error {
@@ -151,12 +164,11 @@ func (tree *Tree) Delete(key Key) error {
 }
 
 func (tree *Tree) Traverse(node *Node) {
-    if node == nil {
-        return
+    if node != nil {
+        tree.Traverse(node.Left)
+        tree.Stack = append(tree.Stack, KeyValue{node.Key, node.Value})
+        tree.Traverse(node.Right)
     }
-    tree.Traverse(node.Left)
-    tree.Stack = append(tree.Stack, KeyValue{node.Key, node.Value})
-    tree.Traverse(node.Right)
 }
 
 func (tree *Tree) Collect() []KeyValue {

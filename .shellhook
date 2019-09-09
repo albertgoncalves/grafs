@@ -45,6 +45,7 @@ goall() {
         "$GOPATH/src/gen/gen.go"
         "$GOPATH/src/hull/hull.go"
         "$GOPATH/src/bst/bst.go"
+        "$GOPATH/src/bst/bst_test.go"
     )
     for f in "${xs[@]}"; do
         echo "$f"

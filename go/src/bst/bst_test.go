@@ -1,6 +1,7 @@
 package bst
 
 import (
+    "fmt"
     "testing"
 )
 
@@ -9,24 +10,24 @@ type PairKey struct {
     Y float64
 }
 
-func (a PairKey) equal(b Key) bool {
+func (a PairKey) equal(b Key) (bool, error) {
     switch b := b.(type) {
     case PairKey:
-        return (a.X == b.X) && (a.Y == b.Y)
+        return (a.X == b.X) && (a.Y == b.Y), nil
     default:
-        return false
+        return false, fmt.Errorf("(%v).equal(%v)", a, b)
     }
 }
 
-func (a PairKey) less(b Key) bool {
+func (a PairKey) less(b Key) (bool, error) {
     switch b := b.(type) {
     case PairKey:
         if a.X == b.X {
-            return a.Y < b.Y
+            return a.Y < b.Y, nil
         }
-        return a.X < b.X
+        return a.X < b.X, nil
     default:
-        return false
+        return false, fmt.Errorf("(%v).less(%v)", a, b)
     }
 }
 
@@ -34,7 +35,7 @@ func compareKeyValues(a, b []KeyValue) bool {
     if len(a) != len(b) {
         return false
     }
-    for i := range(a) {
+    for i := range a {
         if a[i] != b[i] {
             return false
         }
@@ -42,14 +43,15 @@ func compareKeyValues(a, b []KeyValue) bool {
     return true
 }
 
+var items = []KeyValue{
+    {PairKey{0.0, 0.0}, "a"},
+    {PairKey{1.0, 0.0}, "b"},
+    {PairKey{2.0, 0.0}, "c"},
+    {PairKey{2.0, 1.0}, "d"},
+}
+
 func TestInsert(t *testing.T) {
     tree := &Tree{}
-    items := []KeyValue{
-        KeyValue{PairKey{0.0, 0.0}, "a"},
-        KeyValue{PairKey{1.0, 0.0}, "b"},
-        KeyValue{PairKey{2.0, 0.0}, "c"},
-        KeyValue{PairKey{2.0, 1.0}, "d"},
-    }
     for _, item := range items {
         tree.Insert(item.Key, item.Value)
     }
@@ -63,5 +65,19 @@ func TestInsert(t *testing.T) {
         items[2],
     }) {
         t.Error("tree.Insert(...)")
+    }
+}
+
+func TestFind(t *testing.T) {
+    tree := &Tree{}
+    for _, item := range items {
+        tree.Insert(item.Key, item.Value)
+    }
+    if value, err := tree.Find(PairKey{0.0, 0.0}); (value != "a") ||
+        (err != nil) {
+        t.Error("tree.Find(...)")
+    }
+    if _, err := tree.Find(PairKey{3.0, 0.0}); err == nil {
+        t.Error("tree.Find(...)")
     }
 }
