@@ -66,22 +66,22 @@ func (node *Node) Find(key Key) (Value, error) {
     return node.Right.Find(key)
 }
 
-func (node *Node) last(parent *Node) (*Node, *Node) {
+func (node *Node) last(parent *Node) (*Node, *Node, error) {
     if node == nil {
-        return nil, parent
+        return nil, nil, fmt.Errorf("(%v).last(%v)", node, parent)
     }
     if node.Left == nil {
-        return node, parent
+        return node, parent, nil
     }
     return node.Left.last(node)
 }
 
-func (node *Node) first(parent *Node) (*Node, *Node) {
+func (node *Node) first(parent *Node) (*Node, *Node, error) {
     if node == nil {
-        return nil, parent
+        return nil, nil, fmt.Errorf("(%v).first(%v)", node, parent)
     }
     if node.Right == nil {
-        return node, parent
+        return node, parent, nil
     }
     return node.Right.first(node)
 }
@@ -120,7 +120,10 @@ func (node *Node) Delete(key Key, parent *Node) error {
             node.replaceNode(parent, node.Left)
             return nil
         }
-        replacement, replParent := node.Left.first(node)
+        replacement, replParent, err := node.Left.first(node)
+        if err != nil {
+            return err
+        }
         node.Key = replacement.Key
         node.Value = replacement.Value
         return replacement.Delete(replacement.Key, replParent)
@@ -163,8 +166,8 @@ func (tree *Tree) Pop() (Key, Value, error) {
     if tree.Root == nil {
         return nil, nil, fmt.Errorf("(%v).Pop()", tree)
     }
-    node, parent := tree.Root.Right.first(tree.Root)
-    if node == nil {
+    node, parent, err := tree.Root.Right.first(tree.Root)
+    if err != nil {
         key := tree.Root.Key
         value := tree.Root.Value
         tree.Root = nil
