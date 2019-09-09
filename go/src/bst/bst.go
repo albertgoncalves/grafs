@@ -97,13 +97,8 @@ func (node *Node) Delete(key Key, parent *Node) error {
     if node == nil {
         return fmt.Errorf("(%v).Delete(%v, %v)", node, key, parent)
     }
-    if result, err := key.less(node.Key); result && (err == nil) {
-        return node.Left.Delete(key, node)
-    } else if err != nil {
-        return err
-    }
     if result, err := key.equal(node.Key); result && (err == nil) {
-        if node.Left == nil && node.Right == nil {
+        if (node.Left == nil) && (node.Right == nil) {
             node.replaceNode(parent, nil)
             return nil
         }
@@ -119,6 +114,11 @@ func (node *Node) Delete(key Key, parent *Node) error {
         node.Key = replacement.Key
         node.Value = replacement.Value
         return replacement.Delete(replacement.Key, replParent)
+    } else if err != nil {
+        return err
+    }
+    if result, err := key.less(node.Key); result && (err == nil) {
+        return node.Left.Delete(key, node)
     } else if err != nil {
         return err
     }
@@ -157,9 +157,7 @@ func (tree *Tree) Delete(key Key) error {
     if err := tree.Root.Delete(key, fakeParent); err != nil {
         return err
     }
-    if fakeParent.Right == nil {
-        tree.Root = nil
-    }
+    tree.Root = fakeParent.Right
     return nil
 }
 

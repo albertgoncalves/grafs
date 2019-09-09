@@ -50,11 +50,16 @@ var items = []KeyValue{
     {PairKey{2.0, 1.0}, "d"},
 }
 
-func TestInsert(t *testing.T) {
+func initTree() *Tree {
     tree := &Tree{}
     for _, item := range items {
         tree.Insert(item.Key, item.Value)
     }
+    return tree
+}
+
+func TestInsert(t *testing.T) {
+    tree := initTree()
     if !compareKeyValues(tree.Collect(), items) {
         t.Error("tree.Insert(...)")
     }
@@ -69,15 +74,53 @@ func TestInsert(t *testing.T) {
 }
 
 func TestFind(t *testing.T) {
-    tree := &Tree{}
-    for _, item := range items {
-        tree.Insert(item.Key, item.Value)
-    }
+    tree := initTree()
     if value, err := tree.Find(PairKey{0.0, 0.0}); (value != "a") ||
         (err != nil) {
         t.Error("tree.Find(...)")
     }
     if _, err := tree.Find(PairKey{3.0, 0.0}); err == nil {
         t.Error("tree.Find(...)")
+    }
+}
+
+func deletePipeline(t *testing.T, key Key, remainingItems []KeyValue) {
+    tree := initTree()
+    if err := tree.Delete(key); err != nil {
+        t.Error("tree.Delete(...)")
+    }
+    if !compareKeyValues(tree.Collect(), remainingItems) {
+        t.Error("tree.Delete(...)")
+    }
+}
+
+func TestDelete(t *testing.T) {
+    deletePipeline(t, items[0].Key, []KeyValue{
+        items[1],
+        items[2],
+        items[3],
+    })
+    deletePipeline(t, items[1].Key, []KeyValue{
+        items[0],
+        items[2],
+        items[3],
+    })
+    deletePipeline(t, items[2].Key, []KeyValue{
+        items[0],
+        items[1],
+        items[3],
+    })
+    deletePipeline(t, items[3].Key, []KeyValue{
+        items[0],
+        items[1],
+        items[2],
+    })
+    tree := initTree()
+    if err := tree.Delete(items[0].Key); err != nil {
+        t.Error("tree.Delete(...)")
+    }
+    tree.Insert(items[0].Key, items[0].Value)
+    if !compareKeyValues(tree.Collect(), items) {
+        t.Error("tree.Delete(...)")
     }
 }
