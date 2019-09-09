@@ -75,9 +75,12 @@ func TestInsert(t *testing.T) {
 
 func TestFind(t *testing.T) {
     tree := initTree()
-    if value, err := tree.Find(PairKey{0.0, 0.0}); (value != "a") ||
-        (err != nil) {
-        t.Error("tree.Find(...)")
+    for i := range items {
+        if value, err := tree.Find(items[i].Key); (value != items[i].Value) ||
+            (err != nil) {
+            t.Error("tree.Find(...)")
+            break
+        }
     }
     if _, err := tree.Find(PairKey{3.0, 0.0}); err == nil {
         t.Error("tree.Find(...)")
