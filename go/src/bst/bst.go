@@ -11,11 +11,6 @@ type Key interface {
     less(Key) (bool, error)
 }
 
-type KeyValue struct {
-    Key   Key
-    Value Value
-}
-
 type Node struct {
     Key   Key
     Value Value
@@ -141,6 +136,11 @@ func (node *Node) Delete(key Key, parent *Node) error {
 type Tree struct {
     Root  *Node
     Stack []KeyValue
+}
+
+type KeyValue struct {
+    Key   Key
+    Value Value
 }
 
 func (tree *Tree) Insert(key Key, value Value) error {
