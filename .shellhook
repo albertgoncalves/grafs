@@ -21,6 +21,7 @@ done
 if [ ! -f "$GOPATH/.init" ]; then
     go get -v gonum.org/v1/plot
     go get -v golang.org/x/lint/golint
+    go get -v github.com/cheekybits/genny
     touch "$GOPATH/.init"
 fi
 

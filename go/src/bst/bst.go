@@ -2,66 +2,69 @@ package bst
 
 import (
     "fmt"
+    "github.com/cheekybits/genny/generic"
 )
 
-type Value interface{}
+type KeyType generic.Type
 
-type Key interface {
-    equal(*Key) (bool, error)
-    less(*Key) (bool, error)
+type ValueType generic.Type
+
+type KeyTypeValueTypeNode struct {
+    Key   KeyType
+    Value ValueType
+    Equal func(KeyType, KeyType) bool
+    Less  func(KeyType, KeyType) bool
+    Left  *KeyTypeValueTypeNode
+    Right *KeyTypeValueTypeNode
 }
 
-type Node struct {
-    Key   Key
-    Value Value
-    Left  *Node
-    Right *Node
-}
-
-func (node *Node) Insert(key Key, value Value) error {
+func (node *KeyTypeValueTypeNode) Insert(key KeyType, value ValueType) error {
     if node == nil {
         return fmt.Errorf("(%v).Insert(%v, %v)", node, key, value)
     }
-    if result, err := key.equal(&node.Key); result && (err == nil) {
+    if node.Equal(key, node.Key) {
         node.Value = value
         return nil
-    } else if err != nil {
-        return err
     }
-    if result, err := key.less(&node.Key); result && (err == nil) {
+    if node.Less(key, node.Key) {
         if node.Left == nil {
-            node.Left = &Node{Key: key, Value: value}
+            node.Left = &KeyTypeValueTypeNode{
+                Key:   key,
+                Value: value,
+                Equal: node.Equal,
+                Less:  node.Less,
+            }
             return nil
         }
         return node.Left.Insert(key, value)
-    } else if err != nil {
-        return fmt.Errorf("(%v).Insert(%v, %v)", node, key, value)
     }
     if node.Right == nil {
-        node.Right = &Node{Key: key, Value: value}
+        node.Right = &KeyTypeValueTypeNode{
+            Key:   key,
+            Value: value,
+            Equal: node.Equal,
+            Less:  node.Less,
+        }
         return nil
     }
     return node.Right.Insert(key, value)
 }
 
-func (node *Node) Find(key Key) (Value, error) {
+func (node *KeyTypeValueTypeNode) Find(key KeyType) (ValueType, error) {
     if node == nil {
         return nil, fmt.Errorf("(%v).Find(%v)", node, key)
     }
-    if result, err := key.equal(&node.Key); result && (err == nil) {
+    if node.Equal(key, node.Key) {
         return node.Value, nil
-    } else if err != nil {
-        return node.Value, err
     }
-    if result, err := key.less(&node.Key); result && (err == nil) {
+    if node.Less(key, node.Key) {
         return node.Left.Find(key)
-    } else if err != nil {
-        return node.Value, err
     }
     return node.Right.Find(key)
 }
 
-func (node *Node) last(parent *Node) (*Node, *Node, error) {
+func (node *KeyTypeValueTypeNode) last(parent *KeyTypeValueTypeNode) (
+    *KeyTypeValueTypeNode, *KeyTypeValueTypeNode, error) {
     if node == nil {
         return nil, nil, fmt.Errorf("(%v).last(%v)", node, parent)
     }
@@ -71,7 +74,8 @@ func (node *Node) last(parent *Node) (*Node, *Node, error) {
     return node.Left.last(node)
 }
 
-func (node *Node) first(parent *Node) (*Node, *Node, error) {
+func (node *KeyTypeValueTypeNode) first(parent *KeyTypeValueTypeNode) (
+    *KeyTypeValueTypeNode, *KeyTypeValueTypeNode, error) {
     if node == nil {
         return nil, nil, fmt.Errorf("(%v).first(%v)", node, parent)
     }
@@ -81,14 +85,13 @@ func (node *Node) first(parent *Node) (*Node, *Node, error) {
     return node.Right.first(node)
 }
 
-func (node *Node) replaceNode(parent, replacement *Node) error {
+func (node *KeyTypeValueTypeNode) swap(
+    parent,
+    replacement,
+    *KeyTypeValueTypeNode,
+) error {
     if node == nil {
-        return fmt.Errorf(
-            "(%v).replaceNode(%v, %v)",
-            node,
-            parent,
-            replacement,
-        )
+        return fmt.Errorf("(%v).swap(%v, %v)", node, parent, replacement)
     }
     if node == parent.Left {
         parent.Left = replacement
@@ -98,21 +101,24 @@ func (node *Node) replaceNode(parent, replacement *Node) error {
     return nil
 }
 
-func (node *Node) Delete(key Key, parent *Node) error {
+func (node *KeyTypeValueTypeNode) Delete(
+    key KeyType,
+    parent *KeyTypeValueTypeNode,
+) error {
     if node == nil {
         return fmt.Errorf("(%v).Delete(%v, %v)", node, key, parent)
     }
-    if result, err := key.equal(&node.Key); result && (err == nil) {
+    if node.Equal(key, node.Key) {
         if (node.Left == nil) && (node.Right == nil) {
-            node.replaceNode(parent, nil)
+            node.swap(parent, nil)
             return nil
         }
         if node.Left == nil {
-            node.replaceNode(parent, node.Right)
+            node.swap(parent, node.Right)
             return nil
         }
         if node.Right == nil {
-            node.replaceNode(parent, node.Left)
+            node.swap(parent, node.Left)
             return nil
         }
         replacement, replParent, err := node.Left.first(node)
@@ -121,37 +127,42 @@ func (node *Node) Delete(key Key, parent *Node) error {
         }
         node.Key = replacement.Key
         node.Value = replacement.Value
+        node.Equal = replacement.Equal
+        node.Less = replacement.Less
         return replacement.Delete(replacement.Key, replParent)
-    } else if err != nil {
-        return err
     }
-    if result, err := key.less(&node.Key); result && (err == nil) {
+    if node.Less(key, node.Key) {
         return node.Left.Delete(key, node)
-    } else if err != nil {
-        return err
     }
     return node.Right.Delete(key, node)
 }
 
-type Tuple struct {
-    Key   Key
-    Value Value
+type KeyTypeValueTypeTuple struct {
+    Key   KeyType
+    Value ValueType
 }
 
-type Tree struct {
-    Root  *Node
-    Stack []Tuple
+type KeyTypeValueTypeTree struct {
+    Root  *KeyTypeValueTypeNode
+    Stack []KeyTypeValueTypeTuple
+    Equal func(KeyType, KeyType) bool
+    Less  func(KeyType, KeyType) bool
 }
 
-func (tree *Tree) Insert(key Key, value Value) error {
+func (tree *KeyTypeValueTypeTree) Insert(key KeyType, value ValueType) error {
     if tree.Root == nil {
-        tree.Root = &Node{Key: key, Value: value}
+        tree.Root = &KeyTypeValueTypeNode{
+            Key:   key,
+            Value: value,
+            Equal: tree.Equal,
+            Less:  tree.Less,
+        }
         return nil
     }
     return tree.Root.Insert(key, value)
 }
 
-func (tree *Tree) Find(key Key) (Value, error) {
+func (tree *KeyTypeValueTypeTree) Find(key KeyType) (ValueType, error) {
     if tree.Root == nil {
         return nil, fmt.Errorf("(%v).Find(%v)", tree, key)
     }
@@ -162,7 +173,7 @@ func (tree *Tree) Find(key Key) (Value, error) {
     return nil, err
 }
 
-func (tree *Tree) Pop() (Key, Value, error) {
+func (tree *KeyTypeValueTypeTree) Pop() (KeyType, ValueType, error) {
     if tree.Root == nil {
         return nil, nil, fmt.Errorf("(%v).Pop()", tree)
     }
@@ -179,15 +190,15 @@ func (tree *Tree) Pop() (Key, Value, error) {
     return key, value, nil
 }
 
-func (tree *Tree) Empty() bool {
+func (tree *KeyTypeValueTypeTree) Empty() bool {
     return tree.Root == nil
 }
 
-func (tree *Tree) Delete(key Key) error {
+func (tree *KeyTypeValueTypeTree) Delete(key KeyType) error {
     if tree.Root == nil {
         return fmt.Errorf("(%v).Delete(%v)", tree, key)
     }
-    pseudoParent := &Node{Right: tree.Root}
+    pseudoParent := &KeyTypeValueTypeNode{Right: tree.Root}
     if err := tree.Root.Delete(key, pseudoParent); err != nil {
         return err
     }
@@ -195,16 +206,19 @@ func (tree *Tree) Delete(key Key) error {
     return nil
 }
 
-func (tree *Tree) traverse(node *Node) {
+func (tree *KeyTypeValueTypeTree) traverse(node *KeyTypeValueTypeNode) {
     if node != nil {
         tree.traverse(node.Left)
-        tree.Stack = append(tree.Stack, Tuple{node.Key, node.Value})
+        tree.Stack = append(
+            tree.Stack,
+            KeyTypeValueTypeTuple{node.Key, node.Value},
+        )
         tree.traverse(node.Right)
     }
 }
 
-func (tree *Tree) Collect() []Tuple {
-    tree.Stack = make([]Tuple, 0)
+func (tree *KeyTypeValueTypeTree) Collect() []KeyTypeValueTypeTuple {
+    tree.Stack = make([]KeyTypeValueTypeTuple, 0)
     if tree.Root != nil {
         tree.traverse(tree.Root)
     }
