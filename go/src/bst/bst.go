@@ -133,14 +133,14 @@ func (node *Node) Delete(key Key, parent *Node) error {
     return node.Right.Delete(key, node)
 }
 
-type Tree struct {
-    Root  *Node
-    Stack []KeyValue
-}
-
-type KeyValue struct {
+type Tuple struct {
     Key   Key
     Value Value
+}
+
+type Tree struct {
+    Root  *Node
+    Stack []Tuple
 }
 
 func (tree *Tree) Insert(key Key, value Value) error {
@@ -198,13 +198,13 @@ func (tree *Tree) Delete(key Key) error {
 func (tree *Tree) traverse(node *Node) {
     if node != nil {
         tree.traverse(node.Left)
-        tree.Stack = append(tree.Stack, KeyValue{node.Key, node.Value})
+        tree.Stack = append(tree.Stack, Tuple{node.Key, node.Value})
         tree.traverse(node.Right)
     }
 }
 
-func (tree *Tree) Collect() []KeyValue {
-    tree.Stack = make([]KeyValue, 0)
+func (tree *Tree) Collect() []Tuple {
+    tree.Stack = make([]Tuple, 0)
     if tree.Root != nil {
         tree.traverse(tree.Root)
     }

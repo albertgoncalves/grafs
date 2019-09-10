@@ -31,7 +31,7 @@ func (a PairKey) less(b Key) (bool, error) {
     }
 }
 
-func compareKeyValues(a, b []KeyValue) bool {
+func compareTuples(a, b []Tuple) bool {
     if len(a) != len(b) {
         return false
     }
@@ -43,7 +43,7 @@ func compareKeyValues(a, b []KeyValue) bool {
     return true
 }
 
-var items = []KeyValue{
+var items = []Tuple{
     {PairKey{0.0, 0.0}, "a"},
     {PairKey{1.0, 0.0}, "b"},
     {PairKey{2.0, 0.0}, "c"},
@@ -60,10 +60,10 @@ func initTree() *Tree {
 
 func TestInsert(t *testing.T) {
     tree := initTree()
-    if !compareKeyValues(tree.Collect(), items) {
+    if !compareTuples(tree.Collect(), items) {
         t.Error("tree.Insert(...)")
     }
-    if compareKeyValues(tree.Collect(), []KeyValue{
+    if compareTuples(tree.Collect(), []Tuple{
         items[0],
         items[1],
         items[3],
@@ -87,33 +87,33 @@ func TestFind(t *testing.T) {
     }
 }
 
-func deletePipeline(t *testing.T, key Key, remainingItems []KeyValue) {
+func deletePipeline(t *testing.T, key Key, remainingItems []Tuple) {
     tree := initTree()
     if err := tree.Delete(key); err != nil {
         t.Error("tree.Delete(...)")
     }
-    if !compareKeyValues(tree.Collect(), remainingItems) {
+    if !compareTuples(tree.Collect(), remainingItems) {
         t.Error("tree.Delete(...)")
     }
 }
 
 func TestDelete(t *testing.T) {
-    deletePipeline(t, items[0].Key, []KeyValue{
+    deletePipeline(t, items[0].Key, []Tuple{
         items[1],
         items[2],
         items[3],
     })
-    deletePipeline(t, items[1].Key, []KeyValue{
+    deletePipeline(t, items[1].Key, []Tuple{
         items[0],
         items[2],
         items[3],
     })
-    deletePipeline(t, items[2].Key, []KeyValue{
+    deletePipeline(t, items[2].Key, []Tuple{
         items[0],
         items[1],
         items[3],
     })
-    deletePipeline(t, items[3].Key, []KeyValue{
+    deletePipeline(t, items[3].Key, []Tuple{
         items[0],
         items[1],
         items[2],
@@ -123,7 +123,7 @@ func TestDelete(t *testing.T) {
         t.Error("tree.Delete(...)")
     }
     tree.Insert(items[0].Key, items[0].Value)
-    if !compareKeyValues(tree.Collect(), items) {
+    if !compareTuples(tree.Collect(), items) {
         t.Error("tree.Delete(...)")
     }
 }
@@ -140,12 +140,12 @@ func TestEmpty(t *testing.T) {
 func popPipeline(
     t *testing.T,
     tree *Tree,
-    item KeyValue,
-    remainingItems []KeyValue,
+    item Tuple,
+    remainingItems []Tuple,
 ) {
     if key, value, err := tree.Pop(); (key != item.Key) ||
         (value != item.Value) || (err != nil) ||
-        (!compareKeyValues(tree.Collect(), remainingItems)) {
+        (!compareTuples(tree.Collect(), remainingItems)) {
         t.Error("tree.Pop()")
     }
 }
