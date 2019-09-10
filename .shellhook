@@ -38,21 +38,13 @@ golint() {
 }
 
 goall() {
-    xs=(
-        "$GOPATH/main.go"
-        "$GOPATH/src/geom/geom.go"
-        "$GOPATH/src/geom/geom_test.go"
-        "$GOPATH/src/gen/gen.go"
-        "$GOPATH/src/hull/hull.go"
-        "$GOPATH/src/bst/bst.go"
-        "$GOPATH/src/bst/bst_test.go"
-    )
-    for f in "${xs[@]}"; do
-        echo "$f"
-        golint "$f"
-        gofmts "$f"
-    done
+    find . -type f -name '*.go' \
+        -not -path "*github.com*" \
+        -not -path "*gonum.org*" \
+        -not -path "*golang.org*" \
+        -exec bash -c 'echo "$0"; golint "$0"; gofmts "$0"' {} \;
 }
 
 export -f gofmts
 export -f golint
+export -f goall
