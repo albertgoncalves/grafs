@@ -7,8 +7,8 @@ import (
 type Value interface{}
 
 type Key interface {
-    equal(Key) (bool, error)
-    less(Key) (bool, error)
+    equal(*Key) (bool, error)
+    less(*Key) (bool, error)
 }
 
 type Node struct {
@@ -22,13 +22,13 @@ func (node *Node) Insert(key Key, value Value) error {
     if node == nil {
         return fmt.Errorf("(%v).Insert(%v, %v)", node, key, value)
     }
-    if result, err := key.equal(node.Key); result && (err == nil) {
+    if result, err := key.equal(&node.Key); result && (err == nil) {
         node.Value = value
         return nil
     } else if err != nil {
         return err
     }
-    if result, err := key.less(node.Key); result && (err == nil) {
+    if result, err := key.less(&node.Key); result && (err == nil) {
         if node.Left == nil {
             node.Left = &Node{Key: key, Value: value}
             return nil
@@ -48,12 +48,12 @@ func (node *Node) Find(key Key) (Value, error) {
     if node == nil {
         return nil, fmt.Errorf("(%v).Find(%v)", node, key)
     }
-    if result, err := key.equal(node.Key); result && (err == nil) {
+    if result, err := key.equal(&node.Key); result && (err == nil) {
         return node.Value, nil
     } else if err != nil {
         return node.Value, err
     }
-    if result, err := key.less(node.Key); result && (err == nil) {
+    if result, err := key.less(&node.Key); result && (err == nil) {
         return node.Left.Find(key)
     } else if err != nil {
         return node.Value, err
@@ -102,7 +102,7 @@ func (node *Node) Delete(key Key, parent *Node) error {
     if node == nil {
         return fmt.Errorf("(%v).Delete(%v, %v)", node, key, parent)
     }
-    if result, err := key.equal(node.Key); result && (err == nil) {
+    if result, err := key.equal(&node.Key); result && (err == nil) {
         if (node.Left == nil) && (node.Right == nil) {
             node.replaceNode(parent, nil)
             return nil
@@ -125,7 +125,7 @@ func (node *Node) Delete(key Key, parent *Node) error {
     } else if err != nil {
         return err
     }
-    if result, err := key.less(node.Key); result && (err == nil) {
+    if result, err := key.less(&node.Key); result && (err == nil) {
         return node.Left.Delete(key, node)
     } else if err != nil {
         return err

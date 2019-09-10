@@ -10,18 +10,18 @@ type PairKey struct {
     Y float64
 }
 
-func (a PairKey) equal(b Key) (bool, error) {
-    switch b := b.(type) {
-    case PairKey:
+func (a *PairKey) equal(b *Key) (bool, error) {
+    switch b := (*b).(type) {
+    case *PairKey:
         return (a.X == b.X) && (a.Y == b.Y), nil
     default:
         return false, fmt.Errorf("(%v).equal(%v)", a, b)
     }
 }
 
-func (a PairKey) less(b Key) (bool, error) {
-    switch b := b.(type) {
-    case PairKey:
+func (a *PairKey) less(b *Key) (bool, error) {
+    switch b := (*b).(type) {
+    case *PairKey:
         if a.X == b.X {
             return a.Y < b.Y, nil
         }
@@ -44,10 +44,10 @@ func compareTuples(a, b []Tuple) bool {
 }
 
 var items = []Tuple{
-    {PairKey{0.0, 0.0}, "a"},
-    {PairKey{1.0, 0.0}, "b"},
-    {PairKey{2.0, 0.0}, "c"},
-    {PairKey{2.0, 1.0}, "d"},
+    {&PairKey{0.0, 0.0}, "a"},
+    {&PairKey{1.0, 0.0}, "b"},
+    {&PairKey{2.0, 0.0}, "c"},
+    {&PairKey{2.0, 1.0}, "d"},
 }
 
 func initTree() *Tree {
@@ -82,7 +82,7 @@ func TestFind(t *testing.T) {
             break
         }
     }
-    if _, err := tree.Find(PairKey{3.0, 0.0}); err == nil {
+    if _, err := tree.Find(&PairKey{3.0, 0.0}); err == nil {
         t.Error("tree.Find(...)")
     }
 }
