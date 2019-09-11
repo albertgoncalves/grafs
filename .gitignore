@@ -12,4 +12,5 @@
 !go/src/gen/
 !go/src/hull/
 !go/src/bst/
+!go/src/intersect/
 !build
