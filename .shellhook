@@ -39,13 +39,27 @@ golint() {
 }
 
 goall() {
+    wd=$(pwd)
     cd "$GOPATH" || exit
-    go vet
     find . -type f -name '*.go' \
         -not -path "*github.com*" \
         -not -path "*gonum.org*" \
         -not -path "*golang.org*" \
         -exec bash -c 'echo "$0"; golint "$0"; gofmts "$0"' {} \;
+    cd "$wd" || exit
+}
+
+govets() {
+    wd=$(pwd)
+    cd "$GOPATH/src" || exit
+    echo "main.go"
+    go vet ../main.go
+    find -- * -prune -type d \
+        -not -name "*github.com*" \
+        -not -name "*gonum.org*" \
+        -not -name "*golang.org*" \
+        -exec bash -c 'echo "$0"; go vet "$0"' {} \;
+    cd "$wd" || exit
 }
 
 export -f gofmts

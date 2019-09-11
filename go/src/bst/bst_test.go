@@ -5,17 +5,6 @@ import (
     "testing"
 )
 
-func equal(a, b geom.Pair) bool {
-    return (a.X == b.X) && (a.Y == b.Y)
-}
-
-func less(a, b geom.Pair) bool {
-    if a.X == b.X {
-        return a.Y < b.Y
-    }
-    return a.X < b.X
-}
-
 func compareTuples(a, b []GeomPairGeomSegmentTuple) bool {
     if len(a) != len(b) {
         return false
@@ -28,15 +17,20 @@ func compareTuples(a, b []GeomPairGeomSegmentTuple) bool {
     return true
 }
 
+var a = geom.Pair{X: 0.0, Y: 0.0}
+var b = geom.Pair{X: 1.0, Y: 1.0}
+var c = geom.Pair{X: 2.0, Y: 2.0}
+var d = geom.Pair{X: 3.0, Y: 3.0}
+
 var items = []GeomPairGeomSegmentTuple{
-    {geom.Pair{X: 0.0, Y: 0.0}, geom.Segment{}},
-    {geom.Pair{X: 1.0, Y: 0.0}, geom.Segment{}},
-    {geom.Pair{X: 2.0, Y: 0.0}, geom.Segment{}},
-    {geom.Pair{X: 2.0, Y: 1.0}, geom.Segment{}},
+    {geom.Pair{X: 0.0, Y: 0.0}, geom.Segment{A: a, B: a}},
+    {geom.Pair{X: 1.0, Y: 0.0}, geom.Segment{A: b, B: b}},
+    {geom.Pair{X: 2.0, Y: 0.0}, geom.Segment{A: c, B: c}},
+    {geom.Pair{X: 2.0, Y: 1.0}, geom.Segment{A: d, B: d}},
 }
 
 func initTree() *GeomPairGeomSegmentTree {
-    tree := &GeomPairGeomSegmentTree{Equal: equal, Less: less}
+    tree := &GeomPairGeomSegmentTree{Equal: PairEqual, Less: PairLess}
     for _, item := range items {
         tree.Insert(item.Key, item.Value)
     }
