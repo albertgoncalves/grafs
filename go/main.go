@@ -118,10 +118,11 @@ func destination(handle string) string {
     return fmt.Sprintf("%s/out/%s.png", os.Getenv("GOPATH"), handle)
 }
 
-func displayInfo(seed int, out string) {
+func displayInfo(header, out string, seed int) {
     fmt.Printf(
-        "$ %sDemo%s\n%sseed=%d\n%sout=%s\n",
+        "$ %s%s%s\n%sseed=%d\n%sout=%s\n",
         BOLD,
+        header,
         END,
         TAB,
         seed,
@@ -139,7 +140,7 @@ func main() {
     flag.Parse()
     if flagProvided("d") {
         out := destination("demo")
-        displayInfo(*seed, out)
+        displayInfo("Plotting Demo", out, *seed)
         rand.Seed(int64(*seed))
         p := initPlot()
         p.Add(plotter.NewGrid())
@@ -149,7 +150,7 @@ func main() {
     }
     if flagProvided("c") {
         out := destination("hull")
-        displayInfo(*seed, out)
+        displayInfo("Convex Hull", out, *seed)
         rand.Seed(int64(*seed))
         points := gen.RandomPairs(*n)
         upper, lower := hull.ConvexHull(points)
@@ -162,7 +163,7 @@ func main() {
     }
     if flagProvided("i") {
         out := destination("brutesweep")
-        displayInfo(*seed, out)
+        displayInfo("Segment Intersections", out, *seed)
         rand.Seed(int64(*seed))
         segments := gen.RandomSegments(*n)
         if points, err := intersect.BruteSweep(segments); err == nil {
