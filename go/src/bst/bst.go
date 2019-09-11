@@ -9,16 +9,16 @@ import (
     "geom"
 )
 
-type GeomPairGeomSegmentNode struct {
+type GeomPairLabelSegmentNode struct {
     Key   geom.Pair
-    Value geom.Segment
+    Value LabelSegment
     Equal func(geom.Pair, geom.Pair) bool
     Less  func(geom.Pair, geom.Pair) bool
-    Left  *GeomPairGeomSegmentNode
-    Right *GeomPairGeomSegmentNode
+    Left  *GeomPairLabelSegmentNode
+    Right *GeomPairLabelSegmentNode
 }
 
-func (node *GeomPairGeomSegmentNode) Insert(key geom.Pair, value geom.Segment) error {
+func (node *GeomPairLabelSegmentNode) Insert(key geom.Pair, value LabelSegment) error {
     if node == nil {
         return fmt.Errorf("(%v).Insert(%v, %v)", node, key, value)
     }
@@ -28,7 +28,7 @@ func (node *GeomPairGeomSegmentNode) Insert(key geom.Pair, value geom.Segment) e
     }
     if node.Less(key, node.Key) {
         if node.Left == nil {
-            node.Left = &GeomPairGeomSegmentNode{
+            node.Left = &GeomPairLabelSegmentNode{
                 Key:   key,
                 Value: value,
                 Equal: node.Equal,
@@ -39,7 +39,7 @@ func (node *GeomPairGeomSegmentNode) Insert(key geom.Pair, value geom.Segment) e
         return node.Left.Insert(key, value)
     }
     if node.Right == nil {
-        node.Right = &GeomPairGeomSegmentNode{
+        node.Right = &GeomPairLabelSegmentNode{
             Key:   key,
             Value: value,
             Equal: node.Equal,
@@ -50,9 +50,9 @@ func (node *GeomPairGeomSegmentNode) Insert(key geom.Pair, value geom.Segment) e
     return node.Right.Insert(key, value)
 }
 
-func (node *GeomPairGeomSegmentNode) Find(key geom.Pair) (geom.Segment, error) {
+func (node *GeomPairLabelSegmentNode) Find(key geom.Pair) (LabelSegment, error) {
     if node == nil {
-        return geom.Segment{}, fmt.Errorf("(%v).Find(%v)", node, key)
+        return LabelSegment{}, fmt.Errorf("(%v).Find(%v)", node, key)
     }
     if node.Equal(key, node.Key) {
         return node.Value, nil
@@ -63,8 +63,8 @@ func (node *GeomPairGeomSegmentNode) Find(key geom.Pair) (geom.Segment, error) {
     return node.Right.Find(key)
 }
 
-func (node *GeomPairGeomSegmentNode) last(parent *GeomPairGeomSegmentNode) (
-    *GeomPairGeomSegmentNode, *GeomPairGeomSegmentNode, error) {
+func (node *GeomPairLabelSegmentNode) last(parent *GeomPairLabelSegmentNode) (
+    *GeomPairLabelSegmentNode, *GeomPairLabelSegmentNode, error) {
     if node == nil {
         return nil, nil, fmt.Errorf("(%v).last(%v)", node, parent)
     }
@@ -74,8 +74,8 @@ func (node *GeomPairGeomSegmentNode) last(parent *GeomPairGeomSegmentNode) (
     return node.Left.last(node)
 }
 
-func (node *GeomPairGeomSegmentNode) first(parent *GeomPairGeomSegmentNode) (
-    *GeomPairGeomSegmentNode, *GeomPairGeomSegmentNode, error) {
+func (node *GeomPairLabelSegmentNode) first(parent *GeomPairLabelSegmentNode) (
+    *GeomPairLabelSegmentNode, *GeomPairLabelSegmentNode, error) {
     if node == nil {
         return nil, nil, fmt.Errorf("(%v).first(%v)", node, parent)
     }
@@ -85,9 +85,9 @@ func (node *GeomPairGeomSegmentNode) first(parent *GeomPairGeomSegmentNode) (
     return node.Right.first(node)
 }
 
-func (node *GeomPairGeomSegmentNode) swap(
+func (node *GeomPairLabelSegmentNode) swap(
     parent,
-    replacement *GeomPairGeomSegmentNode,
+    replacement *GeomPairLabelSegmentNode,
 ) error {
     if node == nil {
         return fmt.Errorf("(%v).swap(%v, %v)", node, parent, replacement)
@@ -100,9 +100,9 @@ func (node *GeomPairGeomSegmentNode) swap(
     return nil
 }
 
-func (node *GeomPairGeomSegmentNode) Delete(
+func (node *GeomPairLabelSegmentNode) Delete(
     key geom.Pair,
-    parent *GeomPairGeomSegmentNode,
+    parent *GeomPairLabelSegmentNode,
 ) error {
     if node == nil {
         return fmt.Errorf("(%v).Delete(%v, %v)", node, key, parent)
@@ -136,21 +136,21 @@ func (node *GeomPairGeomSegmentNode) Delete(
     return node.Right.Delete(key, node)
 }
 
-type GeomPairGeomSegmentTuple struct {
+type GeomPairLabelSegmentTuple struct {
     Key   geom.Pair
-    Value geom.Segment
+    Value LabelSegment
 }
 
-type GeomPairGeomSegmentTree struct {
-    Root  *GeomPairGeomSegmentNode
-    Stack []GeomPairGeomSegmentTuple
+type GeomPairLabelSegmentTree struct {
+    Root  *GeomPairLabelSegmentNode
+    Stack []GeomPairLabelSegmentTuple
     Equal func(geom.Pair, geom.Pair) bool
     Less  func(geom.Pair, geom.Pair) bool
 }
 
-func (tree *GeomPairGeomSegmentTree) Insert(key geom.Pair, value geom.Segment) error {
+func (tree *GeomPairLabelSegmentTree) Insert(key geom.Pair, value LabelSegment) error {
     if tree.Root == nil {
-        tree.Root = &GeomPairGeomSegmentNode{
+        tree.Root = &GeomPairLabelSegmentNode{
             Key:   key,
             Value: value,
             Equal: tree.Equal,
@@ -161,26 +161,26 @@ func (tree *GeomPairGeomSegmentTree) Insert(key geom.Pair, value geom.Segment) e
     return tree.Root.Insert(key, value)
 }
 
-func (tree *GeomPairGeomSegmentTree) Find(key geom.Pair) (geom.Segment, error) {
+func (tree *GeomPairLabelSegmentTree) Find(key geom.Pair) (LabelSegment, error) {
     if tree.Root == nil {
-        return geom.Segment{}, fmt.Errorf("(%v).Find(%v)", tree, key)
+        return LabelSegment{}, fmt.Errorf("(%v).Find(%v)", tree, key)
     }
     value, err := tree.Root.Find(key)
     if err != nil {
-        return geom.Segment{}, err
+        return LabelSegment{}, err
     }
     return value, nil
 }
 
-func (tree *GeomPairGeomSegmentTree) Pop() (geom.Pair, geom.Segment, error) {
+func (tree *GeomPairLabelSegmentTree) Pop() (geom.Pair, LabelSegment, error) {
     if tree.Root == nil {
-        return geom.Pair{}, geom.Segment{}, fmt.Errorf("(%v).Pop()", tree)
+        return geom.Pair{}, LabelSegment{}, fmt.Errorf("(%v).Pop()", tree)
     }
     node, parent, err := tree.Root.Right.first(tree.Root)
     if err != nil {
         key := tree.Root.Key
         value := tree.Root.Value
-        tree.Root = nil
+        tree.Root = tree.Root.Left
         return key, value, nil
     }
     key := node.Key
@@ -189,15 +189,15 @@ func (tree *GeomPairGeomSegmentTree) Pop() (geom.Pair, geom.Segment, error) {
     return key, value, nil
 }
 
-func (tree *GeomPairGeomSegmentTree) Empty() bool {
+func (tree *GeomPairLabelSegmentTree) Empty() bool {
     return tree.Root == nil
 }
 
-func (tree *GeomPairGeomSegmentTree) Delete(key geom.Pair) error {
+func (tree *GeomPairLabelSegmentTree) Delete(key geom.Pair) error {
     if tree.Root == nil {
         return fmt.Errorf("(%v).Delete(%v)", tree, key)
     }
-    pseudoParent := &GeomPairGeomSegmentNode{Right: tree.Root}
+    pseudoParent := &GeomPairLabelSegmentNode{Right: tree.Root}
     if err := tree.Root.Delete(key, pseudoParent); err != nil {
         return err
     }
@@ -205,19 +205,19 @@ func (tree *GeomPairGeomSegmentTree) Delete(key geom.Pair) error {
     return nil
 }
 
-func (tree *GeomPairGeomSegmentTree) traverse(node *GeomPairGeomSegmentNode) {
+func (tree *GeomPairLabelSegmentTree) traverse(node *GeomPairLabelSegmentNode) {
     if node != nil {
         tree.traverse(node.Left)
         tree.Stack = append(
             tree.Stack,
-            GeomPairGeomSegmentTuple{node.Key, node.Value},
+            GeomPairLabelSegmentTuple{node.Key, node.Value},
         )
         tree.traverse(node.Right)
     }
 }
 
-func (tree *GeomPairGeomSegmentTree) Collect() []GeomPairGeomSegmentTuple {
-    tree.Stack = make([]GeomPairGeomSegmentTuple, 0)
+func (tree *GeomPairLabelSegmentTree) Collect() []GeomPairLabelSegmentTuple {
+    tree.Stack = make([]GeomPairLabelSegmentTuple, 0)
     if tree.Root != nil {
         tree.traverse(tree.Root)
     }

@@ -11,6 +11,7 @@ import (
     "gonum.org/v1/plot/vg/draw"
     "hull"
     "image/color"
+    "intersect"
     "log"
     "math/rand"
     "os"
@@ -66,7 +67,7 @@ func initPlot() *plot.Plot {
 }
 
 func savePlot(p *plot.Plot, out string) {
-    if err := p.Save(8*vg.Inch, 12*vg.Inch, out); err != nil {
+    if err := p.Save(6*vg.Inch, 6*vg.Inch, out); err != nil {
         log.Panic(err)
     }
 }
@@ -74,8 +75,8 @@ func savePlot(p *plot.Plot, out string) {
 func addPairs(p *plot.Plot, pairs []geom.Pair) {
     scatter, err := plotter.NewScatter(pairsToXYs(pairs))
     scatter.GlyphStyle.Shape = draw.CircleGlyph{}
-    scatter.Color = color.RGBA{R: 0, G: 0, B: 0, A: 200}
-    scatter.GlyphStyle.Radius = 4.25
+    scatter.Color = color.RGBA{R: 0, G: 0, B: 0, A: 255}
+    scatter.GlyphStyle.Radius = 2.5
     if err != nil {
         log.Panic(err)
     }
@@ -95,7 +96,7 @@ func addSegments(p *plot.Plot, segments []geom.Segment) {
     for _, line := range lines {
         line, err := plotter.NewLine(line)
         line.LineStyle.Color = randomRGB()
-        line.LineStyle.Width = 3.25
+        line.LineStyle.Width = 1.5
         if err != nil {
             log.Panic(err)
         }
@@ -134,6 +135,7 @@ func main() {
     n := flag.Int("n", 10, "n")
     flag.Bool("d", false, "Plotting Demo")
     flag.Bool("c", false, "Convex Hull")
+    flag.Bool("i", false, "Sweep Intersections")
     flag.Parse()
     if flagProvided("d") {
         out := destination("demo")
@@ -157,5 +159,18 @@ func main() {
         addPolyLine(p, upper)
         addPolyLine(p, lower)
         savePlot(p, out)
+    }
+    if flagProvided("i") {
+        out := destination("brutesweep")
+        displayInfo(*seed, out)
+        rand.Seed(int64(*seed))
+        segments := gen.RandomSegments(*n)
+        if points, err := intersect.BruteSweep(segments); err == nil {
+            p := initPlot()
+            p.Add(plotter.NewGrid())
+            addSegments(p, segments)
+            addPairs(p, points)
+            savePlot(p, out)
+        }
     }
 }

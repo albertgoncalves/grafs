@@ -65,3 +65,5 @@ govets() {
 export -f gofmts
 export -f golint
 export -f goall
+
+alias flake8="flake8 --ignore 'E722'"

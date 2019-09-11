@@ -80,8 +80,7 @@ def brute_sweep_intersections(segments):
         event_queue.insert(upper_end(*segment), (status["upper"], segment))
         event_queue.insert(lower_end(*segment), (status["lower"], segment))
     while not event_queue.empty():
-        (event, (label, segment)) = event_queue.pop()
-        (_, y) = event
+        (_, (label, segment)) = event_queue.pop()
         if label == status["upper"]:
             for other in list(status_queue.keys()):
                 counter += 1

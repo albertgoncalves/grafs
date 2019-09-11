@@ -9,8 +9,8 @@ func PairEqual(a, b geom.Pair) bool {
 }
 
 func PairLess(a, b geom.Pair) bool {
-    if a.X == b.X {
-        return a.Y < b.Y
+    if a.Y == b.Y {
+        return a.X < b.X
     }
-    return a.X < b.X
+    return a.Y < b.Y
 }
