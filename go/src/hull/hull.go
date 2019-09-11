@@ -6,7 +6,7 @@ import (
 )
 
 func deleteIndex(pairs []geom.Pair, i int) []geom.Pair {
-    newPairs := make([]geom.Pair, 0)
+    newPairs := make([]geom.Pair, 0, len(pairs)-1)
     newPairs = append(newPairs, pairs[:i]...)
     return append(newPairs, pairs[i+1:]...)
 }
