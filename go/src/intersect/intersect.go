@@ -6,23 +6,15 @@ import (
     "geom"
 )
 
-const UPPER = "upper"
-const LOWER = "lower"
+const UPPER = 0
+const LOWER = 1
 
-func upperEnd(segment geom.Segment) geom.Pair {
+func upperLower(segment geom.Segment) (geom.Pair, geom.Pair) {
     if (segment.B.Y < segment.A.Y) ||
         ((segment.A.Y == segment.B.Y) && (segment.A.X < segment.B.X)) {
-        return segment.A
+        return segment.A, segment.B
     }
-    return segment.B
-}
-
-func lowerEnd(segment geom.Segment) geom.Pair {
-    if (segment.B.Y < segment.A.Y) ||
-        ((segment.A.Y == segment.B.Y) && (segment.A.X < segment.B.X)) {
-        return segment.B
-    }
-    return segment.A
+    return segment.B, segment.A
 }
 
 func BruteSweep(segments []geom.Segment) ([]geom.Pair, error) {
@@ -33,12 +25,13 @@ func BruteSweep(segments []geom.Segment) ([]geom.Pair, error) {
     }
     statusQueue := make(map[geom.Segment]interface{})
     for _, segment := range segments {
+        upper, lower := upperLower(segment)
         eventQueue.Insert(
-            upperEnd(segment),
+            upper,
             bst.LabelSegment{Label: UPPER, Segment: segment},
         )
         eventQueue.Insert(
-            lowerEnd(segment),
+            lower,
             bst.LabelSegment{Label: LOWER, Segment: segment},
         )
     }

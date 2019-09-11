@@ -20,19 +20,19 @@ func compareTuples(a, b []GeomPairLabelSegmentTuple) bool {
 var items = []GeomPairLabelSegmentTuple{
     {
         geom.Pair{X: 0.0, Y: 0.0},
-        LabelSegment{Label: "a", Segment: geom.Segment{}},
+        LabelSegment{Label: 0, Segment: geom.Segment{}},
     },
     {
         geom.Pair{X: 1.0, Y: 0.0},
-        LabelSegment{Label: "b", Segment: geom.Segment{}},
+        LabelSegment{Label: 1, Segment: geom.Segment{}},
     },
     {
         geom.Pair{X: 2.0, Y: 0.0},
-        LabelSegment{Label: "c", Segment: geom.Segment{}},
+        LabelSegment{Label: 2, Segment: geom.Segment{}},
     },
     {
         geom.Pair{X: 2.0, Y: 1.0},
-        LabelSegment{Label: "d", Segment: geom.Segment{}},
+        LabelSegment{Label: 3, Segment: geom.Segment{}},
     },
 }
 

@@ -5,6 +5,6 @@ import (
 )
 
 type LabelSegment struct {
-    Label   string
+    Label   uint8
     Segment geom.Segment
 }
