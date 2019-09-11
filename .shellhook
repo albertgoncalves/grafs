@@ -39,6 +39,8 @@ golint() {
 }
 
 goall() {
+    cd "$GOPATH" || exit
+    go vet
     find . -type f -name '*.go' \
         -not -path "*github.com*" \
         -not -path "*gonum.org*" \

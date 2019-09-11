@@ -1,37 +1,22 @@
 package bst
 
 import (
-    "fmt"
+    "geom"
     "testing"
 )
 
-type PairKey struct {
-    X float64
-    Y float64
+func equal(a, b geom.Pair) bool {
+    return (a.X == b.X) && (a.Y == b.Y)
 }
 
-func (a *PairKey) equal(b *Key) (bool, error) {
-    switch b := (*b).(type) {
-    case *PairKey:
-        return (a.X == b.X) && (a.Y == b.Y), nil
-    default:
-        return false, fmt.Errorf("(%v).equal(%v)", a, b)
+func less(a, b geom.Pair) bool {
+    if a.X == b.X {
+        return a.Y < b.Y
     }
+    return a.X < b.X
 }
 
-func (a *PairKey) less(b *Key) (bool, error) {
-    switch b := (*b).(type) {
-    case *PairKey:
-        if a.X == b.X {
-            return a.Y < b.Y, nil
-        }
-        return a.X < b.X, nil
-    default:
-        return false, fmt.Errorf("(%v).less(%v)", a, b)
-    }
-}
-
-func compareTuples(a, b []Tuple) bool {
+func compareTuples(a, b []GeomPairGeomSegmentTuple) bool {
     if len(a) != len(b) {
         return false
     }
@@ -43,15 +28,15 @@ func compareTuples(a, b []Tuple) bool {
     return true
 }
 
-var items = []Tuple{
-    {&PairKey{0.0, 0.0}, "a"},
-    {&PairKey{1.0, 0.0}, "b"},
-    {&PairKey{2.0, 0.0}, "c"},
-    {&PairKey{2.0, 1.0}, "d"},
+var items = []GeomPairGeomSegmentTuple{
+    {geom.Pair{X: 0.0, Y: 0.0}, geom.Segment{}},
+    {geom.Pair{X: 1.0, Y: 0.0}, geom.Segment{}},
+    {geom.Pair{X: 2.0, Y: 0.0}, geom.Segment{}},
+    {geom.Pair{X: 2.0, Y: 1.0}, geom.Segment{}},
 }
 
-func initTree() *Tree {
-    tree := &Tree{}
+func initTree() *GeomPairGeomSegmentTree {
+    tree := &GeomPairGeomSegmentTree{Equal: equal, Less: less}
     for _, item := range items {
         tree.Insert(item.Key, item.Value)
     }
@@ -63,7 +48,7 @@ func TestInsert(t *testing.T) {
     if !compareTuples(tree.Collect(), items) {
         t.Error("tree.Insert(...)")
     }
-    if compareTuples(tree.Collect(), []Tuple{
+    if compareTuples(tree.Collect(), []GeomPairGeomSegmentTuple{
         items[0],
         items[1],
         items[3],
@@ -82,12 +67,16 @@ func TestFind(t *testing.T) {
             break
         }
     }
-    if _, err := tree.Find(&PairKey{3.0, 0.0}); err == nil {
+    if _, err := tree.Find(geom.Pair{X: 3.0, Y: 0.0}); err == nil {
         t.Error("tree.Find(...)")
     }
 }
 
-func deletePipeline(t *testing.T, key Key, remainingItems []Tuple) {
+func deletePipeline(
+    t *testing.T,
+    key geom.Pair,
+    remainingItems []GeomPairGeomSegmentTuple,
+) {
     tree := initTree()
     if err := tree.Delete(key); err != nil {
         t.Error("tree.Delete(...)")
@@ -98,22 +87,22 @@ func deletePipeline(t *testing.T, key Key, remainingItems []Tuple) {
 }
 
 func TestDelete(t *testing.T) {
-    deletePipeline(t, items[0].Key, []Tuple{
+    deletePipeline(t, items[0].Key, []GeomPairGeomSegmentTuple{
         items[1],
         items[2],
         items[3],
     })
-    deletePipeline(t, items[1].Key, []Tuple{
+    deletePipeline(t, items[1].Key, []GeomPairGeomSegmentTuple{
         items[0],
         items[2],
         items[3],
     })
-    deletePipeline(t, items[2].Key, []Tuple{
+    deletePipeline(t, items[2].Key, []GeomPairGeomSegmentTuple{
         items[0],
         items[1],
         items[3],
     })
-    deletePipeline(t, items[3].Key, []Tuple{
+    deletePipeline(t, items[3].Key, []GeomPairGeomSegmentTuple{
         items[0],
         items[1],
         items[2],
@@ -129,7 +118,7 @@ func TestDelete(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
-    if tree := (&Tree{}); !tree.Empty() {
+    if tree := (&GeomPairGeomSegmentTree{}); !tree.Empty() {
         t.Error("tree.Empty()")
     }
     if tree := initTree(); tree.Empty() {
@@ -139,9 +128,9 @@ func TestEmpty(t *testing.T) {
 
 func popPipeline(
     t *testing.T,
-    tree *Tree,
-    item Tuple,
-    remainingItems []Tuple,
+    tree *GeomPairGeomSegmentTree,
+    item GeomPairGeomSegmentTuple,
+    remainingItems []GeomPairGeomSegmentTuple,
 ) {
     if key, value, err := tree.Pop(); (key != item.Key) ||
         (value != item.Value) || (err != nil) ||

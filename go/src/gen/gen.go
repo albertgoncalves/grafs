@@ -6,7 +6,7 @@ import (
 )
 
 func RandomPair() geom.Pair {
-    return geom.Pair{rand.Float64(), rand.Float64()}
+    return geom.Pair{X: rand.Float64(), Y: rand.Float64()}
 }
 
 func RandomPairs(n int) []geom.Pair {
@@ -18,7 +18,7 @@ func RandomPairs(n int) []geom.Pair {
 }
 
 func RandomSegment() geom.Segment {
-    return geom.Segment{RandomPair(), RandomPair()}
+    return geom.Segment{A: RandomPair(), B: RandomPair()}
 }
 
 func RandomSegments(n int) []geom.Segment {

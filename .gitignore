@@ -12,3 +12,4 @@
 !go/src/gen/
 !go/src/hull/
 !go/src/bst/
+!build
