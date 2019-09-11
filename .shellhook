@@ -52,13 +52,14 @@ goall() {
 govets() {
     wd=$(pwd)
     cd "$GOPATH/src" || exit
-    echo "main.go"
-    go vet ../main.go
-    find -- * -prune -type d \
-        -not -name "*github.com*" \
-        -not -name "*gonum.org*" \
-        -not -name "*golang.org*" \
-        -exec bash -c 'echo "$0"; go vet "$0"' {} \;
+    src=$(
+        find -- * -prune -type d \
+            -not -name "*github.com*" \
+            -not -name "*gonum.org*" \
+            -not -name "*golang.org*" \
+            | tr '\r\n' ' '
+    )
+    eval "go vet -v $src"
     cd "$wd" || exit
 }
 
