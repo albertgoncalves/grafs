@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-"$GOPATH/bin/genny" gen \
-    "KeyType=geom.Pair ValueType=LabelSegment" \
-    < "$GOPATH/src/bst/.generic_bst.go" \
-    > "$GOPATH/src/bst/bst.go"
-
-gofmts "$GOPATH/src/bst/bst.go"
