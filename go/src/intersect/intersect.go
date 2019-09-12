@@ -20,8 +20,8 @@ func upperLower(segment geom.Segment) (geom.Pair, geom.Pair) {
 func BruteSweep(segments []geom.Segment) ([]geom.Pair, error) {
     points := make([]geom.Pair, 0)
     eventQueue := &bst.GeomPairLabelSegmentTree{
-        Equal: bst.PairEqual,
-        Less:  bst.PairLess,
+        Equal: geom.PairEqual,
+        Less:  geom.PairLess,
     }
     statusQueue := make(map[geom.Segment]interface{})
     for _, segment := range segments {

@@ -37,7 +37,10 @@ var items = []GeomPairLabelSegmentTuple{
 }
 
 func initTree() *GeomPairLabelSegmentTree {
-    tree := &GeomPairLabelSegmentTree{Equal: PairEqual, Less: PairLess}
+    tree := &GeomPairLabelSegmentTree{
+        Equal: geom.PairEqual,
+        Less:  geom.PairLess,
+    }
     for _, item := range items {
         tree.Insert(item.Key, item.Value)
     }

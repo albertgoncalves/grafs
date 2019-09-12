@@ -1,14 +1,10 @@
-package bst
+package geom
 
-import (
-    "geom"
-)
-
-func PairEqual(a, b geom.Pair) bool {
+func PairEqual(a, b Pair) bool {
     return (a.X == b.X) && (a.Y == b.Y)
 }
 
-func PairLess(a, b geom.Pair) bool {
+func PairLess(a, b Pair) bool {
     if a.Y == b.Y {
         return a.X < b.X
     }
