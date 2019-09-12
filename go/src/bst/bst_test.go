@@ -146,10 +146,8 @@ func popPipeline(
 func TestPop(t *testing.T) {
     tree := initTree()
     n := len(items)
-    var m int
-    for i := 1; i < 5; i++ {
-        m = n - i
-        popPipeline(t, tree, items[m], items[:m])
+    for i := n - 1; -1 < i; i-- {
+        popPipeline(t, tree, items[i], items[:i])
     }
     if _, _, err := tree.Pop(); err == nil {
         t.Error("tree.Pop()")
