@@ -61,14 +61,14 @@ func randomRGB() color.RGBA {
 func initPlot() *plot.Plot {
     p, err := plot.New()
     if err != nil {
-        log.Panic(err)
+        log.Fatal(err)
     }
     return p
 }
 
 func savePlot(p *plot.Plot, out string) {
     if err := p.Save(6*vg.Inch, 6*vg.Inch, out); err != nil {
-        log.Panic(err)
+        log.Fatal(err)
     }
 }
 
@@ -78,7 +78,7 @@ func addPairs(p *plot.Plot, pairs []geom.Pair) {
     scatter.Color = color.RGBA{R: 0, G: 0, B: 0, A: 255}
     scatter.GlyphStyle.Radius = 2.5
     if err != nil {
-        log.Panic(err)
+        log.Fatal(err)
     }
     p.Add(scatter)
 }
@@ -86,7 +86,7 @@ func addPairs(p *plot.Plot, pairs []geom.Pair) {
 func addPolyLine(p *plot.Plot, pairs []geom.Pair) {
     line, err := plotter.NewLine(pairsToXYs(pairs))
     if err != nil {
-        log.Panic(err)
+        log.Fatal(err)
     }
     p.Add(line)
 }
@@ -98,7 +98,7 @@ func addSegments(p *plot.Plot, segments []geom.Segment) {
         line.LineStyle.Color = randomRGB()
         line.LineStyle.Width = 1.5
         if err != nil {
-            log.Panic(err)
+            log.Fatal(err)
         }
         p.Add(line)
     }
