@@ -180,7 +180,7 @@ func (tree *KeyTypeValueTypeTree) Pop() (KeyType, ValueType, error) {
     if err != nil {
         key := tree.Root.Key
         value := tree.Root.Value
-        tree.Root = nil
+        tree.Root = tree.Root.Left
         return key, value, nil
     }
     key := node.Key
