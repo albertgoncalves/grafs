@@ -40,7 +40,8 @@ func BruteSweep(segments []geom.Segment) ([]geom.Pair, error) {
         if err != nil {
             return points, fmt.Errorf("BruteSweep(%v)", segments)
         }
-        if status.Label == UPPER {
+        switch status.Label {
+        case UPPER:
             for segment := range statusQueue {
                 if point, err := geom.PointOfIntersection(
                     status.Segment,
@@ -50,7 +51,7 @@ func BruteSweep(segments []geom.Segment) ([]geom.Pair, error) {
                 }
             }
             statusQueue[status.Segment] = nil
-        } else {
+        case LOWER:
             delete(statusQueue, status.Segment)
         }
     }

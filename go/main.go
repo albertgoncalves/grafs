@@ -67,7 +67,7 @@ func initPlot() *plot.Plot {
 }
 
 func savePlot(p *plot.Plot, out string) {
-    if err := p.Save(6*vg.Inch, 6*vg.Inch, out); err != nil {
+    if err := p.Save(8*vg.Inch, 8*vg.Inch, out); err != nil {
         log.Fatal(err)
     }
 }
@@ -75,8 +75,8 @@ func savePlot(p *plot.Plot, out string) {
 func addPairs(p *plot.Plot, pairs []geom.Pair) {
     scatter, err := plotter.NewScatter(pairsToXYs(pairs))
     scatter.GlyphStyle.Shape = draw.CircleGlyph{}
-    scatter.Color = color.RGBA{R: 0, G: 0, B: 0, A: 255}
-    scatter.GlyphStyle.Radius = 2.5
+    scatter.Color = color.RGBA{R: 0, G: 0, B: 0, A: 90}
+    scatter.GlyphStyle.Radius = 4.0
     if err != nil {
         log.Fatal(err)
     }
