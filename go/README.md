@@ -1,4 +1,4 @@
-# grafs (go)
+# grafs (Go)
 
 ![](cover.png)
 
