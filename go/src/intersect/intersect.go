@@ -68,10 +68,8 @@ func segmentEqual(l, r bst.PairSegment) bool {
     return l.Segment == r.Segment
 }
 
-
-
 func round(x float64) float64 {
-    return math.Round(x * K) / K
+    return math.Round(x*K) / K
 }
 
 func segmentLess(l, r bst.PairSegment) bool {
@@ -124,7 +122,7 @@ func Sweep(segments []geom.Segment) ([]geom.Pair, error) {
             return points, fmt.Errorf("Sweep(%v)", segments)
         }
         switch status.Label {
-        case UPPER: {
+        case UPPER:
             memo[status.First] = event
             pairSegment := bst.PairSegment{
                 Pair:    event,
@@ -164,8 +162,7 @@ func Sweep(segments []geom.Segment) ([]geom.Pair, error) {
                     }
                 }
             }
-        }
-        case LOWER: {
+        case LOWER:
             pairSegment := bst.PairSegment{
                 Pair:    memo[status.First],
                 Segment: status.First,
@@ -190,8 +187,7 @@ func Sweep(segments []geom.Segment) ([]geom.Pair, error) {
                     }
                 }
             }
-        }
-        case INTERSECTION: {
+        case INTERSECTION:
             points = append(points, event)
             // snag intersecting segment, next in queue
             statusQueue.Delete(bst.PairSegment{
@@ -246,7 +242,6 @@ func Sweep(segments []geom.Segment) ([]geom.Pair, error) {
                     )
                 }
             }
-        }
         }
     }
     return points, nil
