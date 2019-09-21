@@ -84,7 +84,7 @@ func segmentLess(l, r bst.PairSegment) bool {
     }
     xl := (y - bl) / ml
     xr := (y - br) / mr
-    if math.Abs(xr-xl) < 0.00001 {
+    if math.Abs(xr-xl) < 0.001 {
         return false
     }
     return xl < xr
@@ -187,7 +187,6 @@ func Sweep(segments []geom.Segment) ([]geom.Pair, error) {
             }
         case INTERSECTION:
             points = append(points, event)
-            // snag intersecting segment, next in queue
             statusQueue.Delete(bst.PairSegment{
                 Pair:    memo[status.First],
                 Segment: status.First,
