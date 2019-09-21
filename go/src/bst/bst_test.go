@@ -156,3 +156,23 @@ func TestPop(t *testing.T) {
         t.Error("tree.Pop()")
     }
 }
+
+func TestNeighbors(t *testing.T) {
+    tree := initTree()
+    if left, right, err := tree.Neighbors(items[0].Key); (err != nil) ||
+        (left != nil) || (right.Key != items[1].Key) {
+        t.Error("tree.Neighbors(...)")
+    }
+    if left, right, err := tree.Neighbors(items[1].Key); (err != nil) ||
+        (left.Key != items[0].Key) || (right.Key != items[2].Key) {
+        t.Error("tree.Neighbors(...)")
+    }
+    if left, right, err := tree.Neighbors(items[2].Key); (err != nil) ||
+        (left.Key != items[1].Key) || (right.Key != items[3].Key) {
+        t.Error("tree.Neighbors(...)")
+    }
+    tree.Pop()
+    if _, _, err := tree.Neighbors(items[3].Key); (err == nil) {
+        t.Error("tree.Neighbors(...)")
+    }
+}
