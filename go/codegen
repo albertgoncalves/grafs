@@ -2,7 +2,7 @@
 
 go clean -cache
 "$GOPATH/bin/genny" gen \
-    "KeyType=geom.Pair,PairSegment ValueType=LabelSegment,Any" \
+    "KeyType=geom.Pair,PairSegment ValueType=LabelSegment,LabelSegments,Any" \
     < "$GOPATH/src/bst/_generic_bst.go" \
     > "$GOPATH/src/bst/codegen_bst.go"
 gofmts "$GOPATH/src/bst/codegen_bst.go"

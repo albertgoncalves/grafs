@@ -136,6 +136,7 @@ func main() {
     n := flag.Int("n", 10, "n")
     flag.Bool("d", false, "Plotting Demo")
     flag.Bool("c", false, "Convex Hull")
+    flag.Bool("b", false, "Sweep Intersections (Brute)")
     flag.Bool("i", false, "Sweep Intersections")
     flag.Parse()
     if flagProvided("d") {
@@ -161,12 +162,25 @@ func main() {
         addPolyLine(p, lower)
         savePlot(p, out)
     }
-    if flagProvided("i") {
+    if flagProvided("b") {
         out := destination("brutesweep")
-        displayInfo("Segment Intersections", out, *seed)
+        displayInfo("Segment Intersections (Brute)", out, *seed)
         rand.Seed(int64(*seed))
         segments := gen.RandomSegments(*n)
         if points, err := intersect.BruteSweep(segments); err == nil {
+            p := initPlot()
+            p.Add(plotter.NewGrid())
+            addSegments(p, segments)
+            addPairs(p, points)
+            savePlot(p, out)
+        }
+    }
+    if flagProvided("i") {
+        out := destination("sweep")
+        displayInfo("Segment Intersections", out, *seed)
+        rand.Seed(int64(*seed))
+        segments := gen.RandomSegments(*n)
+        if points, err := intersect.Sweep(segments); err == nil {
             p := initPlot()
             p.Add(plotter.NewGrid())
             addSegments(p, segments)

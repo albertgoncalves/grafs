@@ -146,16 +146,16 @@ func (node *KeyTypeValueTypeNode) Neighbors(
     if node == nil {
         return nil, nil, fmt.Errorf("(%v).Neighbors(%v)", node, key)
     } else if node.Equal(key, node.Key) {
-        var localLeft *KeyTypeValueTypeNode = nil
-        var localRight *KeyTypeValueTypeNode = nil
-        var err error = nil
-        if (node.Left != nil) {
+        var localLeft *KeyTypeValueTypeNode
+        var localRight *KeyTypeValueTypeNode
+        var err error
+        if node.Left != nil {
             localLeft, _, err = node.Left.first(node)
             if err != nil {
                 return nil, nil, err
             }
         }
-        if (node.Right != nil) {
+        if node.Right != nil {
             localRight, _, err = node.Right.last(node)
             if err != nil {
                 return nil, nil, err
@@ -200,9 +200,8 @@ func (tree *KeyTypeValueTypeTree) Insert(key KeyType, value ValueType) error {
             Less:     tree.Less,
         }
         return nil
-    } else {
-        return tree.Root.Insert(key, value)
     }
+    return tree.Root.Insert(key, value)
 }
 
 func (tree *KeyTypeValueTypeTree) Find(
@@ -211,31 +210,29 @@ func (tree *KeyTypeValueTypeTree) Find(
 ) (ValueType, error) {
     if tree.Root == nil {
         return fallback, fmt.Errorf("(%v).Find(%v)", tree, key)
-    } else {
-        value, err := tree.Root.Find(key, tree.Fallback)
-        if err != nil {
-            return tree.Fallback, err
-        }
-        return value, nil
     }
+    value, err := tree.Root.Find(key, tree.Fallback)
+    if err != nil {
+        return tree.Fallback, err
+    }
+    return value, nil
 }
 
 func (tree *KeyTypeValueTypeTree) Pop() (KeyType, ValueType, error) {
     if tree.Root == nil {
         return KeyType{}, tree.Fallback, fmt.Errorf("(%v).Pop()", tree)
-    } else {
-        node, parent, err := tree.Root.Right.first(tree.Root)
-        if err != nil {
-            key := tree.Root.Key
-            value := tree.Root.Value
-            tree.Root = tree.Root.Left
-            return key, value, nil
-        }
-        key := node.Key
-        value := node.Value
-        node.Delete(node.Key, parent)
+    }
+    node, parent, err := tree.Root.Right.first(tree.Root)
+    if err != nil {
+        key := tree.Root.Key
+        value := tree.Root.Value
+        tree.Root = tree.Root.Left
         return key, value, nil
     }
+    key := node.Key
+    value := node.Value
+    node.Delete(node.Key, parent)
+    return key, value, nil
 }
 
 func (tree *KeyTypeValueTypeTree) Empty() bool {
@@ -245,14 +242,13 @@ func (tree *KeyTypeValueTypeTree) Empty() bool {
 func (tree *KeyTypeValueTypeTree) Delete(key KeyType) error {
     if tree.Root == nil {
         return fmt.Errorf("(%v).Delete(%v)", tree, key)
-    } else {
-        pseudoParent := &KeyTypeValueTypeNode{Right: tree.Root}
-        if err := tree.Root.Delete(key, pseudoParent); err != nil {
-            return err
-        }
-        tree.Root = pseudoParent.Right
-        return nil
     }
+    pseudoParent := &KeyTypeValueTypeNode{Right: tree.Root}
+    if err := tree.Root.Delete(key, pseudoParent); err != nil {
+        return err
+    }
+    tree.Root = pseudoParent.Right
+    return nil
 }
 
 func (tree *KeyTypeValueTypeTree) Neighbors(key KeyType) (
@@ -262,13 +258,12 @@ func (tree *KeyTypeValueTypeTree) Neighbors(key KeyType) (
 ) {
     if tree.Root == nil {
         return nil, nil, fmt.Errorf("(%v).Neighbors(%v)", tree, key)
-    } else {
-        left, right, err := tree.Root.Neighbors(key, nil, nil)
-        if err != nil {
-            return nil, nil, err
-        }
-        return left, right, nil
     }
+    left, right, err := tree.Root.Neighbors(key, nil, nil)
+    if err != nil {
+        return nil, nil, err
+    }
+    return left, right, nil
 }
 
 func (tree *KeyTypeValueTypeTree) traverse(node *KeyTypeValueTypeNode) {

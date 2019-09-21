@@ -4,10 +4,15 @@ import (
     "bst"
     "fmt"
     "geom"
+    "math"
 )
 
-const UPPER = 0
-const LOWER = 1
+const (
+    UPPER        = 0
+    INTERSECTION = 1
+    LOWER        = 2
+    K            = 1000
+)
 
 func upperLower(segment geom.Segment) (geom.Pair, geom.Pair) {
     if (segment.B.Y < segment.A.Y) ||
@@ -60,7 +65,13 @@ func BruteSweep(segments []geom.Segment) ([]geom.Pair, error) {
 }
 
 func segmentEqual(l, r bst.PairSegment) bool {
-    return l == r
+    return l.Segment == r.Segment
+}
+
+
+
+func round(x float64) float64 {
+    return math.Round(x * K) / K
 }
 
 func segmentLess(l, r bst.PairSegment) bool {
@@ -78,17 +89,17 @@ func segmentLess(l, r bst.PairSegment) bool {
     if err != nil {
         return true
     }
-    xl := (y - bl) / ml
-    xr := (y - br) / mr
+    xl := round((y - bl) / ml)
+    xr := round((y - br) / mr)
     return xl < xr
 }
 
-func Sweet(segments []geom.Segment) ([]geom.Pair, error) {
+func Sweep(segments []geom.Segment) ([]geom.Pair, error) {
     points := make([]geom.Pair, 0)
-    eventQueue := &bst.GeomPairLabelSegmentTree{
+    eventQueue := &bst.GeomPairLabelSegmentsTree{
         Equal:    geom.PairEqual,
         Less:     geom.PairLess,
-        Fallback: bst.LabelSegment{},
+        Fallback: bst.LabelSegments{},
     }
     statusQueue := &bst.PairSegmentAnyTree{
         Equal:    segmentEqual,
@@ -96,8 +107,147 @@ func Sweet(segments []geom.Segment) ([]geom.Pair, error) {
         Fallback: nil,
     }
     memo := make(map[geom.Segment]geom.Pair)
-    fmt.Println(eventQueue)
-    fmt.Println(statusQueue)
-    fmt.Println(memo)
+    for _, segment := range segments {
+        upper, lower := upperLower(segment)
+        eventQueue.Insert(
+            upper,
+            bst.LabelSegments{Label: UPPER, First: segment},
+        )
+        eventQueue.Insert(
+            lower,
+            bst.LabelSegments{Label: LOWER, First: segment},
+        )
+    }
+    for !eventQueue.Empty() {
+        event, status, err := eventQueue.Pop()
+        if err != nil {
+            return points, fmt.Errorf("Sweep(%v)", segments)
+        }
+        switch status.Label {
+        case UPPER: {
+            memo[status.First] = event
+            pairSegment := bst.PairSegment{
+                Pair:    event,
+                Segment: status.First,
+            }
+            statusQueue.Insert(pairSegment, nil)
+            left, right, err := statusQueue.Neighbors(pairSegment)
+            if err == nil {
+                if left != nil {
+                    if point, err := geom.PointOfIntersection(
+                        left.Key.Segment,
+                        status.First,
+                    ); (err == nil) && (point.Y < event.Y) {
+                        eventQueue.Insert(
+                            point,
+                            bst.LabelSegments{
+                                Label:  INTERSECTION,
+                                First:  status.First,
+                                Second: left.Key.Segment,
+                            },
+                        )
+                    }
+                }
+                if right != nil {
+                    if point, err := geom.PointOfIntersection(
+                        status.First,
+                        right.Key.Segment,
+                    ); (err == nil) && (point.Y < event.Y) {
+                        eventQueue.Insert(
+                            point,
+                            bst.LabelSegments{
+                                Label:  INTERSECTION,
+                                First:  right.Key.Segment,
+                                Second: status.First,
+                            },
+                        )
+                    }
+                }
+            }
+        }
+        case LOWER: {
+            pairSegment := bst.PairSegment{
+                Pair:    memo[status.First],
+                Segment: status.First,
+            }
+            left, right, err := statusQueue.Neighbors(pairSegment)
+            if err == nil {
+                if err := statusQueue.Delete(pairSegment); err == nil {
+                    if (left != nil) && (right != nil) {
+                        if point, err := geom.PointOfIntersection(
+                            left.Key.Segment,
+                            right.Key.Segment,
+                        ); (err == nil) && (point.Y < event.Y) {
+                            eventQueue.Insert(
+                                point,
+                                bst.LabelSegments{
+                                    Label:  INTERSECTION,
+                                    First:  right.Key.Segment,
+                                    Second: left.Key.Segment,
+                                },
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        case INTERSECTION: {
+            points = append(points, event)
+            // snag intersecting segment, next in queue
+            statusQueue.Delete(bst.PairSegment{
+                Pair:    memo[status.First],
+                Segment: status.First,
+            })
+            statusQueue.Delete(bst.PairSegment{
+                Pair:    memo[status.Second],
+                Segment: status.Second,
+            })
+            pairSegmentLeft := bst.PairSegment{
+                Pair:    event,
+                Segment: status.First,
+            }
+            pairSegmentRight := bst.PairSegment{
+                Pair:    event,
+                Segment: status.Second,
+            }
+            memo[status.First] = event
+            memo[status.Second] = event
+            statusQueue.Insert(pairSegmentLeft, nil)
+            statusQueue.Insert(pairSegmentRight, nil)
+            farLeft, _, err := statusQueue.Neighbors(pairSegmentLeft)
+            if (err == nil) && (farLeft != nil) {
+                if point, err := geom.PointOfIntersection(
+                    farLeft.Key.Segment,
+                    status.First,
+                ); (err == nil) && (point.Y < event.Y) {
+                    eventQueue.Insert(
+                        point,
+                        bst.LabelSegments{
+                            Label:  INTERSECTION,
+                            First:  status.First,
+                            Second: farLeft.Key.Segment,
+                        },
+                    )
+                }
+            }
+            _, farRight, err := statusQueue.Neighbors(pairSegmentRight)
+            if (err == nil) && (farRight != nil) {
+                if point, err := geom.PointOfIntersection(
+                    status.Second,
+                    farRight.Key.Segment,
+                ); (err == nil) && (point.Y < event.Y) {
+                    eventQueue.Insert(
+                        point,
+                        bst.LabelSegments{
+                            Label:  INTERSECTION,
+                            First:  farRight.Key.Segment,
+                            Second: status.Second,
+                        },
+                    )
+                }
+            }
+        }
+        }
+    }
     return points, nil
 }

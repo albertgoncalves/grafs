@@ -172,7 +172,7 @@ func TestNeighbors(t *testing.T) {
         t.Error("tree.Neighbors(...)")
     }
     tree.Pop()
-    if _, _, err := tree.Neighbors(items[3].Key); (err == nil) {
+    if _, _, err := tree.Neighbors(items[3].Key); err == nil {
         t.Error("tree.Neighbors(...)")
     }
 }

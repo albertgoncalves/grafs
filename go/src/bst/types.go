@@ -14,4 +14,10 @@ type PairSegment struct {
     Segment geom.Segment
 }
 
+type LabelSegments struct {
+    Label  uint8
+    First  geom.Segment
+    Second geom.Segment
+}
+
 type Any = interface{}
