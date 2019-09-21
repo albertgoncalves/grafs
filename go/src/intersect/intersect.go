@@ -24,9 +24,9 @@ func upperLower(segment geom.Segment) (geom.Pair, geom.Pair) {
 func BruteSweep(segments []geom.Segment) ([]geom.Pair, error) {
     points := make([]geom.Pair, 0)
     eventQueue := &bst.GeomPairLabelSegmentTree{
-        Equal:    geom.PairEqual,
-        Less:     geom.PairLess,
-        Fallback: bst.LabelSegment{},
+        Equal: geom.PairEqual,
+        Less:  geom.PairLess,
+        Null:  bst.LabelSegment{},
     }
     statusQueue := make(map[geom.Segment]interface{})
     for _, segment := range segments {
@@ -91,16 +91,22 @@ func segmentLess(l, r bst.PairSegment) bool {
 }
 
 func Sweep(segments []geom.Segment) ([]geom.Pair, error) {
+    /*  This implementation does not handle the occurrence of more than a
+        single event at any single coordinate. This degenerate condition can be
+        the result of segments sharing endpoints or the result of more than two
+        segments intersecting at the same point. Should this case arise, while
+        the program will not crash, the algorithm will be unable to identify
+        all points of intersection. */
     points := make([]geom.Pair, 0)
     eventQueue := &bst.GeomPairLabelSegmentsTree{
-        Equal:    geom.PairEqual,
-        Less:     geom.PairLess,
-        Fallback: bst.LabelSegments{},
+        Equal: geom.PairEqual,
+        Less:  geom.PairLess,
+        Null:  bst.LabelSegments{},
     }
     statusQueue := &bst.PairSegmentAnyTree{
-        Equal:    segmentEqual,
-        Less:     segmentLess,
-        Fallback: nil,
+        Equal: segmentEqual,
+        Less:  segmentLess,
+        Null:  nil,
     }
     memo := make(map[geom.Segment]geom.Pair)
     for _, segment := range segments {
