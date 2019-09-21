@@ -11,7 +11,6 @@ const (
     UPPER        = 0
     INTERSECTION = 1
     LOWER        = 2
-    K            = 1000
 )
 
 func upperLower(segment geom.Segment) (geom.Pair, geom.Pair) {
@@ -68,10 +67,6 @@ func segmentEqual(l, r bst.PairSegment) bool {
     return l.Segment == r.Segment
 }
 
-func round(x float64) float64 {
-    return math.Round(x*K) / K
-}
-
 func segmentLess(l, r bst.PairSegment) bool {
     var y float64
     if l.Pair.Y < r.Pair.Y {
@@ -87,8 +82,11 @@ func segmentLess(l, r bst.PairSegment) bool {
     if err != nil {
         return true
     }
-    xl := round((y - bl) / ml)
-    xr := round((y - br) / mr)
+    xl := (y - bl) / ml
+    xr := (y - br) / mr
+    if math.Abs(xr-xl) < 0.00001 {
+        return false
+    }
     return xl < xr
 }
 
