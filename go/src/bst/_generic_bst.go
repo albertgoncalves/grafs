@@ -10,12 +10,13 @@ type KeyType generic.Type
 type ValueType generic.Type
 
 type KeyTypeValueTypeNode struct {
-    Key   KeyType
-    Value ValueType
-    Equal func(KeyType, KeyType) bool
-    Less  func(KeyType, KeyType) bool
-    Left  *KeyTypeValueTypeNode
-    Right *KeyTypeValueTypeNode
+    Key      KeyType
+    Value    ValueType
+    Fallback ValueType
+    Equal    func(KeyType, KeyType) bool
+    Less     func(KeyType, KeyType) bool
+    Left     *KeyTypeValueTypeNode
+    Right    *KeyTypeValueTypeNode
 }
 
 func (node *KeyTypeValueTypeNode) Insert(key KeyType, value ValueType) error {
@@ -29,10 +30,11 @@ func (node *KeyTypeValueTypeNode) Insert(key KeyType, value ValueType) error {
     if node.Less(key, node.Key) {
         if node.Left == nil {
             node.Left = &KeyTypeValueTypeNode{
-                Key:   key,
-                Value: value,
-                Equal: node.Equal,
-                Less:  node.Less,
+                Key:      key,
+                Value:    value,
+                Fallback: node.Fallback,
+                Equal:    node.Equal,
+                Less:     node.Less,
             }
             return nil
         }
@@ -40,27 +42,31 @@ func (node *KeyTypeValueTypeNode) Insert(key KeyType, value ValueType) error {
     }
     if node.Right == nil {
         node.Right = &KeyTypeValueTypeNode{
-            Key:   key,
-            Value: value,
-            Equal: node.Equal,
-            Less:  node.Less,
+            Key:      key,
+            Value:    value,
+            Fallback: node.Fallback,
+            Equal:    node.Equal,
+            Less:     node.Less,
         }
         return nil
     }
     return node.Right.Insert(key, value)
 }
 
-func (node *KeyTypeValueTypeNode) Find(key KeyType) (ValueType, error) {
+func (node *KeyTypeValueTypeNode) Find(
+    key KeyType,
+    fallback ValueType,
+) (ValueType, error) {
     if node == nil {
-        return ValueType{}, fmt.Errorf("(%v).Find(%v)", node, key)
+        return fallback, fmt.Errorf("(%v).Find(%v)", node, key)
     }
     if node.Equal(key, node.Key) {
         return node.Value, nil
     }
     if node.Less(key, node.Key) {
-        return node.Left.Find(key)
+        return node.Left.Find(key, node.Fallback)
     }
-    return node.Right.Find(key)
+    return node.Right.Find(key, node.Fallback)
 }
 
 func (node *KeyTypeValueTypeNode) last(parent *KeyTypeValueTypeNode) (
@@ -142,39 +148,44 @@ type KeyTypeValueTypeTuple struct {
 }
 
 type KeyTypeValueTypeTree struct {
-    Root  *KeyTypeValueTypeNode
-    Stack []KeyTypeValueTypeTuple
-    Equal func(KeyType, KeyType) bool
-    Less  func(KeyType, KeyType) bool
+    Root     *KeyTypeValueTypeNode
+    Stack    []KeyTypeValueTypeTuple
+    Fallback ValueType
+    Equal    func(KeyType, KeyType) bool
+    Less     func(KeyType, KeyType) bool
 }
 
 func (tree *KeyTypeValueTypeTree) Insert(key KeyType, value ValueType) error {
     if tree.Root == nil {
         tree.Root = &KeyTypeValueTypeNode{
-            Key:   key,
-            Value: value,
-            Equal: tree.Equal,
-            Less:  tree.Less,
+            Key:      key,
+            Value:    value,
+            Fallback: tree.Fallback,
+            Equal:    tree.Equal,
+            Less:     tree.Less,
         }
         return nil
     }
     return tree.Root.Insert(key, value)
 }
 
-func (tree *KeyTypeValueTypeTree) Find(key KeyType) (ValueType, error) {
+func (tree *KeyTypeValueTypeTree) Find(
+    key KeyType,
+    fallback ValueType,
+) (ValueType, error) {
     if tree.Root == nil {
-        return ValueType{}, fmt.Errorf("(%v).Find(%v)", tree, key)
+        return fallback, fmt.Errorf("(%v).Find(%v)", tree, key)
     }
-    value, err := tree.Root.Find(key)
+    value, err := tree.Root.Find(key, tree.Fallback)
     if err != nil {
-        return ValueType{}, err
+        return tree.Fallback, err
     }
     return value, nil
 }
 
 func (tree *KeyTypeValueTypeTree) Pop() (KeyType, ValueType, error) {
     if tree.Root == nil {
-        return KeyType{}, ValueType{}, fmt.Errorf("(%v).Pop()", tree)
+        return KeyType{}, tree.Fallback, fmt.Errorf("(%v).Pop()", tree)
     }
     node, parent, err := tree.Root.Right.first(tree.Root)
     if err != nil {

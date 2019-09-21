@@ -20,8 +20,9 @@ func upperLower(segment geom.Segment) (geom.Pair, geom.Pair) {
 func BruteSweep(segments []geom.Segment) ([]geom.Pair, error) {
     points := make([]geom.Pair, 0)
     eventQueue := &bst.GeomPairLabelSegmentTree{
-        Equal: geom.PairEqual,
-        Less:  geom.PairLess,
+        Equal:    geom.PairEqual,
+        Less:     geom.PairLess,
+        Fallback: bst.LabelSegment{},
     }
     statusQueue := make(map[geom.Segment]interface{})
     for _, segment := range segments {
@@ -55,5 +56,48 @@ func BruteSweep(segments []geom.Segment) ([]geom.Pair, error) {
             delete(statusQueue, status.Segment)
         }
     }
+    return points, nil
+}
+
+func segmentEqual(l, r bst.PairSegment) bool {
+    return l == r
+}
+
+func segmentLess(l, r bst.PairSegment) bool {
+    var y float64
+    if l.Pair.Y < r.Pair.Y {
+        y = l.Pair.Y
+    } else {
+        y = r.Pair.Y
+    }
+    ml, bl, err := geom.SlopeIntercept(l.Segment)
+    if err != nil {
+        return false
+    }
+    mr, br, err := geom.SlopeIntercept(r.Segment)
+    if err != nil {
+        return true
+    }
+    xl := (y - bl) / ml
+    xr := (y - br) / mr
+    return xl < xr
+}
+
+func Sweet(segments []geom.Segment) ([]geom.Pair, error) {
+    points := make([]geom.Pair, 0)
+    eventQueue := &bst.GeomPairLabelSegmentTree{
+        Equal:    geom.PairEqual,
+        Less:     geom.PairLess,
+        Fallback: bst.LabelSegment{},
+    }
+    statusQueue := &bst.PairSegmentAnyTree{
+        Equal:    segmentEqual,
+        Less:     segmentLess,
+        Fallback: nil,
+    }
+    memo := make(map[geom.Segment]geom.Pair)
+    fmt.Println(eventQueue)
+    fmt.Println(statusQueue)
+    fmt.Println(memo)
     return points, nil
 }

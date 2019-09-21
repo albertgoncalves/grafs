@@ -38,8 +38,9 @@ var items = []GeomPairLabelSegmentTuple{
 
 func initTree() *GeomPairLabelSegmentTree {
     tree := &GeomPairLabelSegmentTree{
-        Equal: geom.PairEqual,
-        Less:  geom.PairLess,
+        Equal:    geom.PairEqual,
+        Less:     geom.PairLess,
+        Fallback: LabelSegment{},
     }
     for _, item := range items {
         tree.Insert(item.Key, item.Value)
@@ -65,13 +66,15 @@ func TestInsert(t *testing.T) {
 func TestFind(t *testing.T) {
     tree := initTree()
     for i := range items {
-        if value, err := tree.Find(items[i].Key); (value != items[i].Value) ||
+        value, err := tree.Find(items[i].Key, LabelSegment{})
+        if (value != items[i].Value) ||
             (err != nil) {
             t.Error("tree.Find(...)")
             break
         }
     }
-    if _, err := tree.Find(geom.Pair{X: 3.0, Y: 0.0}); err == nil {
+    _, err := tree.Find(geom.Pair{X: 3.0, Y: 0.0}, LabelSegment{})
+    if err == nil {
         t.Error("tree.Find(...)")
     }
 }
