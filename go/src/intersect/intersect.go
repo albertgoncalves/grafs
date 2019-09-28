@@ -84,7 +84,7 @@ func segmentLess(l, r bst.PairSegment) bool {
     }
     xl := (y - bl) / ml
     xr := (y - br) / mr
-    if math.Abs(xr-xl) < 0.001 {
+    if math.Abs(xr-xl) < 0.0000001 {
         return false
     }
     return xl < xr
