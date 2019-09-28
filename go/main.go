@@ -167,25 +167,29 @@ func main() {
         displayInfo("Segment Intersections (Brute)", out, *seed)
         rand.Seed(int64(*seed))
         segments := gen.RandomSegments(*n)
-        if points, err := intersect.BruteSweep(segments); err == nil {
-            p := initPlot()
-            p.Add(plotter.NewGrid())
-            addSegments(p, segments)
-            addPairs(p, points)
-            savePlot(p, out)
+        points, err := intersect.BruteSweep(segments)
+        if err != nil {
+            log.Fatal(err)
         }
+        p := initPlot()
+        p.Add(plotter.NewGrid())
+        addSegments(p, segments)
+        addPairs(p, points)
+        savePlot(p, out)
     }
     if flagProvided("i") {
         out := destination("sweep")
         displayInfo("Segment Intersections", out, *seed)
         rand.Seed(int64(*seed))
         segments := gen.RandomSegments(*n)
-        if points, err := intersect.Sweep(segments); err == nil {
-            p := initPlot()
-            p.Add(plotter.NewGrid())
-            addSegments(p, segments)
-            addPairs(p, points)
-            savePlot(p, out)
+        points, err := intersect.Sweep(segments)
+        if err != nil {
+            log.Fatal(err)
         }
+        p := initPlot()
+        p.Add(plotter.NewGrid())
+        addSegments(p, segments)
+        addPairs(p, points)
+        savePlot(p, out)
     }
 }

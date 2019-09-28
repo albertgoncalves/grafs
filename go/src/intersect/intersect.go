@@ -123,7 +123,10 @@ func Sweep(segments []geom.Segment) ([]geom.Pair, error) {
     for !eventQueue.Empty() {
         event, status, err := eventQueue.Pop()
         if err != nil {
-            return points, fmt.Errorf("Sweep(%v)", segments)
+            return points, fmt.Errorf(
+                "Sweep(%v) { eventQueue.Pop() }",
+                segments,
+            )
         }
         switch status.Label {
         case UPPER:
@@ -167,8 +170,17 @@ func Sweep(segments []geom.Segment) ([]geom.Pair, error) {
                 }
             }
         case LOWER:
+            first, ok := memo[status.First]
+            if !ok {
+                return points, fmt.Errorf(
+                    "Sweep(%v) { case LOWER: memo[%v] }",
+                    segments,
+                    status.First,
+                )
+            }
+            delete(memo, status.First)
             pairSegment := bst.PairSegment{
-                Pair:    memo[status.First],
+                Pair:    first,
                 Segment: status.First,
             }
             left, right, err := statusQueue.Neighbors(pairSegment)
@@ -192,13 +204,29 @@ func Sweep(segments []geom.Segment) ([]geom.Pair, error) {
                 }
             }
         case INTERSECTION:
+            first, ok := memo[status.First]
+            if !ok {
+                return points, fmt.Errorf(
+                    "Sweep(%v) { case INTERSECTION: memo[%v] }",
+                    segments,
+                    status.First,
+                )
+            }
+            second, ok := memo[status.Second]
+            if !ok {
+                return points, fmt.Errorf(
+                    "Sweep(%v) { case INTERSECTION: memo[%v] }",
+                    segments,
+                    status.Second,
+                )
+            }
             points = append(points, event)
             statusQueue.Delete(bst.PairSegment{
-                Pair:    memo[status.First],
+                Pair:    first,
                 Segment: status.First,
             })
             statusQueue.Delete(bst.PairSegment{
-                Pair:    memo[status.Second],
+                Pair:    second,
                 Segment: status.Second,
             })
             pairSegmentLeft := bst.PairSegment{
