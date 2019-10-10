@@ -8,9 +8,9 @@ import (
 )
 
 const (
-    UPPER        = 0
-    INTERSECTION = 1
-    LOWER        = 2
+    UPPER = iota
+    INTERSECTION
+    LOWER
 )
 
 func upperLower(segment geom.Segment) (geom.Pair, geom.Pair) {
