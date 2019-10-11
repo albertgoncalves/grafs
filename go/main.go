@@ -15,6 +15,7 @@ import (
     "log"
     "math/rand"
     "os"
+    "path/filepath"
 )
 
 const BOLD = "\033[1m"
@@ -115,7 +116,7 @@ func flagProvided(name string) bool {
 }
 
 func destination(handle string) string {
-    return fmt.Sprintf("%s/out/%s.png", os.Getenv("GOPATH"), handle)
+    return filepath.Join(os.Getenv("GOPATH"), "out", handle)
 }
 
 func displayInfo(header, out string, seed int) {
@@ -140,7 +141,7 @@ func main() {
     flag.Bool("i", false, "Sweep Intersections")
     flag.Parse()
     if flagProvided("d") {
-        out := destination("demo")
+        out := destination("demo.png")
         displayInfo("Plotting Demo", out, *seed)
         rand.Seed(int64(*seed))
         p := initPlot()
@@ -150,7 +151,7 @@ func main() {
         savePlot(p, out)
     }
     if flagProvided("c") {
-        out := destination("hull")
+        out := destination("hull.png")
         displayInfo("Convex Hull", out, *seed)
         rand.Seed(int64(*seed))
         points := gen.RandomPairs(*n)
@@ -163,7 +164,7 @@ func main() {
         savePlot(p, out)
     }
     if flagProvided("b") {
-        out := destination("brutesweep")
+        out := destination("brutesweep.png")
         displayInfo("Segment Intersections (Brute)", out, *seed)
         rand.Seed(int64(*seed))
         segments := gen.RandomSegments(*n)
@@ -178,7 +179,7 @@ func main() {
         savePlot(p, out)
     }
     if flagProvided("i") {
-        out := destination("sweep")
+        out := destination("sweep.png")
         displayInfo("Segment Intersections", out, *seed)
         rand.Seed(int64(*seed))
         segments := gen.RandomSegments(*n)
