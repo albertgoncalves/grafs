@@ -7,8 +7,7 @@ else
     alias open="xdg-open"
 fi
 
-export GOPATH
-GOPATH=$(pwd)
+export GOPATH=$PWD
 
 for f in "$GOPATH/out" "$GOPATH/bin"; do
     if [ ! -d "$f" ]; then
