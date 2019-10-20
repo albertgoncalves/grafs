@@ -9,9 +9,9 @@ fi
 
 export GOPATH=$PWD
 
-for f in "$GOPATH/out" "$GOPATH/bin"; do
-    if [ ! -d "$f" ]; then
-        mkdir "$f"
+for x in "$GOPATH/out" "$GOPATH/bin"; do
+    if [ ! -d "$x" ]; then
+        mkdir "$x"
     fi
 done
 

@@ -7,8 +7,7 @@ else
     alias open="xdg-open"
 fi
 
-export WD
-WD=$(pwd)
+export WD=$PWD
 
 if [ ! -d "$WD/out" ]; then
     mkdir "$WD/out"
