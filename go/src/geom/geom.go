@@ -64,8 +64,8 @@ func Ccw(a, b, c Pair) bool {
     return ((c.Y - a.Y) * (b.X - a.X)) > ((b.Y - a.Y) * (c.X - a.X))
 }
 
+/* https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection */
 func PointOfIntersection(a, b Segment) (Pair, error) {
-    // https://en.wikipedia.org/wiki/Line–line_intersection
     x1 := a.A.X
     x2 := a.B.X
     x3 := b.A.X
